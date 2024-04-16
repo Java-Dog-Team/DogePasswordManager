@@ -1,7 +1,10 @@
 package com.example.dogepasswordmanager
 
+import android.content.Context
 import android.media.Image
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -26,6 +29,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -35,8 +40,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -47,14 +57,16 @@ class MainPage : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            mainPage()
+            mainPage(this@MainPage)
         }
     }
 }
 
+//選項按鈕對應的物件
+var appData: AppData? = null
 
 @Composable
-fun mainPage() {
+fun mainPage(context: Context) {
     var dialogShowingFlag = remember { mutableStateOf(false) }
     //當前頁面名稱(密碼庫、密碼產生器、設定)
     var currentPageName = remember {
@@ -67,17 +79,17 @@ fun mainPage() {
 
     var lists = ArrayList<AppData>()
     lists.add(AppData(R.drawable.google_icon, "Google", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google", "test@gmail.com", "testPassword"))
+    lists.add(AppData(R.drawable.google_icon, "Google2", "test@gmail.com", "testPassword"))
+    lists.add(AppData(R.drawable.google_icon, "Google3", "test@gmail.com", "testPassword"))
+    lists.add(AppData(R.drawable.google_icon, "Google4", "test@gmail.com", "testPassword"))
+    lists.add(AppData(R.drawable.google_icon, "Google5", "test@gmail.com", "testPassword"))
+    lists.add(AppData(R.drawable.google_icon, "Google6", "test@gmail.com", "testPassword"))
+    lists.add(AppData(R.drawable.google_icon, "Google7", "test@gmail.com", "testPassword"))
+    lists.add(AppData(R.drawable.google_icon, "Google8", "test@gmail.com", "testPassword"))
+    lists.add(AppData(R.drawable.google_icon, "Google9", "test@gmail.com", "testPassword"))
+    lists.add(AppData(R.drawable.google_icon, "Google10", "test@gmail.com", "testPassword"))
+    lists.add(AppData(R.drawable.google_icon, "Google11", "test@gmail.com", "testPassword"))
+    lists.add(AppData(R.drawable.google_icon, "Google12", "test@gmail.com", "testPassword"))
 
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -126,8 +138,8 @@ fun mainPage() {
                         AppPassword = item.AppPassword,
                         dialogShowingFlag
                     )
-                    //顯示對話窗
-                    dialogWindow(item, dialogShowingFlag)
+
+
                 }
             }
         }
@@ -185,7 +197,6 @@ fun mainPage() {
                 )
                 Text(text = "密碼產生器")
             }
-
             //設定按鈕
             Column(horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -212,7 +223,8 @@ fun mainPage() {
 
     }
 
-
+    //顯示對話窗
+    dialogWindow(context, dialogShowingFlag)
 }
 
 //應用程式紀錄區塊
@@ -297,6 +309,7 @@ fun AppDataBlock(
                     .clickable {
                         //跳出對話框
                         dialogShowingState.value = true
+                        appData = AppData(AppImg, AppName, AppUsername, AppPassword)
                     }
             )
         }
@@ -305,11 +318,125 @@ fun AppDataBlock(
 
 }
 
+//按下選項按鈕後出現的對話窗
 @Composable
-fun dialogWindow(appData: AppData, dialogShowingState: MutableState<Boolean>) {
+fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
+    val clipboardManager: ClipboardManager = LocalClipboardManager.current
     if (dialogShowingState.value) {
+        //對話窗內容
         Dialog(onDismissRequest = { dialogShowingState.value = false }) {
-            Text(text = "TEst", fontSize = 100.sp)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(375.dp)
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
+                ),
+                shape = RectangleShape
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 5.dp, bottom = 20.dp),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    //應用程式名稱Title
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(0.5f)
+
+                    ) {
+                        Text(
+                            text = appData!!.AppName,
+                            fontSize = 25.sp,
+                            color = Color.Black,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 7.dp)
+                        )
+
+                    }
+                    //檢視帳號資訊
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .clickable() {
+
+                        }) {
+
+
+                        Text(
+                            text = "檢視帳號資訊",
+                            fontSize = 15.sp,
+                            color = Color.Black,
+                            modifier = Modifier.padding(start = 7.dp)
+                        )
+
+                    }
+                    //編輯帳號資訊
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .clickable() {
+
+                        }) {
+
+                        Text(
+                            text = "編輯帳號資訊",
+                            fontSize = 15.sp,
+                            color = Color.Black,
+                            modifier = Modifier.padding(start = 7.dp)
+                        )
+
+                    }
+                    //複製帳號
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .clickable() {
+                            //複製帳號到剪貼簿
+                            clipboardManager.setText(AnnotatedString(appData!!.AppUsername))
+                            //顯示複製成功訊息
+                            Toast
+                                .makeText(context, "複製成功", Toast.LENGTH_SHORT)
+                                .show()
+                        }) {
+
+                        Text(
+                            text = "複製帳號",
+                            fontSize = 15.sp,
+                            color = Color.Black,
+                            modifier = Modifier.padding(start = 7.dp)
+                        )
+
+
+                    }
+                    //複製密碼
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+
+                        .clickable() {
+                            //複製密碼到剪貼簿
+                            clipboardManager.setText(AnnotatedString(appData!!.AppPassword))
+                            //顯示複製成功訊息
+                            Toast
+                                .makeText(context, "複製成功", Toast.LENGTH_SHORT)
+                                .show()
+                        }) {
+
+                        Text(
+                            text = "複製密碼",
+                            fontSize = 15.sp,
+                            modifier = Modifier.padding(start = 7.dp)
+                        )
+
+
+                    }
+                }
+            }
 
         }
     }
