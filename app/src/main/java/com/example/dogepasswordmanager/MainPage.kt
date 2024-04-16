@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,7 +51,9 @@ fun mainPage() {
         mutableStateOf("密碼庫")
     }
 
-
+    var topLeftButtonVisibleFlag = remember {
+        mutableStateOf(true)
+    }
 
     var lists = ArrayList<String>()
     lists.add("test1")
@@ -89,36 +93,7 @@ fun mainPage() {
                 horizontalAlignment = Alignment.End
             ) {
 
-                Row {
-                    Column(modifier = Modifier.padding(start = 5.dp, end = 10.dp)) {
-                        //搜尋圖示
-                        Image(
-                            painter = painterResource(id = R.drawable.search),
-                            contentDescription = "Search Icon",
-                            modifier = Modifier
-                                .size(35.dp, 35.dp)
-                                .clickable() {
-                                    //搜尋按鈕按下後的操作
-                                }
-
-                        )
-                    }
-
-                    Column(modifier = Modifier.padding(start = 5.dp, end = 10.dp)) {
-                        //過濾圖示
-                        Image(
-                            painter = painterResource(id = R.drawable.filter),
-                            contentDescription = "Filter Icon",
-                            modifier = Modifier
-                                .size(35.dp, 35.dp)
-                                .clickable() {
-                                    //過濾按鈕按下後的操作
-                                }
-                        )
-                    }
-
-                }
-
+                topLeftFunctionButton(isVisible = topLeftButtonVisibleFlag.value)
 
             }
 
@@ -133,7 +108,7 @@ fun mainPage() {
                 .weight(8f)
                 .background(Color.White)
         ) {
-            LazyColumn {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
 
                 items(lists) { item ->
                     Text(text = item, fontSize = 50.sp)
@@ -160,6 +135,8 @@ fun mainPage() {
                     .clickable() {
                         //按下按鈕後處理
                         currentPageName.value = "密碼庫"
+                        //顯示左上角搜尋、過濾按鈕
+                        topLeftButtonVisibleFlag.value = true;
                     }) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(
@@ -179,7 +156,10 @@ fun mainPage() {
                     .fillMaxSize()
                     .border(1.dp, Color.LightGray)
                     .clickable() {
+                        //當前頁面名稱
                         currentPageName.value = "密碼產生器"
+                        //隱藏左上角搜尋、過濾按鈕
+                        topLeftButtonVisibleFlag.value = false;
                     }
             ) {
                 Image(
@@ -200,6 +180,8 @@ fun mainPage() {
                     .clickable() {
                         //按下按鈕後處理
                         currentPageName.value = "設定"
+                        //隱藏左上角搜尋、過濾按鈕
+                        topLeftButtonVisibleFlag.value = false;
                     }
             ) {
                 Image(
@@ -216,3 +198,45 @@ fun mainPage() {
 
 }
 
+
+//左上方功能按鈕(搜尋、過濾)
+@Composable
+fun topLeftFunctionButton(isVisible: Boolean) {
+    if (isVisible) {
+        Row {
+            Column(modifier = Modifier
+                .padding(start = 5.dp, end = 10.dp)
+                .clickable() {
+                    //搜尋按鈕按下後的操作
+                }) {
+
+                //搜尋圖示
+                Image(
+                    painter = painterResource(id = R.drawable.search),
+                    contentDescription = "Search Icon",
+                    modifier = Modifier
+                        .size(35.dp, 35.dp)
+
+
+                )
+            }
+
+            Column(modifier = Modifier
+                .padding(start = 5.dp, end = 10.dp)
+                .clickable() {
+                    //搜尋按鈕按下後的操作
+                }) {
+                //過濾圖示
+                Image(
+                    painter = painterResource(id = R.drawable.filter),
+                    contentDescription = "Filter Icon",
+                    modifier = Modifier
+                        .size(35.dp, 35.dp)
+
+                )
+            }
+
+        }
+    }
+
+}
