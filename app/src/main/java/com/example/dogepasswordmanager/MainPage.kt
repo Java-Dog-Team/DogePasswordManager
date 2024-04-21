@@ -1131,13 +1131,25 @@ fun generateSecurePassword(
     specialChar: Boolean = true
 ): String {
 
-    var charset = ""
+    var charset = arrayListOf<Char>()
 
 
     var upperLetterLst = ('A'..'Z').toList()
     var lowerLetterLst = ('a'..'z').toList()
     var digitLst = ('0'..'9').toList()
-    var specialCharLst = ("!@#\$%^&*").toList()
+
+    //!@#$%^&*
+    var specialCharLst =
+        arrayListOf<Char>(
+            '!',
+            '@',
+            '#',
+            '$',
+            '%',
+            '^',
+            '&',
+            '*'
+        )
 
     //用來避免沒有產生到某些使用者要求的符號
     var hasUpperCase = true
@@ -1149,7 +1161,7 @@ fun generateSecurePassword(
     //依照使用者需求生成密碼
     if (upperCase) {
         for (ch in 'A'..'Z') {
-            charset = charset.plus(ch)
+            charset.add(ch)
         }
 
         hasUpperCase = false
@@ -1157,20 +1169,27 @@ fun generateSecurePassword(
 
     if (lowerCase) {
         for (ch in 'a'..'z') {
-            charset = charset.plus(ch)
+            charset.add(ch)
         }
         hasLowerCase = false
     }
 
     if (digits) {
         for (ch in '0'..'9') {
-            charset = charset.plus(ch)
+            charset.add(ch)
         }
         hasDigit = false
     }
 
     if (specialChar) {
-        charset = charset.plus("!@#\$%^&*")
+        charset.add('!')
+        charset.add('@')
+        charset.add('#')
+        charset.add('$')
+        charset.add('%')
+        charset.add('^')
+        charset.add('&')
+        charset.add('*')
         hasSpecialChar = false
     }
 
@@ -1191,10 +1210,12 @@ fun generateSecurePassword(
             result = result.plus(specialCharLst[secureRandom.nextInt(specialCharLst.size)])
             hasSpecialChar = true
         } else {
-            result = result.plus(charset[secureRandom.nextInt(charset.length)])
+            result = result.plus(charset[secureRandom.nextInt(charset.size)])
         }
+
     }
 
+    Log.d("MSG", result)
 
     return result
 }
