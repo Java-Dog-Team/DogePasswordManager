@@ -1,14 +1,14 @@
 package com.example.dogepasswordmanager
 
 import android.app.Activity
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,7 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -38,12 +37,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.dogepasswordmanager.ui.theme.BrickRed
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.actionCodeSettings
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 //註冊頁面
 class RegisterPage : ComponentActivity() {
@@ -55,43 +55,30 @@ class RegisterPage : ComponentActivity() {
         //輸入格式錯誤(空白、不為正確格式)
         var FORMAT_ERROR = 1
 
-        //帳號太短
-        var USERNAME_TOO_SHORT = 2
-
 
         //正確
-        var OK = 4
+        var OK = 2
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = Firebase.auth
         setContent {
             registerPage(context = this@RegisterPage)
         }
     }
+
+
+
 }
 
+private lateinit var auth: FirebaseAuth
 
 //註冊頁面
 @Composable
 fun registerPage(context: Context) {
 
     val activity = LocalContext.current as? Activity
-
-    //使用者輸入帳號
-    var userInputUsername = remember {
-        mutableStateOf("")
-    }
-
-    //使用者輸入帳號是否有誤
-    var usernameError = remember {
-        mutableStateOf(false)
-    }
-
-    //帳號錯誤類型
-    var usernameErroType = remember {
-        mutableStateOf(RegisterPage.OK)
-    }
 
 
     //使用者輸入密碼
@@ -157,7 +144,8 @@ fun registerPage(context: Context) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                //帳號欄位
+
+                //電子郵件欄位
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -166,45 +154,25 @@ fun registerPage(context: Context) {
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
 
-                    TextField(
-                        value = userInputUsername.value,
-                        onValueChange = {
-                            userInputUsername.value = it
-                        },
-                        placeholder = {
-                            Text(text = "帳號")
-                        },
-                        singleLine = true,
-                        isError = usernameError.value,
+                    TextField(value = userInputEmail.value, onValueChange = {
+                        userInputEmail.value = it
+                    }, label = {
+                        Text(text = "電子郵件")
+                    }, singleLine = true,
+                        isError = emailError.value,
                         supportingText = {
-                            //沒有輸入帳號或帳號格式錯誤
-                            if (usernameErroType.value == RegisterPage.FORMAT_ERROR) {
+                            //錯誤訊息
+                            if (emailError.value) {
                                 Text(
-                                    text = "請確認帳號輸入",
+                                    text = "請確認是否為電子郵件格式",
                                     modifier = Modifier.fillMaxWidth(),
                                     color = BrickRed,
                                     fontSize = 15.sp
                                 )
 
-                            } else if (usernameErroType.value == RegisterPage.ALREADY_EXIST) {
-                                //帳號已存在
-                                Text(
-                                    text = "帳號已存在",
-                                    modifier = Modifier.fillMaxWidth(),
-                                    color = BrickRed,
-                                    fontSize = 15.sp
-                                )
-                            } else if (usernameErroType.value == RegisterPage.USERNAME_TOO_SHORT) {
-                                //帳號太短
-                                Text(
-                                    text = "帳號至少要3個字元",
-                                    modifier = Modifier.fillMaxWidth(),
-                                    color = BrickRed,
-                                    fontSize = 15.sp
-                                )
                             }
-                        }
-                    )
+                        })
+
                 }
 
                 //密碼欄位
@@ -224,7 +192,7 @@ fun registerPage(context: Context) {
                         singleLine = true,
                         visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        placeholder = { Text(text = "密碼") },
+                        label = { Text(text = "密碼") },
                         isError = passwordError.value,
                         supportingText = {
                             //錯誤訊息
@@ -290,7 +258,7 @@ fun registerPage(context: Context) {
                         singleLine = true,
                         visualTransformation = if (confirmedPasswordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        placeholder = { Text(text = "確認密碼") },
+                        label = { Text(text = "確認密碼") },
                         isError = confirmedPasswordError.value,
                         supportingText = {
                             //錯誤訊息
@@ -339,35 +307,6 @@ fun registerPage(context: Context) {
                     )
                 }
 
-                //電子郵件欄位
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp, bottom = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-
-                    TextField(value = userInputEmail.value, onValueChange = {
-                        userInputEmail.value = it
-                    }, placeholder = {
-                        Text(text = "電子郵件")
-                    }, singleLine = true,
-                        isError = emailError.value,
-                        supportingText = {
-                            //錯誤訊息
-                            if (emailError.value) {
-                                Text(
-                                    text = "請確認是否為電子郵件格式",
-                                    modifier = Modifier.fillMaxWidth(),
-                                    color = BrickRed,
-                                    fontSize = 15.sp
-                                )
-
-                            }
-                        })
-
-                }
 
             }
         }
@@ -396,21 +335,11 @@ fun registerPage(context: Context) {
 
                             //對所有輸入欄位進行檢查 以及 帳號存在性檢查
 
-                            //檢查帳號
-                            usernameErroType.value = checkUsername(userInputUsername.value)
-
-
-                            if (usernameErroType.value != RegisterPage.OK) {
-                                usernameError.value = true
-                            } else {
-                                usernameError.value = false
-                            }
-
 
                             //檢查密碼
                             passwordErrorType.value = checkPassword(userInputPassword.value)
 
-                            if (usernameErroType.value != RegisterPage.OK) {
+                            if (passwordErrorType.value != RegisterPage.OK) {
                                 passwordError.value = true
                             } else {
                                 passwordError.value = false
@@ -428,8 +357,15 @@ fun registerPage(context: Context) {
                             emailError.value = checkEmail(userInputEmail.value)
 
                             //全部欄位都沒發生錯誤
-                            if (!usernameError.value && !passwordError.value && !confirmedPasswordError.value && !emailError.value) {
-                                //前往驗證碼驗證頁面
+                            if (!passwordError.value && !confirmedPasswordError.value && !emailError.value) {
+                                //寄送驗證信到該使用者信箱中
+                                if (activity != null) {
+                                    sendAuthenticationMail(
+                                        activity = activity,
+                                        userInputEmail.value,
+                                        userInputPassword.value
+                                    )
+                                }
                             }
 
                         },
@@ -470,32 +406,6 @@ fun registerPage(context: Context) {
 }
 
 
-//檢查帳號
-fun checkUsername(username: String = ""): Int {
-
-    //要補一個帳號已經存在的檢查
-
-    //空字串
-    if (username.equals("")) {
-        return RegisterPage.FORMAT_ERROR
-    }
-
-    //帳號太短
-    if (username.length < 3) {
-        return RegisterPage.USERNAME_TOO_SHORT
-    }
-
-    var regex = "([a-zA-Z0-9]){3,18}".toRegex()
-    var result = regex.matches(username)
-
-    //輸入正確
-    if (result) {
-        return RegisterPage.OK
-    }
-    //輸入格式有誤
-    return RegisterPage.FORMAT_ERROR
-}
-
 //檢查電子郵件格式
 fun checkEmail(email: String = ""): Boolean {
     return !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
@@ -513,11 +423,38 @@ fun checkPassword(password: String): Int {
         "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~\$^+=<>]).{6,}\$".toRegex()
 
     var result = regex.matches(password)
-    Log.d("MSG", result.toString())
     //正確
     if (result)
         return RegisterPage.OK
 
     //格式錯誤
     return RegisterPage.FORMAT_ERROR
+}
+
+private fun sendAuthenticationMail(activity: Activity, email: String, password: String) {
+
+
+    auth.createUserWithEmailAndPassword(email, password)
+        .addOnCompleteListener(activity) { task ->
+            if (task.isSuccessful) {
+
+
+                //當前使用者資訊
+                val user = auth.currentUser
+
+                //寄送驗證信件
+                user!!.sendEmailVerification()
+
+                //跳轉至登入頁面
+                activity.finish()
+
+            } else {
+                Log.w(TAG, "createUserWithEmail:failure", task.exception)
+                Toast.makeText(
+                    activity,
+                    "帳號已存在",
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }
+        }
 }

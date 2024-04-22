@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "127028011890",
+    "project_id": "androiddogepasswordmanager",
+    "storage_bucket": "androiddogepasswordmanager.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:127028011890:android:eafdcd6748034e5fa2f3eb",
+        "android_client_info": {
+          "package_name": "com.example.dogepasswordmanager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvg1AE_SEkB8KkjuOS5OQ3bszvgXPTFeA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

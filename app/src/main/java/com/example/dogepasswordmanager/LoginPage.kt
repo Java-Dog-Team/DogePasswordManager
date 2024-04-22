@@ -1,8 +1,12 @@
 package com.example.dogepasswordmanager
 
+import android.app.Activity
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -20,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -29,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,20 +43,46 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = Firebase.auth
         setContent {
             loginPage(context = this@MainActivity)
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+        val currentUser = auth.currentUser
+    }
+
 }
 
+private lateinit var auth: FirebaseAuth
 
 //登入頁面
 @Composable
 fun loginPage(context: Context) {
+
+    val activity = LocalContext.current as Activity
+
+    //使用者帳號是否輸入有誤
+    var usernameError = remember {
+        mutableStateOf(false)
+    }
+
+    //使用者密碼是否輸入有誤
+    var passwordError = remember {
+        mutableStateOf(false)
+    }
+
 
     //使用者輸入帳號
     var userInputUsername = remember {
@@ -102,20 +134,30 @@ fun loginPage(context: Context) {
 
                 //帳號輸入
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp, bottom = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    //顯示帳號文字
-                    Text(text = "帳號", fontSize = 30.sp)
+
                     //帳號輸入框
                     TextField(
                         value = userInputUsername.value,
-                        placeholder = { Text(text = "請輸入帳號") },
+                        label = { Text(text = "電子郵件") },
                         singleLine = true,
                         onValueChange = {
                             userInputUsername.value = it
-                        })
+                        },
+                        isError = usernameError.value,
+                        supportingText = {
+                            if (usernameError.value)
+                                Text(
+                                    text = "請檢查電子郵件輸入",
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                        }
+                    )
                 }
 
                 //密碼輸入
@@ -125,8 +167,6 @@ fun loginPage(context: Context) {
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
 
-                    //顯示密碼文字
-                    Text(text = "密碼", fontSize = 30.sp)
 
                     //密碼輸入欄位
                     TextField(
@@ -134,7 +174,7 @@ fun loginPage(context: Context) {
                         singleLine = true,
                         visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        placeholder = { Text(text = "請輸入密碼") },
+                        label = { Text(text = "密碼") },
                         trailingIcon = {
                             //可以看到密碼
                             if (passwordVisible.value) {
@@ -165,6 +205,14 @@ fun loginPage(context: Context) {
                         onValueChange = {
                             userInputPassword.value = it
                         },
+                        isError = passwordError.value,
+                        supportingText = {
+                            if (passwordError.value)
+                                Text(
+                                    text = "請檢查密碼輸入",
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                        }
                     )
                 }
 
@@ -178,6 +226,28 @@ fun loginPage(context: Context) {
                     Button(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp),
                         onClick = {
                             //按下登入按鈕後的操作
+
+
+                            //檢查帳密是否有誤 有誤:顯示錯誤文字
+                            if (userInputPassword.value == "") {
+                                passwordError.value = true
+                            } else {
+                                passwordError.value = false
+                            }
+                            if (userInputUsername.value == "") {
+                                usernameError.value = true
+                            } else {
+                                usernameError.value = false
+                            }
+
+                            //檢查輸入無誤: 檢查帳號密碼是否正確以及電子郵件是否驗證
+                            if (userInputUsername.value != "" && userInputPassword.value != "") {
+                                passwordError.value = false
+                                usernameError.value = false
+                                LogIn(activity, userInputUsername.value, userInputPassword.value)
+                            }
+
+
                         }) {
                         //登入按鈕文字
                         Text(text = "登入", fontSize = 20.sp)
@@ -185,6 +255,7 @@ fun loginPage(context: Context) {
                 }
 
 
+                //註冊、修改密碼
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -257,3 +328,41 @@ fun loginPage(context: Context) {
 
 }
 
+private fun LogIn(activity: Activity, email: String, password: String) {
+    auth.signInWithEmailAndPassword(email, password)
+        .addOnCompleteListener(activity) { task ->
+            //登入成功後 檢查電子郵件是否驗證
+            if (task.isSuccessful) {
+                // Sign in success, update UI with the signed-in user's information
+                Log.d(TAG, "signInWithEmail:success " + email)
+                val user = auth.currentUser
+                //使用者已驗證過電子郵件
+                if (user!!.isEmailVerified) {
+                    //導向主頁面
+
+                    var intent = Intent()
+                    intent.setClass(
+                        activity,
+                        MainPage::class.java
+                    )
+                    //開啟主頁面
+                    activity.startActivity(intent)
+                    //關閉登入頁面
+                    activity.finish()
+                } else {
+
+                    //信箱尚未驗證
+                    Toast.makeText(activity, "信箱尚未驗證", Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+            } else {
+
+                //登入帳密有誤
+                Toast.makeText(activity, "輸入帳密有誤", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+
+
+}

@@ -83,6 +83,9 @@ import com.example.dogepasswordmanager.ui.theme.BackGroundColor
 import com.example.dogepasswordmanager.ui.theme.BrickRed
 import com.example.dogepasswordmanager.ui.theme.ItemColor
 import com.example.dogepasswordmanager.ui.theme.digitsColor
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import java.security.SecureRandom
 
 
@@ -96,6 +99,10 @@ class MainPage : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = Firebase.auth
+        //獲取使用者電子郵件
+        val userEmail = auth.currentUser?.email
+
         setContent {
             mainPage(this@MainPage)
         }
@@ -104,6 +111,7 @@ class MainPage : ComponentActivity() {
 
 //選項按鈕對應的物件
 var appData: AppData? = null
+private lateinit var auth: FirebaseAuth
 
 @Composable
 fun mainPage(context: Context) {
@@ -121,26 +129,9 @@ fun mainPage(context: Context) {
         mutableStateOf(true)
     }
 
+    //使用者紀錄資訊
     var lists = ArrayList<AppData>()
-    lists.add(
-        AppData(
-            R.drawable.google_icon,
-            "Google",
-            "test@gma11111111111111111111111111il.com",
-            "testPassword"
-        )
-    )
-    lists.add(AppData(R.drawable.google_icon, "Google2", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google3", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google4", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google5", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google6", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google7", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google8", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google9", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google10", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google11", "test@gmail.com", "testPassword"))
-    lists.add(AppData(R.drawable.google_icon, "Google12", "test@gmail.com", "testPassword"))
+
 
 
     Column(
@@ -169,8 +160,7 @@ fun mainPage(context: Context) {
             }
             //功能圖示
             Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.End
+                modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End
             ) {
 
                 topLeftFunctionButton(isVisible = topLeftButtonVisibleFlag.value)
@@ -236,9 +226,7 @@ fun mainPage(context: Context) {
                         colorFilter = ColorFilter.tint(Color.Gray)
                     )
                     Text(
-                        text = "密碼庫",
-                        color = Color.Gray,
-                        modifier = Modifier.padding(top = 5.dp)
+                        text = "密碼庫", color = Color.Gray, modifier = Modifier.padding(top = 5.dp)
                     )
                 }
 
@@ -257,8 +245,7 @@ fun mainPage(context: Context) {
                         topLeftButtonVisibleFlag.value = false;
                         //切換顯示密碼產生器頁面
                         showingPage.value = MainPage.PASSWORD_GEN
-                    }
-            ) {
+                    }) {
                 Image(
                     painter = painterResource(id = R.drawable.sync),
                     contentDescription = "Generate Password Icon",
@@ -266,9 +253,7 @@ fun mainPage(context: Context) {
                     colorFilter = ColorFilter.tint(Color.Gray)
                 )
                 Text(
-                    text = "密碼產生器",
-                    color = Color.Gray,
-                    modifier = Modifier.padding(top = 5.dp)
+                    text = "密碼產生器", color = Color.Gray, modifier = Modifier.padding(top = 5.dp)
                 )
             }
             //設定按鈕
@@ -285,8 +270,7 @@ fun mainPage(context: Context) {
                         topLeftButtonVisibleFlag.value = false;
                         //切換顯示設定頁面
                         showingPage.value = MainPage.SETTING
-                    }
-            ) {
+                    }) {
                 Image(
                     painter = painterResource(id = R.drawable.settings),
                     contentDescription = "Setting Icon",
@@ -316,7 +300,8 @@ fun passwordRoom(lists: ArrayList<AppData>, dialogShowingFlag: MutableState<Bool
             items(lists) { item ->
 
                 AppDataBlock(
-                    AppImg = item.AppImg,
+                    //這裡要改
+                    AppImg = 1,
                     AppName = item.AppName,
                     AppUsername = item.AppUsername,
                     AppPassword = item.AppPassword,
@@ -327,17 +312,17 @@ fun passwordRoom(lists: ArrayList<AppData>, dialogShowingFlag: MutableState<Bool
             }
         }
         //新增記錄按鈕
-        FloatingActionButton(
-            containerColor = ItemColor,
+        FloatingActionButton(containerColor = ItemColor,
             contentColor = Color.White,
             shape = CircleShape,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(20.dp), onClick = {
+                .padding(20.dp),
+            onClick = {
 
                 //按下新增按鈕後的操作
-            }
-        ) {
+
+            }) {
 
             Icon(Icons.Filled.Add, "Floating Action Button")
 
@@ -356,8 +341,7 @@ fun passwordGeneratorPage(context: Context) {
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
 
     //產生的密碼
-    var gen_password =
-        remember { mutableStateOf(generateSecurePassword()) }
+    var gen_password = remember { mutableStateOf(generateSecurePassword()) }
 
     //滑條選定的值
     var sliderPosition = remember {
@@ -480,8 +464,7 @@ fun passwordGeneratorPage(context: Context) {
                     )
                     //滑條
                     Slider(
-                        value = sliderPosition.value,
-                        onValueChange = {
+                        value = sliderPosition.value, onValueChange = {
                             //使用者調整欲生成的密碼長度過程，產生新的密碼並顯示在頁面上
                             sliderPosition.value = it
                             //生成新的密碼
@@ -492,11 +475,8 @@ fun passwordGeneratorPage(context: Context) {
                                 digits.value,
                                 specialChar.value
                             )
-                        },
-                        valueRange = 8f..128f,
-                        colors = SliderDefaults.colors(
-                            thumbColor = Color.LightGray,
-                            activeTrackColor = ItemColor
+                        }, valueRange = 8f..128f, colors = SliderDefaults.colors(
+                            thumbColor = Color.LightGray, activeTrackColor = ItemColor
                         )
                     )
                 }
@@ -538,45 +518,41 @@ fun passwordGeneratorPage(context: Context) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
-                        Switch(
-                            checked = upperCaseLetter.value,
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = ItemColor,
-                                uncheckedThumbColor = Color.LightGray,
-                                uncheckedTrackColor = Color.DarkGray,
-                            ), onCheckedChange = {
+                        Switch(checked = upperCaseLetter.value, colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = ItemColor,
+                            uncheckedThumbColor = Color.LightGray,
+                            uncheckedTrackColor = Color.DarkGray,
+                        ), onCheckedChange = {
 
-                                upperCaseLetter.value = it
+                            upperCaseLetter.value = it
 
-                                //避免所有選項都關閉(至少強制打開小寫字母)
-                                if (!upperCaseLetter.value && !lowerCaseLetter.value && !digits.value && !specialChar.value) {
-                                    lowerCaseLetter.value = true
-                                }
-
-                                //生成新的密碼
-                                gen_password.value = generateSecurePassword(
-                                    sliderPosition.value.toInt(),
-                                    upperCaseLetter.value,
-                                    lowerCaseLetter.value,
-                                    digits.value,
-                                    specialChar.value
-                                )
-                            },
-                            thumbContent = {
-                                //選擇時，在thumb上出現打勾圖案
-                                if (upperCaseLetter.value) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Check,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(SwitchDefaults.IconSize)
-                                    )
-                                } else {
-                                    null
-                                }
-
+                            //避免所有選項都關閉(至少強制打開小寫字母)
+                            if (!upperCaseLetter.value && !lowerCaseLetter.value && !digits.value && !specialChar.value) {
+                                lowerCaseLetter.value = true
                             }
-                        )
+
+                            //生成新的密碼
+                            gen_password.value = generateSecurePassword(
+                                sliderPosition.value.toInt(),
+                                upperCaseLetter.value,
+                                lowerCaseLetter.value,
+                                digits.value,
+                                specialChar.value
+                            )
+                        }, thumbContent = {
+                            //選擇時，在thumb上出現打勾圖案
+                            if (upperCaseLetter.value) {
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
+                                )
+                            } else {
+                                null
+                            }
+
+                        })
                     }
 
                 }
@@ -600,43 +576,41 @@ fun passwordGeneratorPage(context: Context) {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Switch(checked = lowerCaseLetter.value,
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = ItemColor,
-                                uncheckedThumbColor = Color.LightGray,
-                                uncheckedTrackColor = Color.DarkGray,
-                            ), onCheckedChange = {
+                        Switch(checked = lowerCaseLetter.value, colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = ItemColor,
+                            uncheckedThumbColor = Color.LightGray,
+                            uncheckedTrackColor = Color.DarkGray,
+                        ), onCheckedChange = {
 
-                                lowerCaseLetter.value = it
+                            lowerCaseLetter.value = it
 
-                                //避免所有選項都關閉(至少強制打開小寫字母)
-                                if (!upperCaseLetter.value && !lowerCaseLetter.value && !digits.value && !specialChar.value) {
-                                    lowerCaseLetter.value = true
-                                }
+                            //避免所有選項都關閉(至少強制打開小寫字母)
+                            if (!upperCaseLetter.value && !lowerCaseLetter.value && !digits.value && !specialChar.value) {
+                                lowerCaseLetter.value = true
+                            }
 
-                                //生成新的密碼
-                                gen_password.value = generateSecurePassword(
-                                    sliderPosition.value.toInt(),
-                                    upperCaseLetter.value,
-                                    lowerCaseLetter.value,
-                                    digits.value,
-                                    specialChar.value
+                            //生成新的密碼
+                            gen_password.value = generateSecurePassword(
+                                sliderPosition.value.toInt(),
+                                upperCaseLetter.value,
+                                lowerCaseLetter.value,
+                                digits.value,
+                                specialChar.value
+                            )
+                        }, thumbContent = {
+                            //選擇時，在thumb上出現打勾圖案
+                            if (lowerCaseLetter.value) {
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
                                 )
-                            },
-                            thumbContent = {
-                                //選擇時，在thumb上出現打勾圖案
-                                if (lowerCaseLetter.value) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Check,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(SwitchDefaults.IconSize)
-                                    )
-                                } else {
-                                    null
-                                }
+                            } else {
+                                null
+                            }
 
-                            })
+                        })
                     }
 
                 }
@@ -662,43 +636,41 @@ fun passwordGeneratorPage(context: Context) {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Switch(checked = digits.value,
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = ItemColor,
-                                uncheckedThumbColor = Color.LightGray,
-                                uncheckedTrackColor = Color.DarkGray,
-                            ), onCheckedChange = {
+                        Switch(checked = digits.value, colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = ItemColor,
+                            uncheckedThumbColor = Color.LightGray,
+                            uncheckedTrackColor = Color.DarkGray,
+                        ), onCheckedChange = {
 
-                                digits.value = it
+                            digits.value = it
 
-                                //避免所有選項都關閉(至少強制打開小寫字母)
-                                if (!upperCaseLetter.value && !lowerCaseLetter.value && !digits.value && !specialChar.value) {
-                                    lowerCaseLetter.value = true
-                                }
+                            //避免所有選項都關閉(至少強制打開小寫字母)
+                            if (!upperCaseLetter.value && !lowerCaseLetter.value && !digits.value && !specialChar.value) {
+                                lowerCaseLetter.value = true
+                            }
 
-                                //生成新的密碼
-                                gen_password.value = generateSecurePassword(
-                                    sliderPosition.value.toInt(),
-                                    upperCaseLetter.value,
-                                    lowerCaseLetter.value,
-                                    digits.value,
-                                    specialChar.value
+                            //生成新的密碼
+                            gen_password.value = generateSecurePassword(
+                                sliderPosition.value.toInt(),
+                                upperCaseLetter.value,
+                                lowerCaseLetter.value,
+                                digits.value,
+                                specialChar.value
+                            )
+                        }, thumbContent = {
+                            //選擇時，在thumb上出現打勾圖案
+                            if (digits.value) {
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
                                 )
-                            },
-                            thumbContent = {
-                                //選擇時，在thumb上出現打勾圖案
-                                if (digits.value) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Check,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(SwitchDefaults.IconSize)
-                                    )
-                                } else {
-                                    null
-                                }
+                            } else {
+                                null
+                            }
 
-                            })
+                        })
                     }
 
                 }
@@ -725,43 +697,41 @@ fun passwordGeneratorPage(context: Context) {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Switch(checked = specialChar.value,
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = ItemColor,
-                                uncheckedThumbColor = Color.LightGray,
-                                uncheckedTrackColor = Color.DarkGray,
-                            ), onCheckedChange = {
+                        Switch(checked = specialChar.value, colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = ItemColor,
+                            uncheckedThumbColor = Color.LightGray,
+                            uncheckedTrackColor = Color.DarkGray,
+                        ), onCheckedChange = {
 
-                                specialChar.value = it
+                            specialChar.value = it
 
-                                //避免所有選項都關閉(至少強制打開小寫字母)
-                                if (!upperCaseLetter.value && !lowerCaseLetter.value && !digits.value && !specialChar.value) {
-                                    lowerCaseLetter.value = true
-                                }
+                            //避免所有選項都關閉(至少強制打開小寫字母)
+                            if (!upperCaseLetter.value && !lowerCaseLetter.value && !digits.value && !specialChar.value) {
+                                lowerCaseLetter.value = true
+                            }
 
-                                //生成新的密碼
-                                gen_password.value = generateSecurePassword(
-                                    sliderPosition.value.toInt(),
-                                    upperCaseLetter.value,
-                                    lowerCaseLetter.value,
-                                    digits.value,
-                                    specialChar.value
+                            //生成新的密碼
+                            gen_password.value = generateSecurePassword(
+                                sliderPosition.value.toInt(),
+                                upperCaseLetter.value,
+                                lowerCaseLetter.value,
+                                digits.value,
+                                specialChar.value
+                            )
+                        }, thumbContent = {
+                            //選擇時，在thumb上出現打勾圖案
+                            if (specialChar.value) {
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(SwitchDefaults.IconSize)
                                 )
-                            },
-                            thumbContent = {
-                                //選擇時，在thumb上出現打勾圖案
-                                if (specialChar.value) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Check,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(SwitchDefaults.IconSize)
-                                    )
-                                } else {
-                                    null
-                                }
+                            } else {
+                                null
+                            }
 
-                            })
+                        })
                     }
 
                 }
@@ -820,8 +790,7 @@ fun AppDataBlock(
             Row(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxSize(),
-                verticalAlignment = Alignment.Top
+                    .fillMaxSize(), verticalAlignment = Alignment.Top
             ) {
                 Text(
                     text = AppName,
@@ -851,15 +820,15 @@ fun AppDataBlock(
         //選項按鈕
         Column(
             horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Center, modifier = Modifier
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
                 .padding(end = 20.dp)
         ) {
 
             //選項按鈕Icon
-            Image(
-                painter = painterResource(id = R.drawable.option),
+            Image(painter = painterResource(id = R.drawable.option),
                 contentDescription = "Option Icon",
                 colorFilter = ColorFilter.tint(Color.LightGray),
                 modifier = Modifier
@@ -868,9 +837,10 @@ fun AppDataBlock(
                     .clickable {
                         //跳出對話框
                         dialogShowingState.value = true
-                        appData = AppData(AppImg, AppName, AppUsername, AppPassword)
-                    }
-            )
+
+//                        appData = AppData(AppImg, AppName, AppUsername, AppPassword)
+
+                    })
         }
     }
 
@@ -906,7 +876,8 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
                 ) {
                     //應用程式名稱Title
                     Row(
-                        verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
                             .fillMaxWidth()
                             .weight(0.5f)
 
@@ -928,20 +899,20 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
                             .weight(0.5f)
                     ) {
                         Divider(
-                            color = Color.LightGray,
-                            thickness = 1.dp
+                            color = Color.LightGray, thickness = 1.dp
                         )
 
 
                     }
 
                     //檢視帳號資訊
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .clickable() {
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .clickable() {
 
-                        }) {
+                            }) {
 
 
                         Text(
@@ -953,12 +924,13 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
 
                     }
                     //編輯帳號資訊
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .clickable() {
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .clickable() {
 
-                        }) {
+                            }) {
 
                         Text(
                             text = "編輯帳號資訊",
@@ -969,17 +941,18 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
 
                     }
                     //複製帳號
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .clickable() {
-                            //複製帳號到剪貼簿
-                            clipboardManager.setText(AnnotatedString(appData!!.AppUsername))
-                            //顯示複製成功訊息
-                            Toast
-                                .makeText(context, "複製成功", Toast.LENGTH_SHORT)
-                                .show()
-                        }) {
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .clickable() {
+                                //複製帳號到剪貼簿
+                                clipboardManager.setText(AnnotatedString(appData!!.AppUsername))
+                                //顯示複製成功訊息
+                                Toast
+                                    .makeText(context, "複製成功", Toast.LENGTH_SHORT)
+                                    .show()
+                            }) {
 
                         Text(
                             text = "複製帳號",
@@ -991,18 +964,19 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
 
                     }
                     //複製密碼
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
 
-                        .clickable() {
-                            //複製密碼到剪貼簿
-                            clipboardManager.setText(AnnotatedString(appData!!.AppPassword))
-                            //顯示複製成功訊息
-                            Toast
-                                .makeText(context, "複製成功", Toast.LENGTH_SHORT)
-                                .show()
-                        }) {
+                            .clickable() {
+                                //複製密碼到剪貼簿
+                                clipboardManager.setText(AnnotatedString(appData!!.AppPassword))
+                                //顯示複製成功訊息
+                                Toast
+                                    .makeText(context, "複製成功", Toast.LENGTH_SHORT)
+                                    .show()
+                            }) {
 
                         Text(
                             text = "複製密碼",
@@ -1073,8 +1047,7 @@ fun showGeneratePassword(gen_password: String) {
         },
         textAlign = TextAlign.Justify,
         maxLines = 15,
-        modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp)
+        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
     )
 }
 
@@ -1093,8 +1066,7 @@ fun topLeftFunctionButton(isVisible: Boolean) {
                 Image(
                     painter = painterResource(id = R.drawable.search),
                     contentDescription = "Search Icon",
-                    modifier = Modifier
-                        .size(35.dp, 35.dp),
+                    modifier = Modifier.size(35.dp, 35.dp),
                     colorFilter = ColorFilter.tint(Color.White)
 
 
@@ -1110,8 +1082,7 @@ fun topLeftFunctionButton(isVisible: Boolean) {
                 Image(
                     painter = painterResource(id = R.drawable.filter),
                     contentDescription = "Filter Icon",
-                    modifier = Modifier
-                        .size(35.dp, 35.dp),
+                    modifier = Modifier.size(35.dp, 35.dp),
                     colorFilter = ColorFilter.tint(Color.White)
 
                 )
@@ -1139,17 +1110,9 @@ fun generateSecurePassword(
     var digitLst = ('0'..'9').toList()
 
     //!@#$%^&*
-    var specialCharLst =
-        arrayListOf<Char>(
-            '!',
-            '@',
-            '#',
-            '$',
-            '%',
-            '^',
-            '&',
-            '*'
-        )
+    var specialCharLst = arrayListOf<Char>(
+        '!', '@', '#', '$', '%', '^', '&', '*'
+    )
 
     //用來避免沒有產生到某些使用者要求的符號
     var hasUpperCase = true
