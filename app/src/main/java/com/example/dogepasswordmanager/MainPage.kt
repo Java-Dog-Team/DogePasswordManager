@@ -1,8 +1,12 @@
 package com.example.dogepasswordmanager
 
+import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Intent
 import android.graphics.drawable.Icon
 import android.media.Image
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -51,10 +55,13 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -79,13 +86,16 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import coil.compose.rememberAsyncImagePainter
 import com.example.dogepasswordmanager.ui.theme.BackGroundColor
 import com.example.dogepasswordmanager.ui.theme.BrickRed
 import com.example.dogepasswordmanager.ui.theme.ItemColor
 import com.example.dogepasswordmanager.ui.theme.digitsColor
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.storage
 import java.security.SecureRandom
 
 
@@ -98,21 +108,50 @@ class MainPage : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
+
         auth = Firebase.auth
-        //獲取使用者電子郵件
-        val userEmail = auth.currentUser?.email
+
+        userMail = auth.currentUser?.email.toString()
+
+
 
         setContent {
             mainPage(this@MainPage)
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+        //載入使用者紀錄
+        loadUserData()
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
 }
 
 //選項按鈕對應的物件
 var appData: AppData? = null
-private lateinit var auth: FirebaseAuth
 
+private lateinit var auth: FirebaseAuth
+private lateinit var userMail: String
+
+//使用者紀錄資訊
+var lists = mutableStateListOf<AppData?>()
+
+//firebase 儲存空間物件
+private val storage = com.google.firebase.Firebase.storage
+
+//儲存空間根目錄參考
+private val root = storage.reference
+
+//根目錄->images資料夾
+private var imageRef = root.child("images")
+
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun mainPage(context: Context) {
 
@@ -129,8 +168,7 @@ fun mainPage(context: Context) {
         mutableStateOf(true)
     }
 
-    //使用者紀錄資訊
-    var lists = ArrayList<AppData>()
+
 
 
 
@@ -181,8 +219,14 @@ fun mainPage(context: Context) {
 
 
             if (showingPage.value == MainPage.PASSWORD_ROOM) {
+
+
                 //密碼庫頁面
-                passwordRoom(lists = lists, dialogShowingFlag = dialogShowingFlag)
+                passwordRoom(
+                    context,
+                    dialogShowingFlag = dialogShowingFlag
+                )
+
             } else if (showingPage.value == MainPage.PASSWORD_GEN) {
                 //密碼產生器頁面
                 passwordGeneratorPage(context)
@@ -291,7 +335,10 @@ fun mainPage(context: Context) {
 
 //密碼庫頁面
 @Composable
-fun passwordRoom(lists: ArrayList<AppData>, dialogShowingFlag: MutableState<Boolean>) {
+fun passwordRoom(
+    context: Context,
+    dialogShowingFlag: MutableState<Boolean>
+) {
 
     Box {
 
@@ -300,17 +347,14 @@ fun passwordRoom(lists: ArrayList<AppData>, dialogShowingFlag: MutableState<Bool
             items(lists) { item ->
 
                 AppDataBlock(
-                    //這裡要改
-                    AppImg = 1,
-                    AppName = item.AppName,
-                    AppUsername = item.AppUsername,
-                    AppPassword = item.AppPassword,
+                    item!!,
                     dialogShowingFlag
                 )
 
 
             }
         }
+
         //新增記錄按鈕
         FloatingActionButton(containerColor = ItemColor,
             contentColor = Color.White,
@@ -321,7 +365,10 @@ fun passwordRoom(lists: ArrayList<AppData>, dialogShowingFlag: MutableState<Bool
             onClick = {
 
                 //按下新增按鈕後的操作
-
+                var intent = Intent()
+                intent.setClass(context, AddRecordActivity::class.java)
+                intent.putExtra("email", userMail)
+                context.startActivity(intent)
             }) {
 
             Icon(Icons.Filled.Add, "Floating Action Button")
@@ -745,12 +792,10 @@ fun passwordGeneratorPage(context: Context) {
 //應用程式紀錄區塊
 @Composable
 fun AppDataBlock(
-    AppImg: Int,
-    AppName: String,
-    AppUsername: String,
-    AppPassword: String,
+    userAppData: AppData,
     dialogShowingState: MutableState<Boolean>
 ) {
+
 
     Row(
         modifier = Modifier
@@ -768,16 +813,41 @@ fun AppDataBlock(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+
             //App Icon圖片
-            Image(
-                painter = painterResource(id = AppImg),
-                contentDescription = AppName,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
-                    .border(1.dp, Color.LightGray, CircleShape)
-            )
+            //此應用程式圖示為使用者自訂
+            if (userAppData.AppImgId != "") {
+                var img = remember {
+                    mutableStateOf<Uri?>(null)
+                }
+                imageRef.child(userMail + "/" + userAppData.AppImgId + ".jpg").downloadUrl.addOnCompleteListener { result ->
+                    img.value = result.result
+                }
+                //App Icon預設圖片
+                Image(
+                    painter = rememberAsyncImagePainter(model = img.value),
+                    contentDescription = "App Icon",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .border(1.dp, Color.LightGray, CircleShape)
+                )
+            } else {
+                //App Icon預設圖片
+                Image(
+                    painter = painterResource(id = R.drawable.default_icon),
+                    contentDescription = "App Icon",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .border(1.dp, Color.LightGray, CircleShape)
+                )
+            }
+
+
         }
         //App資訊顯示區塊
         Column(
@@ -793,7 +863,7 @@ fun AppDataBlock(
                     .fillMaxSize(), verticalAlignment = Alignment.Top
             ) {
                 Text(
-                    text = AppName,
+                    text = userAppData.AppName,
                     fontSize = 26.sp,
                     fontFamily = FontFamily.Serif,
                     overflow = TextOverflow.Ellipsis
@@ -808,7 +878,7 @@ fun AppDataBlock(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = AppUsername,
+                    text = userAppData.AppUsername,
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Serif,
                     color = Color.DarkGray,
@@ -838,7 +908,7 @@ fun AppDataBlock(
                         //跳出對話框
                         dialogShowingState.value = true
 
-//                        appData = AppData(AppImg, AppName, AppUsername, AppPassword)
+                        appData = userAppData
 
                     })
         }
@@ -1181,4 +1251,34 @@ fun generateSecurePassword(
     Log.d("MSG", result)
 
     return result
+}
+
+
+fun loadUserData() {
+
+    lists.clear()
+
+    val db = Firebase.firestore
+    var docRef = db.collection(userMail)
+
+    docRef.get()
+        .addOnSuccessListener { document ->
+            for (data in document) {
+                val detailData = data.getData()
+                lists!!.add(
+                    AppData(
+                        DataId = detailData.get("dataId").toString(),
+                        userEmail = detailData.get("userEmail").toString(),
+                        AppImgId = detailData.get("appImgId").toString(),
+                        AppName = detailData.get("appName").toString(),
+                        AppUsername = detailData.get("appUsername").toString(),
+                        AppPassword = detailData.get("appPassword").toString()
+                    )
+                )
+            }
+        }.addOnFailureListener { exception ->
+            Log.w(TAG, "Error getting documents: ", exception)
+        }
+
+
 }
