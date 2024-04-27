@@ -997,6 +997,8 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
                                 intent.putExtra(MainPage.APP_PASSWORD, appData!!.AppPassword)
                                 intent.putExtra(MainPage.APP_USERNAME, appData!!.AppUsername)
                                 context.startActivity(intent)
+
+                                dialogShowingState.value = false
                             }) {
 
 
@@ -1014,6 +1016,8 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
                             .fillMaxWidth()
                             .weight(1f)
                             .clickable() {
+
+                                dialogShowingState.value = false
 
                             }) {
 
