@@ -102,9 +102,14 @@ import java.security.SecureRandom
 class MainPage : ComponentActivity() {
 
     companion object {
-        var PASSWORD_ROOM = 0
-        var PASSWORD_GEN = 1
-        var SETTING = 2
+        val PASSWORD_ROOM = 0
+        val PASSWORD_GEN = 1
+        val SETTING = 2
+        val APP_NAME = "appName"
+        val APP_USERNAME = "appUsername"
+        val APP_PASSWORD = "appPassword"
+        val DATA_ID = "dataId"
+        var APP_IMG_ID = "appImgId"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -134,7 +139,7 @@ class MainPage : ComponentActivity() {
 }
 
 //選項按鈕對應的物件
-var appData: AppData? = null
+private var appData: AppData? = null
 
 private lateinit var auth: FirebaseAuth
 private lateinit var userMail: String
@@ -981,7 +986,17 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
                             .fillMaxWidth()
                             .weight(1f)
                             .clickable() {
+                                //按下檢視帳號資訊按鈕後的動作
 
+                                //顯示檢視帳號資訊頁面
+                                var intent = Intent()
+                                intent.setClass(context, ViewActivity::class.java)
+                                intent.putExtra(MainPage.DATA_ID, appData!!.DataId)
+                                intent.putExtra(MainPage.APP_IMG_ID, appData!!.AppImgId)
+                                intent.putExtra(MainPage.APP_NAME, appData!!.AppName)
+                                intent.putExtra(MainPage.APP_PASSWORD, appData!!.AppPassword)
+                                intent.putExtra(MainPage.APP_USERNAME, appData!!.AppUsername)
+                                context.startActivity(intent)
                             }) {
 
 
@@ -1022,6 +1037,8 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
                                 Toast
                                     .makeText(context, "複製成功", Toast.LENGTH_SHORT)
                                     .show()
+                                //關閉對話框
+                                dialogShowingState.value = false
                             }) {
 
                         Text(
@@ -1046,6 +1063,8 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
                                 Toast
                                     .makeText(context, "複製成功", Toast.LENGTH_SHORT)
                                     .show()
+                                //關閉對話框
+                                dialogShowingState.value = false
                             }) {
 
                         Text(

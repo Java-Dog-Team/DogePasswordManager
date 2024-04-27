@@ -69,7 +69,6 @@ class RegisterPage : ComponentActivity() {
     }
 
 
-
 }
 
 private lateinit var auth: FirebaseAuth
@@ -407,7 +406,7 @@ fun registerPage(context: Context) {
 
 
 //檢查電子郵件格式
-fun checkEmail(email: String = ""): Boolean {
+private fun checkEmail(email: String = ""): Boolean {
     return !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }
 
@@ -419,16 +418,8 @@ fun checkPassword(password: String): Int {
         return RegisterPage.FORMAT_ERROR
 
 
-    var regex =
-        "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~\$^+=<>]).{6,}\$".toRegex()
-
-    var result = regex.matches(password)
-    //正確
-    if (result)
-        return RegisterPage.OK
-
     //格式錯誤
-    return RegisterPage.FORMAT_ERROR
+    return RegisterPage.OK
 }
 
 private fun sendAuthenticationMail(activity: Activity, email: String, password: String) {

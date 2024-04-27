@@ -313,6 +313,11 @@ fun loginPage(context: Context) {
                                 color = Color.Gray,
                                 modifier = Modifier.clickable() {
                                     //點擊忘記密碼按鈕後的操作
+
+                                    //啟動忘記密碼頁面
+                                    var intent = Intent()
+                                    intent.setClass(context,UpdatePasswordPage::class.java)
+                                    context.startActivity(intent)
                                 })
 
                         }
@@ -365,4 +370,8 @@ private fun LogIn(activity: Activity, email: String, password: String) {
         }
 
 
+}
+//檢查電子郵件格式
+private fun checkEmail(email: String = ""): Boolean {
+    return !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }
