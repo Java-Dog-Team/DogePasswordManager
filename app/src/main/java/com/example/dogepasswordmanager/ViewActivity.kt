@@ -104,6 +104,7 @@ fun ViewPage(context: Context) {
                             openDialog = false
 
                             //刪除檔案
+                            deleteRecord()
                         }
                     ) {
                         Text("確定")
@@ -306,6 +307,7 @@ fun ViewPage(context: Context) {
                         onClick = {
                             //按下刪除按鈕後的操作
                             openDialog = true
+
                         },
                         shape = CircleShape,
                         containerColor = BrickRed,
@@ -324,3 +326,6 @@ fun ViewPage(context: Context) {
 }
 
 
+fun deleteRecord(){
+
+}
