@@ -136,7 +136,9 @@ fun ViewPage(context: Context) {
 
                                     }
 
-                                Toast.makeText(context, "複製成功", Toast.LENGTH_SHORT)
+                                Toast
+                                    .makeText(context, "複製成功", Toast.LENGTH_SHORT)
+                                    .show()
                             }
                             .size(35.dp)
                             .padding(bottom = 5.dp),
@@ -192,7 +194,9 @@ fun ViewPage(context: Context) {
 
                                     }
 
-                                Toast.makeText(context, "複製成功", Toast.LENGTH_SHORT)
+                                Toast
+                                    .makeText(context, "複製成功", Toast.LENGTH_SHORT)
+                                    .show()
                             }
                             .size(35.dp)
                             .padding(bottom = 5.dp),
