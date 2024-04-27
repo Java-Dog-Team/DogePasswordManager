@@ -1,9 +1,11 @@
 package com.example.dogepasswordmanager
 
 import android.app.Activity
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -52,13 +54,19 @@ import androidx.compose.ui.window.Dialog
 import com.example.dogepasswordmanager.ui.theme.BrickRed
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 
 class ViewActivity : ComponentActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         intentObj = intent
+        auth = Firebase.auth
+
+
+        userEmail = auth.currentUser?.email.toString()
         super.onCreate(savedInstanceState)
         setContent {
             ViewPage(context = this@ViewActivity)
@@ -66,9 +74,16 @@ class ViewActivity : ComponentActivity() {
         }
     }
 }
+
 private lateinit var intentObj: Intent
+
 //firebase 資料庫
 private val db = Firebase.firestore
+private lateinit var auth: FirebaseAuth
+
+//使用者信箱
+private lateinit var userEmail: String
+
 @Composable
 fun ViewPage(context: Context) {
     var openDialog by remember {
@@ -104,7 +119,7 @@ fun ViewPage(context: Context) {
                             openDialog = false
 
                             //刪除檔案
-                            deleteRecord()
+                            deleteRecord(activity)
                         }
                     ) {
                         Text("確定")
@@ -293,7 +308,37 @@ fun ViewPage(context: Context) {
 
                     //編輯按鈕
                     FloatingActionButton(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            //按下編輯按鈕後的操作
+
+                            //跳出編輯視窗
+                            var newIntent = Intent()
+                            newIntent.setClass(context, AddRecordActivity::class.java)
+                            newIntent.putExtra(
+                                MainPage.DATA_ID,
+                                intentObj.getStringExtra(MainPage.DATA_ID)
+                            )
+                            newIntent.putExtra(
+                                MainPage.APP_IMG_ID,
+                                intentObj.getStringExtra(MainPage.APP_IMG_ID)
+                            )
+                            newIntent.putExtra(
+                                MainPage.APP_NAME,
+                                intentObj.getStringExtra(MainPage.APP_NAME)
+                            )
+                            newIntent.putExtra(
+                                MainPage.APP_PASSWORD,
+                                intentObj.getStringExtra(MainPage.APP_PASSWORD)
+                            )
+                            newIntent.putExtra(
+                                MainPage.APP_USERNAME,
+                                intentObj.getStringExtra(MainPage.APP_USERNAME)
+                            )
+
+                            context.startActivity(newIntent)
+                            //關閉此頁面
+                            activity.finish()
+                        },
                         shape = CircleShape,
                         containerColor = Color.Blue,
                         contentColor = Color.White,
@@ -326,6 +371,16 @@ fun ViewPage(context: Context) {
 }
 
 
-fun deleteRecord(){
-
+fun deleteRecord(activity: Activity) {
+//    刪除記錄
+    intentObj.getStringExtra(MainPage.DATA_ID)?.let {
+        db.collection(userEmail).document(it)
+            .delete()
+            .addOnSuccessListener {
+                Log.d(TAG, "DocumentSnapshot successfully deleted!")
+                //關閉檢視頁面
+                activity.finish()
+            }
+            .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
+    }
 }

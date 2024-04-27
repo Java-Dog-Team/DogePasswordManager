@@ -1,5 +1,6 @@
 package com.example.dogepasswordmanager
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Context
@@ -35,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,7 +58,10 @@ import com.example.dogepasswordmanager.ui.theme.BackGroundColor
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
 
 class AddRecordActivity : ComponentActivity() {
@@ -68,9 +73,14 @@ class AddRecordActivity : ComponentActivity() {
 
 
         userEmail = auth.currentUser?.email.toString()
-
+        db = Firebase.firestore
+        storage = Firebase.storage
+        intentObj = intent
+        root = storage.reference
+        imageRef = root.child("images")
+        Log.d("MSG", intentObj.toString())
         setContent {
-            AddRecordPage(context = this@AddRecordActivity, intent)
+            AddRecordPage(context = this@AddRecordActivity)
         }
 
 
@@ -78,23 +88,25 @@ class AddRecordActivity : ComponentActivity() {
 }
 
 //firebase 資料庫
-private val db = Firebase.firestore
+private lateinit var db: FirebaseFirestore
 
 //firebase 儲存空間物件
-private val storage = Firebase.storage
+private lateinit var storage: FirebaseStorage
 
 //儲存空間根目錄參考
-private val root = storage.reference
+private lateinit var root: StorageReference
 
 //根目錄->images資料夾
-private var imageRef = root.child("images")
+private lateinit var imageRef: StorageReference
 private lateinit var auth: FirebaseAuth
+private lateinit var intentObj: Intent
+
 
 //使用者信箱
 private lateinit var userEmail: String
 
 @Composable
-fun AddRecordPage(context: Context, intent: Intent) {
+fun AddRecordPage(context: Context) {
 
     val activity: Activity = LocalContext.current as Activity
 
@@ -102,41 +114,87 @@ fun AddRecordPage(context: Context, intent: Intent) {
     //使用者選擇的圖片
     var selectedImg: Uri? by remember { mutableStateOf(null) }
 
+    var selectedImg2: Uri? by remember { mutableStateOf(null) }
+
+
+    if (!intentObj.getStringExtra(MainPage.APP_IMG_ID).isNullOrEmpty()) {
+        imageRef.child(userEmail + "/" + intentObj.getStringExtra(MainPage.APP_IMG_ID) + ".jpg").downloadUrl
+            .addOnCompleteListener { result ->
+                selectedImg = result.result
+            }
+    }
+
+    var title: String? = null
+    if (!intentObj.getStringExtra(MainPage.DATA_ID).isNullOrEmpty()) {
+        title = "編輯項目"
+    } else {
+        title = "新增項目"
+    }
+
+
     //使用者輸入帳號
-    var userInputUsername by remember {
-        mutableStateOf("")
+    var userInputUsername: MutableState<String>? = null
+    if (!intentObj.getStringExtra(MainPage.APP_USERNAME).isNullOrEmpty()) {
+
+        userInputUsername = remember {
+            mutableStateOf(intentObj.getStringExtra(MainPage.APP_USERNAME)!!)
+        }
+    } else {
+        userInputUsername = remember {
+            mutableStateOf("")
+        }
     }
 
-    //使用者輸入密碼
-    var userInputPassword by remember {
-        mutableStateOf("")
+//使用者輸入密碼
+    var userInputPassword: MutableState<String>? = null
+    if (!intentObj.getStringExtra(MainPage.APP_PASSWORD).isNullOrEmpty()) {
+        userInputPassword = remember {
+            mutableStateOf(intentObj.getStringExtra(MainPage.APP_PASSWORD)!!)
+        }
+    } else {
+        userInputPassword = remember {
+            mutableStateOf("")
+        }
     }
 
-    //使用者輸入應用程式名稱
-    var userInputAppName by remember {
-        mutableStateOf("")
+//使用者輸入應用程式名稱
+    var userInputAppName: MutableState<String>? = null
+    if (!intentObj.getStringExtra(MainPage.APP_PASSWORD).isNullOrEmpty()) {
+        userInputAppName = remember {
+            mutableStateOf(intentObj.getStringExtra(MainPage.APP_NAME)!!)
+        }
+    } else {
+        userInputAppName = remember {
+            mutableStateOf("")
+        }
+
     }
 
-    //使用者帳號輸入錯誤
+//使用者帳號輸入錯誤
     var usernameInputError by remember {
         mutableStateOf(false)
     }
 
-    //使用者密碼輸入錯誤
+//使用者密碼輸入錯誤
     var passwordInputError by remember {
         mutableStateOf(false)
     }
-    //使用者帳號輸入錯誤
+
+//使用者帳號輸入錯誤
     var appNameInputError by remember {
         mutableStateOf(false)
     }
 
-    //圖片選擇器
+//圖片選擇器
     val photoPicker =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.PickVisualMedia(),
             onResult = { uri ->
-                selectedImg = uri
+                if (uri != null) {
+                    selectedImg2 = uri
+                }
+
+
             })
 
 
@@ -163,7 +221,7 @@ fun AddRecordPage(context: Context, intent: Intent) {
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(
-                        text = "新增項目",
+                        text = title,
                         color = Color.White,
                         fontSize = 30.sp,
                         modifier = Modifier.padding(start = 20.dp)
@@ -185,30 +243,46 @@ fun AddRecordPage(context: Context, intent: Intent) {
                                     .currentTimeMillis()
                                     .toString()
                                 //此紀錄的id
-                                var dataId = System
-                                    .currentTimeMillis()
-                                    .toString()
 
-                                if (selectedImg != null) {
+                                var dataId: String? = null
+
+
+                                //為編輯項目
+                                if (!intentObj
+                                        .getStringExtra(MainPage.DATA_ID)
+                                        .isNullOrEmpty()
+                                ) {
+                                    dataId = intentObj.getStringExtra(MainPage.DATA_ID)
+                                } else {
+                                    dataId = System
+                                        .currentTimeMillis()
+                                        .toString()
+                                }
+
+
+                                if (selectedImg2 != null) {
                                     //存照片到該使用者的雲端儲存庫
                                     uploadImg(
-                                        selectedImg!!, imgId
+                                        selectedImg2!!, imgId
                                     )
                                 } else
                                     imgId = ""
 
 
                                 //將此項紀錄覆蓋或新增到資料庫
+
                                 updateDbRecord(
                                     AppData(
-                                        DataId = dataId,
-                                        userEmail = userEmail,
-                                        AppName = userInputAppName,
-                                        AppUsername = userInputUsername,
-                                        AppPassword = userInputPassword,
+                                        DataId = dataId!!,
+                                        userEmail = userEmail!!,
+                                        AppName = userInputAppName.value!!,
+                                        AppUsername = userInputUsername.value!!,
+                                        AppPassword = userInputPassword.value!!,
                                         AppImgId = imgId
                                     )
+
                                 )
+
 
                                 //結束此頁面
                                 activity.finish()
@@ -243,8 +317,10 @@ fun AddRecordPage(context: Context, intent: Intent) {
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+
+
                     //尚未選擇圖片
-                    if (selectedImg == null) {
+                    if (selectedImg == null && selectedImg2 == null) {
 
                         Image(
                             painter = painterResource(id = R.drawable.default_icon),
@@ -255,6 +331,20 @@ fun AddRecordPage(context: Context, intent: Intent) {
                                 .clip(CircleShape),
                             contentScale = ContentScale.Crop
                         )
+
+                    } else if (selectedImg2 != null) {
+                        //編輯項目中 使用者之前選的圖片
+                        //選擇圖片後的圖片顯示
+                        AsyncImage(
+                            model = selectedImg2,
+                            contentDescription = "App Icon",
+                            modifier = Modifier
+                                .border(2.dp, Color.Gray, CircleShape)
+                                .size(200.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+
                     } else {
                         //選擇圖片後的圖片顯示
                         AsyncImage(
@@ -310,9 +400,9 @@ fun AddRecordPage(context: Context, intent: Intent) {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         TextField(
-                            value = userInputAppName,
+                            value = userInputAppName.value,
                             onValueChange = {
-                                userInputAppName = it
+                                userInputAppName.value = it
                             },
                             label = { Text(text = "應用程式名稱") },
                             isError = appNameInputError,
@@ -338,8 +428,8 @@ fun AddRecordPage(context: Context, intent: Intent) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        TextField(value = userInputUsername, onValueChange = {
-                            userInputUsername = it
+                        TextField(value = userInputUsername.value!!, onValueChange = {
+                            userInputUsername.value = it
                         },
                             label = { Text(text = "應用程式使用者名稱") },
                             isError = usernameInputError,
@@ -363,8 +453,8 @@ fun AddRecordPage(context: Context, intent: Intent) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        TextField(value = userInputPassword, onValueChange = {
-                            userInputPassword = it
+                        TextField(value = userInputPassword.value!!, onValueChange = {
+                            userInputPassword.value = it
                         },
                             label = { Text(text = "應用程式密碼") },
                             isError = passwordInputError,

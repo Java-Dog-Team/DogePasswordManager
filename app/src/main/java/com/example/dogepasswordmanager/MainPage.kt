@@ -95,6 +95,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.storage
 import java.security.SecureRandom
 
@@ -131,6 +132,11 @@ class MainPage : ComponentActivity() {
         super.onStart()
         //載入使用者紀錄
         loadUserData()
+
+        //重新初始化
+        storage = Firebase.storage
+        root = storage.reference
+        imageRef = root.child("images")
     }
 
     override fun onResume() {
@@ -148,10 +154,10 @@ private lateinit var userMail: String
 var lists = mutableStateListOf<AppData?>()
 
 //firebase 儲存空間物件
-private val storage = com.google.firebase.Firebase.storage
+private var storage = com.google.firebase.Firebase.storage
 
 //儲存空間根目錄參考
-private val root = storage.reference
+private var root = storage.reference
 
 //根目錄->images資料夾
 private var imageRef = root.child("images")
@@ -353,7 +359,8 @@ fun passwordRoom(
 
                 AppDataBlock(
                     item!!,
-                    dialogShowingFlag
+                    dialogShowingFlag,
+                    context
                 )
 
 
@@ -798,7 +805,8 @@ fun passwordGeneratorPage(context: Context) {
 @Composable
 fun AppDataBlock(
     userAppData: AppData,
-    dialogShowingState: MutableState<Boolean>
+    dialogShowingState: MutableState<Boolean>,
+    context: Context
 ) {
 
 
@@ -808,6 +816,37 @@ fun AppDataBlock(
             .padding(top = 5.dp, bottom = 7.dp)
             .clip(RoundedCornerShape(50.dp))
             .height(70.dp)
+            .clickable() {
+                appData = userAppData
+                //按下項目條後進入檢視畫面
+                //跳出編輯視窗
+                var newIntent = Intent()
+                newIntent.setClass(context, ViewActivity::class.java)
+                newIntent.putExtra(
+                    MainPage.DATA_ID,
+                    appData!!.DataId
+                )
+                newIntent.putExtra(
+                    MainPage.APP_IMG_ID,
+                    appData!!.AppImgId
+                )
+                newIntent.putExtra(
+                    MainPage.APP_NAME,
+                    appData!!.AppName
+                )
+                newIntent.putExtra(
+                    MainPage.APP_PASSWORD,
+                    appData!!.AppPassword
+                )
+                newIntent.putExtra(
+                    MainPage.APP_USERNAME,
+                    appData!!.AppUsername
+                )
+
+
+                context.startActivity(newIntent)
+                //關閉此頁面
+            }
 
     ) {
         //App圖示
@@ -823,13 +862,16 @@ fun AppDataBlock(
             //App Icon圖片
             //此應用程式圖示為使用者自訂
             if (userAppData.AppImgId != "") {
+
                 var img = remember {
                     mutableStateOf<Uri?>(null)
                 }
+
                 imageRef.child(userMail + "/" + userAppData.AppImgId + ".jpg").downloadUrl.addOnCompleteListener { result ->
                     img.value = result.result
                 }
-                //App Icon預設圖片
+
+                //App Icon
                 Image(
                     painter = rememberAsyncImagePainter(model = img.value),
                     contentDescription = "App Icon",
@@ -990,7 +1032,7 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
 
                                 //顯示檢視帳號資訊頁面
                                 var intent = Intent()
-                                intent.setClass(context, ViewActivity::class.java)
+                                intent.setClass(context, AddRecordActivity::class.java)
                                 intent.putExtra(MainPage.DATA_ID, appData!!.DataId)
                                 intent.putExtra(MainPage.APP_IMG_ID, appData!!.AppImgId)
                                 intent.putExtra(MainPage.APP_NAME, appData!!.AppName)
@@ -1003,25 +1045,6 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
 
 
                         Text(
-                            text = "檢視帳號資訊",
-                            fontSize = 15.sp,
-                            color = Color.Black,
-                            modifier = Modifier.padding(start = 7.dp)
-                        )
-
-                    }
-                    //編輯帳號資訊
-                    Row(verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .clickable() {
-
-                                dialogShowingState.value = false
-
-                            }) {
-
-                        Text(
                             text = "編輯帳號資訊",
                             fontSize = 15.sp,
                             color = Color.Black,
@@ -1029,6 +1052,7 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
                         )
 
                     }
+
                     //複製帳號
                     Row(verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
