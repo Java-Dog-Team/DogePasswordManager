@@ -3,6 +3,7 @@ package com.example.dogepasswordmanager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -95,7 +96,8 @@ fun ViewPage(context: Context) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
+                    .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
 
                 //資訊顯示
@@ -109,8 +111,7 @@ fun ViewPage(context: Context) {
                 //複製按鈕
                 Column(
                     modifier = Modifier
-                        .weight(1f)
-                        .background(Color.Green),
+                        .weight(1f),
                     verticalArrangement = Arrangement.Bottom,
                     horizontalAlignment = Alignment.End
                 ) {
@@ -134,8 +135,10 @@ fun ViewPage(context: Context) {
                                         )
 
                                     }
+
+                                Toast.makeText(context, "複製成功", Toast.LENGTH_SHORT)
                             }
-                            .size(30.dp)
+                            .size(35.dp)
                             .padding(bottom = 5.dp),
                         tint = Color.Blue
                     )
@@ -151,7 +154,8 @@ fun ViewPage(context: Context) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
+                    .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
 
                 Column(modifier = Modifier.weight(1f)) {
@@ -187,8 +191,10 @@ fun ViewPage(context: Context) {
                                         )
 
                                     }
+
+                                Toast.makeText(context, "複製成功", Toast.LENGTH_SHORT)
                             }
-                            .size(30.dp)
+                            .size(35.dp)
                             .padding(bottom = 5.dp),
                         tint = Color.Blue
                     )
