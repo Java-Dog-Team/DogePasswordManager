@@ -1189,22 +1189,6 @@ fun topLeftFunctionButton(isVisible: Boolean) {
 
                 )
             }
-
-            Column(modifier = Modifier
-                .padding(start = 5.dp, end = 10.dp)
-                .clickable() {
-                    //搜尋按鈕按下後的操作
-                }) {
-                //過濾圖示
-                Image(
-                    painter = painterResource(id = R.drawable.filter),
-                    contentDescription = "Filter Icon",
-                    modifier = Modifier.size(35.dp, 35.dp),
-                    colorFilter = ColorFilter.tint(Color.White)
-
-                )
-            }
-
         }
     }
 }

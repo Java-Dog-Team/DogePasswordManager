@@ -1,15 +1,21 @@
 package com.example.dogepasswordmanager
 
 import android.app.Activity
+import androidx.biometric.BiometricPrompt
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
+import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
+import android.os.Build
 import android.os.Bundle
+import android.os.CancellationSignal
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
+import androidx.annotation.RequiresApi
+import androidx.biometric.BiometricManager
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,36 +26,37 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
 
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
@@ -58,9 +65,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onStart() {
         super.onStart()
+
+
+        //抓取使用者登入狀態
         val currentUser = auth.currentUser
+
+
     }
 
 }
@@ -68,6 +82,7 @@ class MainActivity : ComponentActivity() {
 private lateinit var auth: FirebaseAuth
 
 //登入頁面
+@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun loginPage(context: Context) {
 
@@ -100,6 +115,8 @@ fun loginPage(context: Context) {
     var passwordVisible = remember {
         mutableStateOf(false)
     }
+
+    biometricHandler(context = context as FragmentActivity)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
 
@@ -316,7 +333,7 @@ fun loginPage(context: Context) {
 
                                     //啟動忘記密碼頁面
                                     var intent = Intent()
-                                    intent.setClass(context,UpdatePasswordPage::class.java)
+                                    intent.setClass(context, UpdatePasswordPage::class.java)
                                     context.startActivity(intent)
                                 })
 
@@ -371,7 +388,93 @@ private fun LogIn(activity: Activity, email: String, password: String) {
 
 
 }
+
+@RequiresApi(Build.VERSION_CODES.P)
+@Composable
+fun biometricHandler(context: FragmentActivity) {
+
+
+    //當前使用者
+    val currentUser = auth.currentUser
+
+
+
+    if (isBiometricAvailable(context)) {
+
+
+        getBiometricPrompt(context) {
+            var intent = Intent()
+            intent.setClass(context, MainPage::class.java)
+            context.startActivity(intent)
+        }.authenticate(getPromptInfo(context))
+
+    }
+
+}
+
 //檢查電子郵件格式
 private fun checkEmail(email: String = ""): Boolean {
     return !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}
+
+
+// 檢查該裝置是否支援生物辨識
+fun isBiometricAvailable(context: Context): Boolean {
+    val biometricManager = BiometricManager.from(context)
+    return when (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.BIOMETRIC_WEAK)) {
+        BiometricManager.BIOMETRIC_SUCCESS -> true
+        else -> {
+            Log.e("TAG", "Biometric authentication not available")
+            false
+        }
+    }
+}
+
+
+
+@RequiresApi(Build.VERSION_CODES.P)
+private fun getBiometricPrompt(
+    context: FragmentActivity,
+    onAuthSucceed: (BiometricPrompt.AuthenticationResult) -> Unit
+): BiometricPrompt {
+    val biometricPrompt =
+        BiometricPrompt(
+            context,
+            ContextCompat.getMainExecutor(context),
+            object : BiometricPrompt.AuthenticationCallback() {
+                // Handle successful authentication
+                override fun onAuthenticationSucceeded(
+                    result: BiometricPrompt.AuthenticationResult
+                ) {
+                    Log.e("TAG", "Authentication Succeeded: ${result.cryptoObject}")
+                    // 驗證成功後的動作
+                    onAuthSucceed(result)
+                }
+
+                // Handle authentication errors
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    Log.e("TAG", "onAuthenticationError")
+                }
+
+                // Handle authentication failures
+                override fun onAuthenticationFailed() {
+                    Log.e("TAG", "onAuthenticationFailed")
+                }
+            }
+        )
+    return biometricPrompt
+}
+
+//指紋辨識顯示畫面
+private fun getPromptInfo(context: FragmentActivity): BiometricPrompt.PromptInfo {
+    val currentUser = auth.currentUser
+
+    return BiometricPrompt.PromptInfo.Builder()
+        .setTitle("狗狗密碼管理器")
+        .setDescription("請問你要登入" + currentUser!!.email + "嗎?")
+        .setConfirmationRequired(false)
+        .setNegativeButtonText(
+            "取消"
+        )
+        .build()
 }

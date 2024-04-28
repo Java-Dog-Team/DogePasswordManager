@@ -28,7 +28,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -203,7 +205,8 @@ fun AddRecordPage(context: Context) {
     Row(modifier = Modifier.fillMaxSize()) {
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                ,
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -327,7 +330,7 @@ fun AddRecordPage(context: Context) {
                             contentDescription = "Default Icon",
                             modifier = Modifier
                                 .border(2.dp, Color.Gray, CircleShape)
-                                .size(200.dp)
+                                .size(150.dp)
                                 .clip(CircleShape),
                             contentScale = ContentScale.Crop
                         )
@@ -340,7 +343,7 @@ fun AddRecordPage(context: Context) {
                             contentDescription = "App Icon",
                             modifier = Modifier
                                 .border(2.dp, Color.Gray, CircleShape)
-                                .size(200.dp)
+                                .size(150.dp)
                                 .clip(CircleShape),
                             contentScale = ContentScale.Crop
                         )
@@ -352,7 +355,7 @@ fun AddRecordPage(context: Context) {
                             contentDescription = "App Icon",
                             modifier = Modifier
                                 .border(2.dp, Color.Gray, CircleShape)
-                                .size(200.dp)
+                                .size(150.dp)
                                 .clip(CircleShape),
                             contentScale = ContentScale.Crop
                         )

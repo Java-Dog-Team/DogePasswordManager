@@ -73,6 +73,10 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-firestore")
     implementation("androidx.activity:activity:1.9.0")
+
+    // Kotlin
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
