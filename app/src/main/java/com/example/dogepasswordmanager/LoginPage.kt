@@ -116,7 +116,7 @@ fun loginPage(context: Context) {
         mutableStateOf(false)
     }
 
-    biometricHandler(context = context as FragmentActivity)
+
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
 
@@ -305,6 +305,7 @@ fun loginPage(context: Context) {
                                         RegisterPage::class.java
                                     )
                                     context.startActivity(intent)
+
                                 })
 
                         }
@@ -347,7 +348,7 @@ fun loginPage(context: Context) {
 
 
     }
-
+    biometricHandler(context = context as FragmentActivity)
 }
 
 private fun LogIn(activity: Activity, email: String, password: String) {
@@ -431,7 +432,6 @@ fun isBiometricAvailable(context: Context): Boolean {
 }
 
 
-
 @RequiresApi(Build.VERSION_CODES.P)
 private fun getBiometricPrompt(
     context: FragmentActivity,
@@ -465,6 +465,7 @@ private fun getBiometricPrompt(
     return biometricPrompt
 }
 
+
 //指紋辨識顯示畫面
 private fun getPromptInfo(context: FragmentActivity): BiometricPrompt.PromptInfo {
     val currentUser = auth.currentUser
@@ -478,3 +479,4 @@ private fun getPromptInfo(context: FragmentActivity): BiometricPrompt.PromptInfo
         )
         .build()
 }
+
