@@ -127,7 +127,13 @@ class MainPage : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
+        //重新初始化
+        storage = Firebase.storage
+        root = storage.reference
+        imageRef = root.child("images")
 
+        //載入使用者紀錄，載入完畢後就關閉載入動畫
+        loadUserData()
 
     }
 
@@ -154,7 +160,6 @@ private var root = storage.reference
 //根目錄->images資料夾
 private var imageRef = root.child("images")
 
-private var showLoadingFlag = mutableStateOf(true)
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -225,18 +230,6 @@ fun mainPage(context: Context) {
 
             if (showingPage.value == MainPage.PASSWORD_ROOM) {
 
-                //顯示載入動畫
-                if (showLoadingFlag.value)
-                    showLoadingAnimation()
-
-
-                //重新初始化
-                storage = Firebase.storage
-                root = storage.reference
-                imageRef = root.child("images")
-
-                //載入使用者紀錄，載入完畢後就關閉載入動畫
-                loadUserData()
 
                 //密碼庫頁面
                 passwordRoom(
@@ -246,11 +239,9 @@ fun mainPage(context: Context) {
 
 
             } else if (showingPage.value == MainPage.PASSWORD_GEN) {
-                showLoadingFlag.value = true
                 //密碼產生器頁面
                 passwordGeneratorPage(context)
             } else if (showingPage.value == MainPage.SETTING) {
-                showLoadingFlag.value = true
                 //設定畫面
 
             }
@@ -1209,25 +1200,6 @@ fun topLeftFunctionButton(isVisible: Boolean) {
 }
 
 
-//載入動畫
-@Composable
-fun showLoadingAnimation() {
-    Log.d("MSG", "SHOWING ANIMATION")
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(100.dp),
-            color = MaterialTheme.colorScheme.secondary,
-            trackColor = MaterialTheme.colorScheme.surfaceVariant,
-        )
-    }
-
-
-}
-
 //生成密碼
 fun generateSecurePassword(
     length: Int = 8,
@@ -1345,6 +1317,5 @@ fun loadUserData() {
             Log.w(TAG, "Error getting documents: ", exception)
         }
 
-    //資料載入完成 關閉載入動畫
-    showLoadingFlag.value = false
+
 }

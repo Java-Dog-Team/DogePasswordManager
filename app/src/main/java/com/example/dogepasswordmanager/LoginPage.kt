@@ -407,6 +407,8 @@ fun biometricHandler(context: FragmentActivity) {
             var intent = Intent()
             intent.setClass(context, MainPage::class.java)
             context.startActivity(intent)
+
+            context.finish()
         }.authenticate(getPromptInfo(context))
 
     }

@@ -205,8 +205,7 @@ fun AddRecordPage(context: Context) {
     Row(modifier = Modifier.fillMaxSize()) {
 
         Column(
-            modifier = Modifier.fillMaxSize()
-                ,
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -268,11 +267,16 @@ fun AddRecordPage(context: Context) {
                                     uploadImg(
                                         selectedImg2!!, imgId
                                     )
-                                } else
+                                } else if (selectedImg != null)
+                                    imgId = intentObj
+                                        .getStringExtra(MainPage.APP_IMG_ID)
+                                        .toString()
+                                else
                                     imgId = ""
 
 
                                 //將此項紀錄覆蓋或新增到資料庫
+
 
                                 updateDbRecord(
                                     AppData(
@@ -498,6 +502,8 @@ fun uploadImg(img: Uri, imgId: String) {
 
 //更新使用者紀錄
 fun updateDbRecord(appData: AppData) {
+
+
 
 
     val data = hashMapOf(
