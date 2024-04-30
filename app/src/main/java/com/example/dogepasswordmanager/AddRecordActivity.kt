@@ -81,7 +81,6 @@ class AddRecordActivity : ComponentActivity() {
         intentObj = intent
         root = storage.reference
         imageRef = root.child("images")
-        Log.d("MSG", intentObj.toString())
         setContent {
             AddRecordPage(context = this@AddRecordActivity)
         }
@@ -120,6 +119,7 @@ fun AddRecordPage(context: Context) {
     var selectedImg2: Uri? by remember { mutableStateOf(null) }
 
 
+    //使用者之前自訂的圖片
     if (!intentObj.getStringExtra(MainPage.APP_IMG_ID).isNullOrEmpty()) {
         imageRef.child(userEmail + "/" + intentObj.getStringExtra(MainPage.APP_IMG_ID) + ".jpg").downloadUrl
             .addOnCompleteListener { result ->
@@ -200,7 +200,9 @@ fun AddRecordPage(context: Context) {
 
             })
 
-
+    var updateFlag by remember {
+        mutableStateOf(true)
+    }
 
 
     Row(modifier = Modifier.fillMaxSize()) {
@@ -277,12 +279,22 @@ fun AddRecordPage(context: Context) {
                                         .toString()
                                 }
 
-
+                                //使用者新選的圖片
                                 if (selectedImg2 != null) {
                                     //存照片到該使用者的雲端儲存庫
                                     uploadImg(
-                                        selectedImg2!!, imgId
+                                        context,
+                                        selectedImg2!!, imgId, AppData(
+                                            DataId = dataId!!,
+                                            userEmail = userEmail!!,
+                                            AppName = userInputAppName.value!!,
+                                            AppUsername = userInputUsername.value!!,
+                                            AppPassword = userInputPassword.value!!,
+                                            AppImgId = imgId
+                                        )
                                     )
+                                    //有更新圖片的話 就讓上傳圖片的listener去更新資料庫，避免先存資料庫結果找不到圖片的問題
+                                    updateFlag = false
                                 } else if (selectedImg != null)
                                     imgId = intentObj
                                         .getStringExtra(MainPage.APP_IMG_ID)
@@ -293,22 +305,20 @@ fun AddRecordPage(context: Context) {
 
                                 //將此項紀錄覆蓋或新增到資料庫
 
+                                if (updateFlag)
+                                    updateDbRecord(
+                                        context,
+                                        AppData(
+                                            DataId = dataId!!,
+                                            userEmail = userEmail!!,
+                                            AppName = userInputAppName.value!!,
+                                            AppUsername = userInputUsername.value!!,
+                                            AppPassword = userInputPassword.value!!,
+                                            AppImgId = imgId
+                                        )
 
-                                updateDbRecord(
-                                    AppData(
-                                        DataId = dataId!!,
-                                        userEmail = userEmail!!,
-                                        AppName = userInputAppName.value!!,
-                                        AppUsername = userInputUsername.value!!,
-                                        AppPassword = userInputPassword.value!!,
-                                        AppImgId = imgId
                                     )
 
-                                )
-
-
-                                //結束此頁面
-                                activity.finish()
 
                             }
 
@@ -507,17 +517,18 @@ fun AddRecordPage(context: Context) {
 
 
 //上傳圖片
-fun uploadImg(img: Uri, imgId: String) {
+fun uploadImg(context: Context, img: Uri, imgId: String, appData: AppData) {
 
     //將圖片推到雲端儲存庫 儲存位置為images/使用者信箱/圖片id.jpg
     var target = imageRef.child(userEmail + "/" + imgId + ".jpg")
-
-
     val uploadtask = target.putFile(img!!)
+        .addOnCompleteListener() {
+            updateDbRecord(context, appData)
+        }
 }
 
 //更新使用者紀錄
-fun updateDbRecord(appData: AppData) {
+fun updateDbRecord(context: Context, appData: AppData) {
 
 
     val data = hashMapOf(
@@ -535,9 +546,12 @@ fun updateDbRecord(appData: AppData) {
         .document(appData.DataId)
         .set(data)
         .addOnSuccessListener { documentReference ->
-            Log.d(TAG, "DocumentSnapshot added with ID: " + appData.DataId)
+            Log.d("MSG", "DocumentSnapshot added with ID: " + appData.DataId)
+            val activity = context as Activity
+            //儲存成功後 關閉畫面
+            activity.finish()
         }
         .addOnFailureListener { e ->
-            Log.w(TAG, "Error adding document", e)
+            Log.w("MSG", "Error adding document", e)
         }
 }

@@ -1,5 +1,6 @@
 package com.example.dogepasswordmanager
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.biometric.BiometricPrompt
 import android.content.ContentValues.TAG
@@ -52,9 +53,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.google.android.gms.tasks.Tasks.await
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.coroutineScope
 
 class MainActivity : FragmentActivity() {
 
@@ -79,6 +83,7 @@ class MainActivity : FragmentActivity() {
 
 
     }
+
 
 }
 
@@ -432,6 +437,7 @@ private fun LogIn(activity: Activity, email: String, password: String) {
 
 }
 
+@SuppressLint("UnrememberedMutableState")
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun biometricHandler(context: FragmentActivity) {
@@ -440,9 +446,31 @@ fun biometricHandler(context: FragmentActivity) {
     //當前使用者
     val currentUser = auth.currentUser
 
+    val db = Firebase.firestore
+
+    //檢查使用者帳戶存在資料庫中 (之後要再改寫，使其先去抓使用者帳戶資訊是否存在後再跳出生物辨識)
+    var biometricFlag = mutableStateOf(true)
 
 
-    if (isBiometricAvailable(context)) {
+    if (currentUser != null) {
+        db.collection("users")
+            .get().addOnSuccessListener { result ->
+                for (document in result) {
+                    if (document.data.get("email").toString() == currentUser.email.toString()) {
+                        biometricFlag.value = true
+                    }
+
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w(TAG, "Error getting documents.", exception)
+            }
+    }
+
+
+
+
+    if (isBiometricAvailable(context) && currentUser != null && biometricFlag.value) {
 
 
         getBiometricPrompt(context) {

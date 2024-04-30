@@ -141,6 +141,10 @@ class MainPage : ComponentActivity() {
     override fun onResume() {
         super.onResume()
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+    }
 }
 
 //選項按鈕對應的物件
@@ -542,7 +546,11 @@ fun passwordGeneratorPage(context: Context) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Text(text = stringResource(id=R.string.gen_length), fontSize = 30.sp, modifier = Modifier.padding(end = 10.dp))
+                    Text(
+                        text = stringResource(id = R.string.gen_length),
+                        fontSize = 30.sp,
+                        modifier = Modifier.padding(end = 10.dp)
+                    )
                     //顯示滑條當前數值
                     Text(
                         text = sliderPosition.value.toInt().toString(),
@@ -1073,7 +1081,7 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
 
 
                         Text(
-                            text = stringResource(id=R.string.edit_item),
+                            text = stringResource(id = R.string.edit_item),
                             fontSize = 15.sp,
                             color = Color.Black,
                             modifier = Modifier.padding(start = 7.dp)
@@ -1091,14 +1099,18 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
                                 clipboardManager.setText(AnnotatedString(appData!!.AppUsername))
                                 //顯示複製成功訊息
                                 Toast
-                                    .makeText(context, context.getString(R.string.copy_success), Toast.LENGTH_SHORT)
+                                    .makeText(
+                                        context,
+                                        context.getString(R.string.copy_success),
+                                        Toast.LENGTH_SHORT
+                                    )
                                     .show()
                                 //關閉對話框
                                 dialogShowingState.value = false
                             }) {
 
                         Text(
-                            text = stringResource(id=R.string.copy_item_username),
+                            text = stringResource(id = R.string.copy_item_username),
                             fontSize = 15.sp,
                             color = Color.Black,
                             modifier = Modifier.padding(start = 7.dp)
@@ -1117,14 +1129,18 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
                                 clipboardManager.setText(AnnotatedString(appData!!.AppPassword))
                                 //顯示複製成功訊息
                                 Toast
-                                    .makeText(context, context.getString(R.string.copy_success), Toast.LENGTH_SHORT)
+                                    .makeText(
+                                        context,
+                                        context.getString(R.string.copy_success),
+                                        Toast.LENGTH_SHORT
+                                    )
                                     .show()
                                 //關閉對話框
                                 dialogShowingState.value = false
                             }) {
 
                         Text(
-                            text = stringResource(id=R.string.copy_item_password),
+                            text = stringResource(id = R.string.copy_item_password),
                             fontSize = 15.sp,
                             modifier = Modifier.padding(start = 7.dp)
                         )

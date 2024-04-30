@@ -31,7 +31,7 @@
     <string name="register_email_field">電子郵件</string>
     <string name="register_email_field_format_error">請確認是否為電子郵件格式</string>
     <string name="register_password_field">密碼</string>
-    <string name="register_password_field_format_error">密碼(>6)需包含大小寫英文、數字、特殊符號</string>
+    <string name="register_password_field_format_error">密碼至少為6碼</string>
     <string name="register_confirmed_password_field">確認密碼</string>
     <string name="register_confirmed_password_field_format_error">請確認密碼輸入是否相同</string>
     <string name="register_already_has_account_text">已經有帳號了?</string>

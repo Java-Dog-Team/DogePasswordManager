@@ -35,7 +35,7 @@
     <string name="register_email_field">Email</string>
     <string name="register_email_field_format_error">Please input email</string>
     <string name="register_password_field">Password</string>
-    <string name="register_password_field_format_error">Must contain upper/lower case letter,digits,special symbol and at least 6 length</string>
+    <string name="register_password_field_format_error">Must at least 6 length</string>
     <string name="register_confirmed_password_field">Confirm Password</string>
     <string name="register_confirmed_password_field_format_error">Please check the confirm password</string>
     <string name="register_already_has_account_text">Already have an account?</string>

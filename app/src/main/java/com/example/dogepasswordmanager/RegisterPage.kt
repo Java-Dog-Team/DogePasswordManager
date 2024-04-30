@@ -46,6 +46,7 @@ import com.example.dogepasswordmanager.ui.theme.BrickRed
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.actionCodeSettings
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 //註冊頁面
@@ -375,7 +376,7 @@ fun registerPage(context: Context) {
                             .padding(start = 10.dp, end = 10.dp),
                         shape = RoundedCornerShape(30)
                     ) {
-                        Text(text = stringResource(id=R.string.register_button), fontSize = 30.sp)
+                        Text(text = stringResource(id = R.string.register_button), fontSize = 30.sp)
                     }
                 }
 
@@ -418,13 +419,19 @@ private fun checkEmail(email: String = ""): Boolean {
 
 //檢查密碼
 fun checkPassword(password: String): Int {
+
     //空字串
     if (password.equals(""))
         return RegisterPage.FORMAT_ERROR
 
+    val regex = Regex("[a-zA-Z0-9\\W_]{6,}")
 
+    if (regex.matches(password)) {
+        return RegisterPage.OK
+    }
     //格式錯誤
-    return RegisterPage.OK
+    return RegisterPage.FORMAT_ERROR
+
 }
 
 private fun sendAuthenticationMail(activity: Activity, email: String, password: String) {
@@ -440,6 +447,20 @@ private fun sendAuthenticationMail(activity: Activity, email: String, password: 
 
                 //寄送驗證信件
                 user!!.sendEmailVerification()
+
+                //將使用者帳號加入資料庫中
+                val data = hashMapOf(
+                    "email" to user.email.toString()
+                )
+
+                Firebase.firestore.collection("users")
+                    .add(data)
+                    .addOnSuccessListener { documentReference ->
+                        Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.w(TAG, "Error adding document", e)
+                    }
 
                 //跳轉至登入頁面
                 activity.finish()
