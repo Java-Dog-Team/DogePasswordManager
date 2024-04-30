@@ -448,16 +448,31 @@ fun biometricHandler(context: FragmentActivity) {
 
     val db = Firebase.firestore
 
-    //檢查使用者帳戶存在資料庫中 (之後要再改寫，使其先去抓使用者帳戶資訊是否存在後再跳出生物辨識)
-    var biometricFlag = mutableStateOf(true)
+
 
 
     if (currentUser != null) {
+        //檢查生物驗證對象是否刪除帳號
         db.collection("users")
             .get().addOnSuccessListener { result ->
                 for (document in result) {
+
                     if (document.data.get("email").toString() == currentUser.email.toString()) {
-                        biometricFlag.value = true
+
+                        //該帳號存在於資料庫才啟動生物辨識
+                        if (isBiometricAvailable(context)) {
+
+
+                            getBiometricPrompt(context) {
+                                var intent = Intent()
+                                intent.setClass(context, MainPage::class.java)
+                                context.startActivity(intent)
+
+                                context.finish()
+                            }.authenticate(getPromptInfo(context))
+
+                        }
+                        break
                     }
 
                 }
@@ -467,21 +482,6 @@ fun biometricHandler(context: FragmentActivity) {
             }
     }
 
-
-
-
-    if (isBiometricAvailable(context) && currentUser != null && biometricFlag.value) {
-
-
-        getBiometricPrompt(context) {
-            var intent = Intent()
-            intent.setClass(context, MainPage::class.java)
-            context.startActivity(intent)
-
-            context.finish()
-        }.authenticate(getPromptInfo(context))
-
-    }
 
 }
 
