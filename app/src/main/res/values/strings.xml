@@ -9,4 +9,65 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
+
+    <!--    LoginPage-->
+    <string name="login_title">Doge Password Manager</string>
+    <string name="login_email">Email</string>
+    <string name="login_email_error">Please check the email input</string>
+    <string name="login_password">Password</string>
+    <string name="login_password_error">Please check the password input</string>
+    <string name="login_button_text">Login</string>
+    <string name="register_text">No account?</string>
+    <string name="register_button_text">\u0020 Register</string>
+    <string name="forget_password_button_text">Forgot password?</string>
+    <string name="email_verification_error">Email haven\'t authenticate yet</string>
+    <string name="username_password_input_error">Please check your email and password is correct</string>
+    <string name="biometric_login_title">Doge Password Manager</string>
+    <string name="biometric_login_content_start">Login with\u0020</string>
+    <string name="biometric_login_content_end">\u0020 \?</string>
+    <string name="biometric_login_cancel_button_text">Cancel</string>
+    <!--    ForgetPwdPage-->
+    <string name="forget_email_field">Email</string>
+    <string name="forget_email_field_error">Please check the email field</string>
+    <string name="forget_send_reset_password_email">We send the reset link to your email</string>
+    <string name="forget_send_reset_password_email_button">Send reset link</string>
+    <!--    RegisterPage-->
+    <string name="register_email_field">Email</string>
+    <string name="register_email_field_format_error">Please input email</string>
+    <string name="register_password_field">Password</string>
+    <string name="register_password_field_format_error">Must contain upper/lower case letter,digits,special symbol and at least 6 length</string>
+    <string name="register_confirmed_password_field">Confirm Password</string>
+    <string name="register_confirmed_password_field_format_error">Please check the confirm password</string>
+    <string name="register_already_has_account_text">Already have an account?</string>
+    <string name="register_already_has_account_button_text">Login</string>
+    <string name="register_user_already_exist">Account is already exists</string>
+    <string name="register_button">Register</string>
+    <!--    ViewPage-->
+    <string name="view_alert_dialog_title">Delete Item</string>
+    <string name="view_alert_dialog_content">Delete?</string>
+    <string name="view_alert_dialog_confirm_button">Confirm</string>
+    <string name="view_alert_dialog_cancel_button">Cancel</string>
+    <string name="view_title">Item Information</string>
+    <string name="view_app_name">App Name</string>
+    <string name="view_app_username">Username</string>
+    <string name="view_app_password">Password</string>
+    <!--    AddRecordPage-->
+    <string name="addPage_edit_title">Edit Item</string>
+    <string name="addPage_add_title">Add Item</string>
+    <string name="addPage_add_button">Save</string>
+    <string name="addPage_app_name_field">App Name</string>
+    <string name="addPage_app_name_field_error">Please fill the app name field</string>
+    <string name="addPage_app_username_field">App Username</string>
+    <string name="addPage_app_username_field_error">Please fill the app username field</string>
+    <string name="addPage_app_password_field">App Password</string>
+    <string name="addPage_app_password_field_error">Please fill the app password field</string>
+    <!--    MainPage-->
+    <string name="button_option1">Room</string>
+    <string name="button_option2">Generator</string>
+    <string name="button_option3">Setting</string>
+    <string name="copy_success">Copy Success</string>
+    <string name="gen_length">Length</string>
+    <string name="edit_item">Edit</string>
+    <string name="copy_item_username">Copy Username</string>
+    <string name="copy_item_password">Copy Password</string>
 </resources>

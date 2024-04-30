@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
@@ -70,12 +71,12 @@ fun UpdatePasswordPage(context: Context) {
                 userInputEmail = it
             },
                 label = {
-                    Text(text = "電子郵件")
+                    Text(text = stringResource(R.string.forget_email_field))
                 },
                 isError = userInputError,
                 supportingText = {
                     if (userInputError) {
-                        Text(text = "請確認輸入", color = MaterialTheme.colorScheme.error)
+                        Text(text = stringResource(R.string.forget_email_field_error), color = MaterialTheme.colorScheme.error)
                     } else {
                         userInputError = false
                     }
@@ -101,7 +102,7 @@ fun UpdatePasswordPage(context: Context) {
 
                                 Toast.makeText(
                                     context,
-                                    "已寄送密碼重設信件至您的信箱",
+                                    context.getString(R.string.forget_send_reset_password_email),
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 userInputError = false
@@ -115,7 +116,7 @@ fun UpdatePasswordPage(context: Context) {
 
 
             }, modifier = Modifier.padding(top = 15.dp)) {
-                Text(text = "發送密碼重設郵件")
+                Text(text = stringResource(id=R.string.forget_send_reset_password_email_button))
             }
         }
 

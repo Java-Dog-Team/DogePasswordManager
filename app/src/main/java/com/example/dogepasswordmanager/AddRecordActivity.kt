@@ -51,6 +51,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
@@ -128,9 +129,9 @@ fun AddRecordPage(context: Context) {
 
     var title: String? = null
     if (!intentObj.getStringExtra(MainPage.DATA_ID).isNullOrEmpty()) {
-        title = "編輯項目"
+        title = stringResource(id = R.string.addPage_edit_title)
     } else {
-        title = "新增項目"
+        title = stringResource(id = R.string.addPage_add_title)
     }
 
 
@@ -238,6 +239,21 @@ fun AddRecordPage(context: Context) {
 
                             //按下儲存按鈕後的操作
 
+                            //檢查使用者是否有輸入每一欄位
+                            if (userInputAppName.value == "") {
+                                usernameInputError = true
+                            } else
+                                usernameInputError = false
+
+                            if (userInputPassword.value == "") {
+                                passwordInputError = true
+                            } else
+                                passwordInputError = false
+
+                            if (userInputAppName.value == "") {
+                                appNameInputError = true
+                            } else
+                                appNameInputError = false
 
                             //輸入均正確
                             if (!usernameInputError && !passwordInputError && !appNameInputError) {
@@ -302,7 +318,7 @@ fun AddRecordPage(context: Context) {
                     horizontalAlignment = Alignment.End
                 ) {
                     Text(
-                        text = "儲存",
+                        text = stringResource(id = R.string.addPage_add_button),
                         color = Color.White,
                         fontSize = 30.sp,
                         modifier = Modifier.padding(end = 20.dp)
@@ -411,12 +427,12 @@ fun AddRecordPage(context: Context) {
                             onValueChange = {
                                 userInputAppName.value = it
                             },
-                            label = { Text(text = "應用程式名稱") },
+                            label = { Text(text = stringResource(R.string.addPage_app_name_field)) },
                             isError = appNameInputError,
                             supportingText = {
                                 if (appNameInputError) {
                                     Text(
-                                        text = "應用程式名稱請勿留白",
+                                        text = stringResource(id = R.string.addPage_app_name_field_error),
                                         color = MaterialTheme.colorScheme.error
                                     )
 
@@ -438,12 +454,12 @@ fun AddRecordPage(context: Context) {
                         TextField(value = userInputUsername.value!!, onValueChange = {
                             userInputUsername.value = it
                         },
-                            label = { Text(text = "應用程式使用者名稱") },
+                            label = { Text(text = stringResource(id = R.string.addPage_app_username_field)) },
                             isError = usernameInputError,
                             supportingText = {
                                 if (usernameInputError) {
                                     Text(
-                                        text = "應用程式使用者名稱請勿留白",
+                                        text = stringResource(id = R.string.addPage_app_username_field_error),
                                         color = MaterialTheme.colorScheme.error
                                     )
 
@@ -463,12 +479,12 @@ fun AddRecordPage(context: Context) {
                         TextField(value = userInputPassword.value!!, onValueChange = {
                             userInputPassword.value = it
                         },
-                            label = { Text(text = "應用程式密碼") },
+                            label = { Text(text = stringResource(id = R.string.addPage_app_password_field)) },
                             isError = passwordInputError,
                             supportingText = {
                                 if (passwordInputError) {
                                     Text(
-                                        text = "應用程式名稱請勿留白",
+                                        text = stringResource(id = R.string.addPage_app_password_field_error),
                                         color = MaterialTheme.colorScheme.error
                                     )
 
@@ -502,8 +518,6 @@ fun uploadImg(img: Uri, imgId: String) {
 
 //更新使用者紀錄
 fun updateDbRecord(appData: AppData) {
-
-
 
 
     val data = hashMapOf(

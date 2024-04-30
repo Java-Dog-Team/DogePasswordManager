@@ -16,6 +16,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.biometric.BiometricManager
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,10 +42,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -116,21 +119,37 @@ fun loginPage(context: Context) {
         mutableStateOf(false)
     }
 
+    //使否要開啟生物驗證
+    var biometricFlag = remember {
+        mutableStateOf(true)
+    }
 
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
 
 
-        //此App名稱
+        //登入頁面開頭
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .weight(1.5f)
                 .padding(top = 20.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "狗狗密碼管理器", fontSize = 40.sp, fontWeight = FontWeight.Bold)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = stringResource(id = R.string.login_title),
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+            }
+
         }
 
 
@@ -161,7 +180,7 @@ fun loginPage(context: Context) {
                     //帳號輸入框
                     TextField(
                         value = userInputUsername.value,
-                        label = { Text(text = "電子郵件") },
+                        label = { Text(text = stringResource(id = R.string.login_email)) },
                         singleLine = true,
                         onValueChange = {
                             userInputUsername.value = it
@@ -170,7 +189,7 @@ fun loginPage(context: Context) {
                         supportingText = {
                             if (usernameError.value)
                                 Text(
-                                    text = "請檢查電子郵件輸入",
+                                    text = stringResource(id = R.string.login_email_error),
                                     color = MaterialTheme.colorScheme.error
                                 )
                         }
@@ -191,7 +210,7 @@ fun loginPage(context: Context) {
                         singleLine = true,
                         visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        label = { Text(text = "密碼") },
+                        label = { Text(text = stringResource(id = R.string.login_password)) },
                         trailingIcon = {
                             //可以看到密碼
                             if (passwordVisible.value) {
@@ -226,7 +245,7 @@ fun loginPage(context: Context) {
                         supportingText = {
                             if (passwordError.value)
                                 Text(
-                                    text = "請檢查密碼輸入",
+                                    text = stringResource(id = R.string.login_password_error),
                                     color = MaterialTheme.colorScheme.error
                                 )
                         }
@@ -267,7 +286,10 @@ fun loginPage(context: Context) {
 
                         }) {
                         //登入按鈕文字
-                        Text(text = "登入", fontSize = 20.sp)
+                        Text(
+                            text = stringResource(id = R.string.login_button_text),
+                            fontSize = 20.sp
+                        )
                     }
                 }
 
@@ -280,7 +302,8 @@ fun loginPage(context: Context) {
                 ) {
                     Column(
                         modifier = Modifier
-                            .weight(1f),
+                            .weight(1.5f)
+                            .padding(start = 5.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -289,9 +312,12 @@ fun loginPage(context: Context) {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Text(text = "沒有帳號嗎? ", fontSize = 25.sp)
                             Text(
-                                text = "註冊",
+                                text = stringResource(id = R.string.register_text),
+                                fontSize = 25.sp
+                            )
+                            Text(
+                                text = stringResource(id = R.string.register_button_text),
                                 fontSize = 20.sp,
                                 color = Color.Gray,
                                 modifier = Modifier.clickable() {
@@ -312,6 +338,12 @@ fun loginPage(context: Context) {
 
                     }
 
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
                     Column(
                         modifier = Modifier
                             .weight(1f),
@@ -323,10 +355,10 @@ fun loginPage(context: Context) {
                                 .fillMaxWidth()
                                 .padding(end = 10.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.End
+                            horizontalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = "忘記密碼?",
+                                text = stringResource(R.string.forget_password_button_text),
                                 fontSize = 25.sp,
                                 color = Color.Gray,
                                 modifier = Modifier.clickable() {
@@ -342,13 +374,15 @@ fun loginPage(context: Context) {
                     }
                 }
 
-
             }
         }
 
 
     }
-    biometricHandler(context = context as FragmentActivity)
+    if (biometricFlag.value) {
+        biometricHandler(context = context as FragmentActivity)
+        biometricFlag.value = false
+    }
 }
 
 private fun LogIn(activity: Activity, email: String, password: String) {
@@ -375,14 +409,22 @@ private fun LogIn(activity: Activity, email: String, password: String) {
                 } else {
 
                     //信箱尚未驗證
-                    Toast.makeText(activity, "信箱尚未驗證", Toast.LENGTH_SHORT)
+                    Toast.makeText(
+                        activity,
+                        activity.getString(R.string.email_verification_error),
+                        Toast.LENGTH_SHORT
+                    )
                         .show()
                 }
 
             } else {
 
                 //登入帳密有誤
-                Toast.makeText(activity, "輸入帳密有誤", Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    activity,
+                    activity.getString(R.string.username_password_input_error),
+                    Toast.LENGTH_SHORT
+                )
                     .show()
             }
         }
@@ -473,11 +515,15 @@ private fun getPromptInfo(context: FragmentActivity): BiometricPrompt.PromptInfo
     val currentUser = auth.currentUser
 
     return BiometricPrompt.PromptInfo.Builder()
-        .setTitle("狗狗密碼管理器")
-        .setDescription("請問你要登入" + currentUser!!.email + "嗎?")
+        .setTitle(context.getString(R.string.biometric_login_title))
+        .setDescription(
+            context.getString(R.string.biometric_login_content_start) + currentUser!!.email + context.getString(
+                R.string.biometric_login_content_end
+            )
+        )
         .setConfirmationRequired(false)
         .setNegativeButtonText(
-            "取消"
+            context.getString(R.string.biometric_login_cancel_button_text)
         )
         .build()
 }

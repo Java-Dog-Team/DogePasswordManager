@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -104,10 +105,14 @@ fun ViewPage(context: Context) {
                     Icon(Icons.Filled.Warning, contentDescription = "Example Icon")
                 },
                 title = {
-                    Text(text = "刪除項目", fontSize = 30.sp)
+                    Text(text = stringResource(id = R.string.view_alert_dialog_title), fontSize = 30.sp)
                 },
                 text = {
-                    Text(text = "您確定要刪除此項目嗎?", fontSize = 20.sp)
+                    Text(modifier=Modifier.fillMaxWidth(),
+                        text = stringResource(id = R.string.view_alert_dialog_content),
+                        fontSize = 20.sp,
+                        textAlign= TextAlign.Center
+                    )
                 },
                 onDismissRequest = {
                     openDialog = false
@@ -122,7 +127,7 @@ fun ViewPage(context: Context) {
                             deleteRecord(activity)
                         }
                     ) {
-                        Text("確定")
+                        Text(stringResource(id = R.string.view_alert_dialog_confirm_button))
                     }
                 },
                 dismissButton = {
@@ -132,7 +137,7 @@ fun ViewPage(context: Context) {
                             openDialog = false
                         }
                     ) {
-                        Text("取消")
+                        Text(stringResource(id = R.string.view_alert_dialog_cancel_button))
                     }
                 }
             )
@@ -150,7 +155,7 @@ fun ViewPage(context: Context) {
                     .fillMaxWidth()
                     .padding(top = 10.dp, bottom = 10.dp, start = 5.dp)
             ) {
-                Text(text = "項目資訊", color = Color.Blue, fontSize = 20.sp)
+                Text(text = stringResource(id=R.string.view_title), color = Color.Blue, fontSize = 20.sp)
             }
             //應用程式名稱
             Row(
@@ -161,7 +166,7 @@ fun ViewPage(context: Context) {
 
                 Column(modifier = Modifier.fillMaxWidth()) {
 
-                    Text(text = "名稱", color = Color.Gray, fontSize = 15.sp)
+                    Text(text = stringResource(R.string.view_app_name), color = Color.Gray, fontSize = 15.sp)
 
                     intentObj.getStringExtra(MainPage.APP_NAME)
                         ?.let { Text(text = it, fontSize = 25.sp) }
@@ -184,7 +189,7 @@ fun ViewPage(context: Context) {
                 //資訊顯示
                 Column(modifier = Modifier.weight(1f)) {
 
-                    Text(text = "使用者名稱", color = Color.Gray, fontSize = 15.sp)
+                    Text(text = stringResource(id=R.string.view_app_username), color = Color.Gray, fontSize = 15.sp)
 
                     intentObj.getStringExtra(MainPage.APP_USERNAME)
                         ?.let { Text(text = it, fontSize = 25.sp) }
@@ -218,7 +223,7 @@ fun ViewPage(context: Context) {
                                     }
 
                                 Toast
-                                    .makeText(context, "複製成功", Toast.LENGTH_SHORT)
+                                    .makeText(context, context.getString(R.string.copy_success), Toast.LENGTH_SHORT)
                                     .show()
                             }
                             .size(35.dp)
@@ -243,7 +248,7 @@ fun ViewPage(context: Context) {
 
                 Column(modifier = Modifier.weight(1f)) {
 
-                    Text(text = "密碼", color = Color.Gray, fontSize = 15.sp)
+                    Text(text = stringResource(id=R.string.view_app_password), color = Color.Gray, fontSize = 15.sp)
 
                     intentObj.getStringExtra(MainPage.APP_PASSWORD)
                         ?.let { Text(text = it, fontSize = 25.sp) }
@@ -276,7 +281,7 @@ fun ViewPage(context: Context) {
                                     }
 
                                 Toast
-                                    .makeText(context, "複製成功", Toast.LENGTH_SHORT)
+                                    .makeText(context, context.getString(R.string.copy_success), Toast.LENGTH_SHORT)
                                     .show()
                             }
                             .size(35.dp)

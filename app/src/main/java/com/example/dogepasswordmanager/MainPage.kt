@@ -66,6 +66,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -169,15 +170,12 @@ fun mainPage(context: Context) {
     var showingPage = remember { mutableStateOf(MainPage.PASSWORD_ROOM) }
 
     var dialogShowingFlag = remember { mutableStateOf(false) }
-    //當前頁面名稱(密碼庫、密碼產生器、設定)
-    var currentPageName = remember {
-        mutableStateOf("密碼庫")
-    }
 
     var topLeftButtonVisibleFlag = remember {
         mutableStateOf(true)
     }
 
+    var showingTitle = remember { mutableStateOf(MainPage.PASSWORD_ROOM) }
 
 
 
@@ -199,12 +197,28 @@ fun mainPage(context: Context) {
 
             //頁面名稱
             Column {
-                Text(
-                    text = currentPageName.value,
-                    fontSize = 30.sp,
-                    color = Color.White,
-                    modifier = Modifier.padding(start = 15.dp)
-                )
+                //當前為密碼庫頁面
+                if (showingTitle.value == MainPage.PASSWORD_ROOM)
+                    Text(
+                        text = stringResource(id = R.string.button_option1),
+                        fontSize = 30.sp,
+                        color = Color.White,
+                        modifier = Modifier.padding(start = 15.dp)
+                    )
+                else if (showingTitle.value == MainPage.PASSWORD_GEN)
+                    Text(
+                        text = stringResource(id = R.string.button_option2),
+                        fontSize = 30.sp,
+                        color = Color.White,
+                        modifier = Modifier.padding(start = 15.dp)
+                    )
+                else if (showingTitle.value == MainPage.SETTING)
+                    Text(
+                        text = stringResource(id = R.string.button_option3),
+                        fontSize = 30.sp,
+                        color = Color.White,
+                        modifier = Modifier.padding(start = 15.dp)
+                    )
             }
             //功能圖示
             Column(
@@ -268,7 +282,7 @@ fun mainPage(context: Context) {
                     .border(1.dp, Color.LightGray)
                     .clickable() {
                         //按下按鈕後處理
-                        currentPageName.value = "密碼庫"
+                        showingTitle.value = MainPage.PASSWORD_ROOM
                         //顯示左上角搜尋、過濾按鈕
                         topLeftButtonVisibleFlag.value = true;
                         //切換顯示密碼庫頁面
@@ -282,7 +296,7 @@ fun mainPage(context: Context) {
                         colorFilter = ColorFilter.tint(Color.Gray)
                     )
                     Text(
-                        text = "密碼庫",
+                        text = stringResource(id = R.string.button_option1),
                         color = Color.Gray,
                         modifier = Modifier.padding(top = 5.dp)
                     )
@@ -298,7 +312,7 @@ fun mainPage(context: Context) {
                     .border(1.dp, Color.LightGray)
                     .clickable() {
                         //當前頁面名稱
-                        currentPageName.value = "密碼產生器"
+                        showingTitle.value = MainPage.PASSWORD_GEN
                         //隱藏左上角搜尋、過濾按鈕
                         topLeftButtonVisibleFlag.value = false;
                         //切換顯示密碼產生器頁面
@@ -311,7 +325,7 @@ fun mainPage(context: Context) {
                     colorFilter = ColorFilter.tint(Color.Gray)
                 )
                 Text(
-                    text = "密碼產生器",
+                    text = stringResource(id = R.string.button_option2),
                     color = Color.Gray,
                     modifier = Modifier.padding(top = 5.dp)
                 )
@@ -325,7 +339,7 @@ fun mainPage(context: Context) {
                     .border(1.dp, Color.LightGray)
                     .clickable() {
                         //按下按鈕後處理
-                        currentPageName.value = "設定"
+                        showingTitle.value = MainPage.SETTING
                         //隱藏左上角搜尋、過濾按鈕
                         topLeftButtonVisibleFlag.value = false;
                         //切換顯示設定頁面
@@ -337,7 +351,11 @@ fun mainPage(context: Context) {
                     modifier = Modifier.size(40.dp, 40.dp),
                     colorFilter = ColorFilter.tint(Color.Gray)
                 )
-                Text(text = "設定", color = Color.Gray, modifier = Modifier.padding(top = 5.dp))
+                Text(
+                    text = stringResource(id = R.string.button_option3),
+                    color = Color.Gray,
+                    modifier = Modifier.padding(top = 5.dp)
+                )
             }
         }
 
@@ -472,7 +490,11 @@ fun passwordGeneratorPage(context: Context) {
                             //複製帳號到剪貼簿
                             clipboardManager.setText(AnnotatedString(gen_password.value))
                             Toast
-                                .makeText(context, "複製成功", Toast.LENGTH_SHORT)
+                                .makeText(
+                                    context,
+                                    context.getString(R.string.copy_success),
+                                    Toast.LENGTH_SHORT
+                                )
                                 .show()
                         },
                     colorFilter = ColorFilter.tint(ItemColor)
@@ -520,7 +542,7 @@ fun passwordGeneratorPage(context: Context) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    Text(text = "長度", fontSize = 30.sp, modifier = Modifier.padding(end = 10.dp))
+                    Text(text = stringResource(id=R.string.gen_length), fontSize = 30.sp, modifier = Modifier.padding(end = 10.dp))
                     //顯示滑條當前數值
                     Text(
                         text = sliderPosition.value.toInt().toString(),
@@ -1051,7 +1073,7 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
 
 
                         Text(
-                            text = "編輯帳號資訊",
+                            text = stringResource(id=R.string.edit_item),
                             fontSize = 15.sp,
                             color = Color.Black,
                             modifier = Modifier.padding(start = 7.dp)
@@ -1069,14 +1091,14 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
                                 clipboardManager.setText(AnnotatedString(appData!!.AppUsername))
                                 //顯示複製成功訊息
                                 Toast
-                                    .makeText(context, "複製成功", Toast.LENGTH_SHORT)
+                                    .makeText(context, context.getString(R.string.copy_success), Toast.LENGTH_SHORT)
                                     .show()
                                 //關閉對話框
                                 dialogShowingState.value = false
                             }) {
 
                         Text(
-                            text = "複製帳號",
+                            text = stringResource(id=R.string.copy_item_username),
                             fontSize = 15.sp,
                             color = Color.Black,
                             modifier = Modifier.padding(start = 7.dp)
@@ -1095,14 +1117,14 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
                                 clipboardManager.setText(AnnotatedString(appData!!.AppPassword))
                                 //顯示複製成功訊息
                                 Toast
-                                    .makeText(context, "複製成功", Toast.LENGTH_SHORT)
+                                    .makeText(context, context.getString(R.string.copy_success), Toast.LENGTH_SHORT)
                                     .show()
                                 //關閉對話框
                                 dialogShowingState.value = false
                             }) {
 
                         Text(
-                            text = "複製密碼",
+                            text = stringResource(id=R.string.copy_item_password),
                             fontSize = 15.sp,
                             modifier = Modifier.padding(start = 7.dp)
                         )

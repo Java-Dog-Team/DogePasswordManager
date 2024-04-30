@@ -34,9 +34,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dogepasswordmanager.ui.theme.BrickRed
@@ -156,14 +159,14 @@ fun registerPage(context: Context) {
                     TextField(value = userInputEmail.value, onValueChange = {
                         userInputEmail.value = it
                     }, label = {
-                        Text(text = "電子郵件")
+                        Text(text = stringResource(id = R.string.register_email_field))
                     }, singleLine = true,
                         isError = emailError.value,
                         supportingText = {
                             //錯誤訊息
                             if (emailError.value) {
                                 Text(
-                                    text = "請確認是否為電子郵件格式",
+                                    text = stringResource(id = R.string.register_email_field_format_error),
                                     modifier = Modifier.fillMaxWidth(),
                                     color = BrickRed,
                                     fontSize = 15.sp
@@ -191,18 +194,17 @@ fun registerPage(context: Context) {
                         singleLine = true,
                         visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        label = { Text(text = "密碼") },
+                        label = { Text(text = stringResource(id = R.string.register_password_field)) },
                         isError = passwordError.value,
                         supportingText = {
                             //錯誤訊息
                             if (passwordErrorType.value == RegisterPage.FORMAT_ERROR) {
                                 Text(
-                                    text = "密碼(>6)需包含大小寫英文、數字、特殊符號",
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
+                                    text = stringResource(id = R.string.register_password_field_format_error),
 
                                     color = BrickRed,
                                     fontSize = 15.sp,
+                                    textAlign = TextAlign.Left
                                 )
                             }
 
@@ -257,13 +259,13 @@ fun registerPage(context: Context) {
                         singleLine = true,
                         visualTransformation = if (confirmedPasswordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        label = { Text(text = "確認密碼") },
+                        label = { Text(text = stringResource(id = R.string.register_confirmed_password_field)) },
                         isError = confirmedPasswordError.value,
                         supportingText = {
                             //錯誤訊息
                             if (confirmedPasswordError.value) {
                                 Text(
-                                    text = "請確認密碼輸入是否相同",
+                                    text = stringResource(id = R.string.register_confirmed_password_field_format_error),
                                     modifier = Modifier.fillMaxWidth(),
                                     color = BrickRed,
                                     fontSize = 15.sp
@@ -373,7 +375,7 @@ fun registerPage(context: Context) {
                             .padding(start = 10.dp, end = 10.dp),
                         shape = RoundedCornerShape(30)
                     ) {
-                        Text(text = "註冊", fontSize = 30.sp)
+                        Text(text = stringResource(id=R.string.register_button), fontSize = 30.sp)
                     }
                 }
 
@@ -385,10 +387,13 @@ fun registerPage(context: Context) {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "已經有帳號了?", fontSize = 30.sp)
                     Text(
-                        text = "返回登入",
-                        fontSize = 25.sp,
+                        text = stringResource(id = R.string.register_already_has_account_text),
+                        fontSize = 25.sp
+                    )
+                    Text(
+                        text = stringResource(id = R.string.register_already_has_account_button_text),
+                        fontSize = 22.sp,
                         modifier = Modifier.clickable() {
                             //按下返回登入按鈕後的操作
 
@@ -443,7 +448,7 @@ private fun sendAuthenticationMail(activity: Activity, email: String, password: 
                 Log.w(TAG, "createUserWithEmail:failure", task.exception)
                 Toast.makeText(
                     activity,
-                    "帳號已存在",
+                    activity.getString(R.string.register_user_already_exist),
                     Toast.LENGTH_SHORT,
                 ).show()
             }

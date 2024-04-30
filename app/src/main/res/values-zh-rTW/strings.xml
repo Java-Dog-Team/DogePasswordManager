@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">DogePasswordManager</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <!--    LoginPage-->
+    <string name="login_title">狗狗密碼管理器</string>
+    <string name="login_email">電子郵件</string>
+    <string name="login_email_error">請檢查電子郵件輸入</string>
+    <string name="login_password">密碼</string>
+    <string name="login_password_error">請檢查密碼輸入</string>
+    <string name="login_button_text">登入</string>
+    <string name="register_text">沒有帳號嗎? </string>
+    <string name="register_button_text">註冊</string>
+    <string name="forget_password_button_text">忘記密碼?</string>
+    <string name="email_verification_error">信箱尚未驗證</string>
+    <string name="username_password_input_error">輸入帳密有誤</string>
+    <string name="biometric_login_title">狗狗密碼管理器</string>
+    <string name="biometric_login_content_start">請問你要登入</string>
+    <string name="biometric_login_content_end">嗎?</string>
+    <string name="biometric_login_cancel_button_text">取消</string>
+
+    <!--    RegisterPage-->
+    <string name="register_email_field">電子郵件</string>
+    <string name="register_email_field_format_error">請確認是否為電子郵件格式</string>
+    <string name="register_password_field">密碼</string>
+    <string name="register_password_field_format_error">密碼(>6)需包含大小寫英文、數字、特殊符號</string>
+    <string name="register_confirmed_password_field">確認密碼</string>
+    <string name="register_confirmed_password_field_format_error">請確認密碼輸入是否相同</string>
+    <string name="register_already_has_account_text">已經有帳號了?</string>
+    <string name="register_already_has_account_button_text">返回登入</string>
+    <string name="register_user_already_exist">帳號已存在</string>
+    <string name="register_button">註冊</string>
+    <!--    ForgetPwdPage-->
+    <string name="forget_email_field">電子郵件</string>
+    <string name="forget_email_field_error">請確認輸入</string>
+    <string name="forget_send_reset_password_email">已寄送密碼重設信件至您的信箱</string>
+    <string name="forget_send_reset_password_email_button">發送密碼重設郵件</string>
+
+    <!--    ViewPage-->
+    <string name="view_alert_dialog_title">刪除項目</string>
+    <string name="view_alert_dialog_content">您確定要刪除此項目嗎?</string>
+    <string name="view_alert_dialog_confirm_button">確認</string>
+    <string name="view_alert_dialog_cancel_button">取消</string>
+    <string name="view_title">項目資訊</string>
+    <string name="view_app_name">名稱</string>
+    <string name="view_app_username">使用者名稱</string>
+    <string name="view_app_password">密碼</string>
+
+    <!--    AddRecordPage-->
+    <string name="addPage_edit_title">編輯項目</string>
+    <string name="addPage_add_title">新增項目</string>
+    <string name="addPage_add_button">儲存</string>
+    <string name="addPage_app_name_field">應用程式名稱</string>
+    <string name="addPage_app_name_field_error">應用程式名稱請勿留白</string>
+    <string name="addPage_app_username_field">應用程式使用者名稱</string>
+    <string name="addPage_app_username_field_error">應用程式使用者名稱請勿留白</string>
+    <string name="addPage_app_password_field">應用程式密碼</string>
+    <string name="addPage_app_password_field_error">應用程式密碼請勿留白</string>
+    <!--    MainPage-->
+    <string name="button_option1">密碼庫</string>
+    <string name="button_option2">密碼產生器</string>
+    <string name="button_option3">設定</string>
+    <string name="copy_success">複製成功</string>
+    <string name="gen_length">長度</string>
+    <string name="edit_item">編輯帳號資訊</string>
+    <string name="copy_item_username">複製帳號</string>
+    <string name="copy_item_password">複製密碼</string>
+</resources>
