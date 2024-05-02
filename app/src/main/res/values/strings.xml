@@ -70,4 +70,11 @@
     <string name="edit_item">Edit</string>
     <string name="copy_item_username">Copy Username</string>
     <string name="copy_item_password">Copy Password</string>
+    <!--  SettingPage  -->
+    <string name="language">Language</string>
+    <string name="theme">Theme</string>
+    <string name="account">Account</string>
+    <string name="version">Version</string>
+    <string name="teach">Document</string>
+    <string name="deleteAccount">Delete Account</string>
 </resources>

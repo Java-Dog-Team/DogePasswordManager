@@ -44,6 +44,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -261,7 +262,7 @@ fun mainPage(context: Context) {
                 passwordGeneratorPage(context)
             } else if (showingPage.value == MainPage.SETTING) {
                 //設定畫面
-
+                settingPage(context)
             }
 
 
@@ -371,7 +372,6 @@ fun mainPage(context: Context) {
     dialogWindow(context, dialogShowingFlag)
 }
 
-
 //密碼庫頁面
 @Composable
 fun passwordRoom(
@@ -419,6 +419,55 @@ fun passwordRoom(
 
 }
 
+//設定葉面
+@Composable
+fun settingPage(context: Context){
+    val albumlist = ArrayList<String>()
+
+    val language= stringResource(R.string.language)
+    val theme=stringResource(R.string.theme)
+    val account=stringResource(R.string.account)
+    val version=stringResource(R.string.version)
+    val document=stringResource(R.string.teach)
+    val deleteAccount=stringResource(R.string.deleteAccount)
+
+    albumlist.add(language)
+    albumlist.add(theme)
+    albumlist.add(account)
+    albumlist.add(version)
+    albumlist.add(document)
+    albumlist.add(deleteAccount)
+
+    LazyColumn (){
+        items(albumlist){
+            Surface (color = Color(194,194,194),
+                modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                    .clip(RoundedCornerShape(10))
+                    .height(110.dp)){
+                Row(modifier = Modifier
+                    .clickable {
+                        if (item.img == R.drawable.hourse) {
+                            itemClicked(0)
+                        } else if (item.img == R.drawable.chiwawa) {
+                            itemClicked(1)
+                        } else {
+                            itemClicked(2)
+                        }
+                    }
+                    .fillMaxSize()) {
+                    Row(
+                        modifier = Modifier.fillMaxSize()
+                    ){
+                        Text(text = item.name,
+                            modifier = Modifier.fillMaxHeight().padding(35.dp),
+                            fontSize = 30.sp)
+
+                    }
+                }
+            }
+        }
+    }
+}
 
 //密碼產生器頁面
 @Composable

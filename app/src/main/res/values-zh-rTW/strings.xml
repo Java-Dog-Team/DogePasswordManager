@@ -73,4 +73,11 @@
     <string name="edit_item">編輯帳號資訊</string>
     <string name="copy_item_username">複製帳號</string>
     <string name="copy_item_password">複製密碼</string>
+    <!--  SettingPage  -->
+    <string name="language">選擇語言</string>
+    <string name="theme">選擇主題</string>
+    <string name="account">帳號管理</string>
+    <string name="version">版本資訊</string>
+    <string name="teach">教學文件</string>
+    <string name="deleteAccount">刪除帳號</string>
 </resources>
