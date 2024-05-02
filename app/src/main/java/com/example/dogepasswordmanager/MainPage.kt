@@ -422,14 +422,14 @@ fun passwordRoom(
 //設定葉面
 @Composable
 fun settingPage(context: Context){
-    val albumlist = ArrayList<String>()
+    val albumlist = ArrayList<Int>()
 
-    val language= stringResource(R.string.language)
-    val theme=stringResource(R.string.theme)
-    val account=stringResource(R.string.account)
-    val version=stringResource(R.string.version)
-    val document=stringResource(R.string.teach)
-    val deleteAccount=stringResource(R.string.deleteAccount)
+    val language= (R.string.language)
+    val theme=(R.string.theme)
+    val account=(R.string.account)
+    val version=(R.string.version)
+    val document=(R.string.teach)
+    val deleteAccount=(R.string.deleteAccount)
 
     albumlist.add(language)
     albumlist.add(theme)
@@ -440,32 +440,55 @@ fun settingPage(context: Context){
 
     LazyColumn (){
         items(albumlist){
-            Surface (color = Color(194,194,194),
-                modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
-                    .clip(RoundedCornerShape(10))
-                    .height(110.dp)){
-                Row(modifier = Modifier
-                    .clickable {
-                        if (item.img == R.drawable.hourse) {
-                            itemClicked(0)
-                        } else if (item.img == R.drawable.chiwawa) {
-                            itemClicked(1)
-                        } else {
-                            itemClicked(2)
-                        }
+            item->
+            Surface (color = Color(255,255,255),
+                modifier = Modifier
+                    .clickable{
+                        itemClick(item)
                     }
+                    .padding(vertical = 4.dp, horizontal = 8.dp)
+                    .height(85.dp)
+                    ){
+                Row(modifier = Modifier
                     .fillMaxSize()) {
                     Row(
                         modifier = Modifier.fillMaxSize()
                     ){
-                        Text(text = item.name,
-                            modifier = Modifier.fillMaxHeight().padding(35.dp),
-                            fontSize = 30.sp)
+                        var col=Color.Black
+                        if(item==R.string.deleteAccount){
+                            col=Color.Red
+                        }
+                        else{
+                            col=Color.Black
+                        }
+                        Text(text = stringResource(item),
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .padding(20.dp),
+                            fontSize = 30.sp,
+                            color=col)
 
                     }
                 }
             }
+            Divider(
+                color = Color.LightGray, thickness = 1.dp
+            )
         }
+    }
+}
+private fun itemClick(clickItem:Int){
+    //    點選刪除帳號
+    if(clickItem == R.string.deleteAccount){
+        val user = Firebase.auth.currentUser!!
+
+
+        user.delete()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d(TAG, "User account deleted.")
+                }
+            }
     }
 }
 
