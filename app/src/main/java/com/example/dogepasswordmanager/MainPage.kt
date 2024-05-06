@@ -2,11 +2,13 @@ package com.example.dogepasswordmanager
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -38,11 +40,9 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
@@ -51,13 +51,10 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -77,12 +74,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import coil.compose.rememberAsyncImagePainter
 import com.example.dogepasswordmanager.ui.theme.BackGroundColor
 import com.example.dogepasswordmanager.ui.theme.BrickRed
@@ -482,66 +476,97 @@ fun settingPage(context: Context) {
 }
 
 fun itemClick(clickItem: Int, context: Context) {
-    var activity: Activity = context as Activity
     //    點選刪除帳號
     if (clickItem == R.string.deleteAccount) {
-        //    取得目前登入的用戶
-        val user = Firebase.auth.currentUser!!
+        //  設定彈跳視窗
+        val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
+        alertDialog.setTitle("確定刪除帳號？")
+        alertDialog.setPositiveButton(
+//          設定字體顏色
+            Html.fromHtml("<font color='#FF0000'>刪除</font>")
+        ) { dialog, which ->
+//          設定 click 事件
+            deleteAccount(context)
+        };
+        alertDialog.setNeutralButton(
+//                          設定字體顏色
+            Html.fromHtml("<font color='#8080802'>取消</font>")
+        ) { dialog, which ->
+        }
+//      讓使用者可以點視窗以外的灰色部分回到上一頁
+        alertDialog.setCancelable(true)
+//      顯示彈跳視窗
+        alertDialog.show()
+    }
+//  選擇語言
+    else if (clickItem == R.string.theme) {
+
+    } else if (clickItem == R.string.account) {
+
+    } else if (clickItem == R.string.version) {
+
+    } else if (clickItem == R.string.teach) {
+
+    }
+}
+
+fun deleteAccount(context: Context) {
+    var activity: Activity = context as Activity
+    //    取得目前登入的用戶
+    val user = Firebase.auth.currentUser!!
 
 //      讀取存放資料的 database
-        val db = Firebase.firestore
+    val db = Firebase.firestore
 //      刪除使用者的所有資料
-        db.collection(user.email.toString())
-            .get()
-            .addOnSuccessListener { result ->
-                for (document in result) {
-                    //刪除使用者紀錄
-                    db.collection(user.email.toString()).document(document.id)
-                        .delete()
-                        .addOnSuccessListener {
-                            Log.d(
-                                TAG,
-                                "DocumentSnapshot successfully deleted!"
-                            )
-                        }
-                        .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
-                }
+    db.collection(user.email.toString())
+        .get()
+        .addOnSuccessListener { result ->
+            for (document in result) {
+                //刪除使用者紀錄
+                db.collection(user.email.toString()).document(document.id)
+                    .delete()
+                    .addOnSuccessListener {
+                        Log.d(
+                            TAG,
+                            "DocumentSnapshot successfully deleted!"
+                        )
+                    }
+                    .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
             }
-            .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
+        }
+        .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
 
 //      刪除 user 內的使用者的 email
-        db.collection("users")
-            .whereEqualTo("email", userMail)
-            .get()
-            .addOnSuccessListener { docs ->
-                for (doc in docs) {
+    db.collection("users")
+        .whereEqualTo("email", userMail)
+        .get()
+        .addOnSuccessListener { docs ->
+            for (doc in docs) {
 
-                    db.collection("users").document(doc.id)
-                        .delete()
+                db.collection("users").document(doc.id)
+                    .delete()
 
-                }
             }
-            .addOnFailureListener { }
+        }
+        .addOnFailureListener { }
 
 
 //      刪除使用者帳號
-        user.delete()
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.d(TAG, "User account deleted.")
-                    //登出帳號
-                    FirebaseAuth.getInstance().signOut()
-                    //      切換到 login activity
-                    var intent = Intent()
-                    intent.setClass(context, MainActivity::class.java)
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    context.startActivity(intent)
-                    activity.finish()
-                }
+    user.delete()
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d(TAG, "User account deleted.")
+                //登出帳號
+                FirebaseAuth.getInstance().signOut()
+                //      切換到 login activity
+                var intent = Intent()
+                intent.setClass(context, MainActivity::class.java)
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                context.startActivity(intent)
+                activity.finish()
             }
+        }
 
-
-    }
 }
 
 //密碼產生器頁面
