@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -441,14 +442,21 @@ fun settingPage(context: Context) {
                         val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
                         alertDialog.setTitle("確定刪除帳號？")
                         alertDialog.setPositiveButton(
-                            "刪除"
+//                          設定字體顏色
+                            Html.fromHtml("<font color='#FF0000'>刪除</font>")
                         ) { dialog, which ->
+//                            設定 click 事件
                             itemClick(item, context)
                         };
-                        alertDialog.setNeutralButton("取消"){
+                        alertDialog.setNeutralButton(
+//                          設定字體顏色
+                            Html.fromHtml("<font color='#8080802'>取消</font>")
+                        ){
                             dialog,which->
                         }
+//                      讓使用者可以點視窗以外的灰色部分回到上一頁
                         alertDialog.setCancelable(true)
+//                      顯示彈跳視窗
                         alertDialog.show()
                     }
                     .padding(vertical = 4.dp, horizontal = 8.dp)
