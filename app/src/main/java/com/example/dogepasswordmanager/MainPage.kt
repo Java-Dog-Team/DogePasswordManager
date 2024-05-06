@@ -529,19 +529,18 @@ fun itemClick(clickItem: Int, context: Context) {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "User account deleted.")
+                    //登出帳號
+                    FirebaseAuth.getInstance().signOut()
+                    //      切換到 login activity
+                    var intent = Intent()
+                    intent.setClass(context, MainActivity::class.java)
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    context.startActivity(intent)
+                    activity.finish()
                 }
             }
 
 
-        //登出帳號
-        FirebaseAuth.getInstance().signOut()
-
-//      切換到 login activity
-        var intent = Intent()
-        intent.setClass(context, MainActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        context.startActivity(intent)
-        activity.finish()
     }
 }
 

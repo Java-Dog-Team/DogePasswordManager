@@ -1,23 +1,24 @@
 package com.example.dogepasswordmanager
 
 import android.annotation.SuppressLint
+import android.annotation.TargetApi
 import android.app.Activity
-import androidx.biometric.BiometricPrompt
+import android.app.KeyguardManager
+import android.content.ContentResolver
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
-import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STRONG
-import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import android.os.Build
 import android.os.Bundle
-import android.os.CancellationSignal
+import android.provider.Settings.Secure
+import android.provider.Settings.SettingNotFoundException
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.biometric.BiometricManager
-import androidx.compose.foundation.background
+import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -53,15 +54,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
-import com.google.android.gms.tasks.Tasks.await
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.coroutineScope
+
 
 class MainActivity : FragmentActivity() {
 
+    companion object {
+        //生物辨識偏好設定檔案名稱
+        val BIOMETRIC_AVAILABLE = "biometric_available"
+
+
+        //生物辨識內容存取key
+        val BIOMETRIC_AVAILABLE_KEY = "0"
+
+
+    }
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -124,10 +134,7 @@ fun loginPage(context: Context) {
         mutableStateOf(false)
     }
 
-    //使否要開啟生物驗證
-    var biometricFlag = remember {
-        mutableStateOf(true)
-    }
+
 
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
@@ -384,10 +391,41 @@ fun loginPage(context: Context) {
 
 
     }
-    if (biometricFlag.value) {
-        biometricHandler(context = context as FragmentActivity)
-        biometricFlag.value = false
+    //快速登入處理
+    FastLoginHandler(context)
+
+
+}
+
+//快速登入(生物辨識、PIN、圖形碼)
+@Composable
+@RequiresApi(Build.VERSION_CODES.P)
+private fun FastLoginHandler(context: Context) {
+    //是否啟動生物辨識畫面
+    var biometricFlag by remember {
+        mutableStateOf(true)
     }
+
+
+    val currentUser = auth.currentUser
+    if (currentUser != null) {
+
+        //獲取生物辨識偏好設定內容(預設為不開啟)
+        val bioPref: Boolean? = context.getSharedPreferences(
+            currentUser.email.toString() + MainActivity.BIOMETRIC_AVAILABLE,
+            MODE_PRIVATE
+        ).getBoolean(MainActivity.BIOMETRIC_AVAILABLE_KEY, false)
+
+
+        //快速登入優先度: 生物辨識->圖形碼->PIN碼
+        //使用者剛打開app且手機支援生物辨識且使用者有開啟生物辨識選項(在設定頁面需先判斷使用者是否能使用生物辨識...等)
+        if (biometricFlag && isBiometricAvailable(context) && bioPref == true) {
+            biometricHandler(context = context as FragmentActivity)
+            biometricFlag = false
+        }
+    }
+
+
 }
 
 private fun LogIn(activity: Activity, email: String, password: String) {
@@ -467,38 +505,34 @@ fun biometricHandler(context: FragmentActivity) {
     val db = Firebase.firestore
 
 
+    //檢查生物驗證對象是否刪除帳號
+    db.collection("users")
+        .get().addOnSuccessListener { result ->
+            for (document in result) {
+
+                if (document.data.get("email").toString() == currentUser!!.email.toString()) {
+
+                    //該帳號存在於資料庫才啟動生物辨識
 
 
-    if (currentUser != null) {
-        //檢查生物驗證對象是否刪除帳號
-        db.collection("users")
-            .get().addOnSuccessListener { result ->
-                for (document in result) {
+                    getBiometricPrompt(context) {
+                        //驗證成功後的動作
+                        var intent = Intent()
+                        intent.setClass(context, MainPage::class.java)
+                        context.startActivity(intent)
 
-                    if (document.data.get("email").toString() == currentUser.email.toString()) {
-
-                        //該帳號存在於資料庫才啟動生物辨識
-                        if (isBiometricAvailable(context)) {
+                        context.finish()
+                    }.authenticate(getPromptInfo(context))
 
 
-                            getBiometricPrompt(context) {
-                                var intent = Intent()
-                                intent.setClass(context, MainPage::class.java)
-                                context.startActivity(intent)
-
-                                context.finish()
-                            }.authenticate(getPromptInfo(context))
-
-                        }
-                        break
-                    }
-
+                    break
                 }
+
             }
-            .addOnFailureListener { exception ->
-                Log.w(TAG, "Error getting documents.", exception)
-            }
-    }
+        }
+        .addOnFailureListener { exception ->
+            Log.w(TAG, "Error getting documents.", exception)
+        }
 
 
 }
