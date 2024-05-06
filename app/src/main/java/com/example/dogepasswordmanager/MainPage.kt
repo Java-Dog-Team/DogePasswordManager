@@ -2,6 +2,7 @@ package com.example.dogepasswordmanager
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
@@ -38,11 +39,9 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
@@ -51,13 +50,10 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -77,12 +73,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import coil.compose.rememberAsyncImagePainter
 import com.example.dogepasswordmanager.ui.theme.BackGroundColor
 import com.example.dogepasswordmanager.ui.theme.BrickRed
@@ -444,8 +437,20 @@ fun settingPage(context: Context){
             item->
             Surface (color = Color(255,255,255),
                 modifier = Modifier
-                    .clickable{
-                        itemClick(item,context)
+                    .clickable {
+//                      設定彈跳視窗
+                        val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
+                        alertDialog.setTitle("確定刪除帳號？")
+                        alertDialog.setPositiveButton(
+                            "刪除"
+                        ) { dialog, which ->
+                            itemClick(item, context)
+                        };
+                        alertDialog.setNeutralButton("取消"){
+                            dialog,which->
+                        }
+                        alertDialog.setCancelable(true)
+                        alertDialog.show()
                     }
                     .padding(vertical = 4.dp, horizontal = 8.dp)
                     .height(85.dp)
