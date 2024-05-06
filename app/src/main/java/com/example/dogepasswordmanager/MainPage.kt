@@ -524,7 +524,6 @@ fun itemClick(clickItem: Int, context: Context) {
             .addOnFailureListener { }
 
 
-
 //      刪除使用者帳號
         user.delete()
             .addOnCompleteListener { task ->
@@ -532,6 +531,10 @@ fun itemClick(clickItem: Int, context: Context) {
                     Log.d(TAG, "User account deleted.")
                 }
             }
+
+
+        //登出帳號
+        FirebaseAuth.getInstance().signOut()
 
 //      切換到 login activity
         var intent = Intent()

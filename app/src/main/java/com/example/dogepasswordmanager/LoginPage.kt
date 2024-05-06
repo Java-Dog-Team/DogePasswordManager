@@ -464,7 +464,6 @@ fun biometricHandler(context: FragmentActivity) {
 
     //當前使用者
     val currentUser = auth.currentUser
-
     val db = Firebase.firestore
 
 
