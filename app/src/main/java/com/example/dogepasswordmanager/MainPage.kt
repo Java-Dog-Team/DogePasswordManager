@@ -1,6 +1,7 @@
 package com.example.dogepasswordmanager
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
@@ -419,7 +420,7 @@ fun passwordRoom(
 
 }
 
-//設定葉面
+//設定頁面
 @Composable
 fun settingPage(context: Context){
     val albumlist = ArrayList<Int>()
@@ -444,7 +445,7 @@ fun settingPage(context: Context){
             Surface (color = Color(255,255,255),
                 modifier = Modifier
                     .clickable{
-                        itemClick(item)
+                        itemClick(item,context)
                     }
                     .padding(vertical = 4.dp, horizontal = 8.dp)
                     .height(85.dp)
@@ -477,11 +478,27 @@ fun settingPage(context: Context){
         }
     }
 }
-private fun itemClick(clickItem:Int){
+fun itemClick(clickItem:Int,context: Context){
+    var activity:Activity = context as Activity
     //    點選刪除帳號
     if(clickItem == R.string.deleteAccount){
+        //    取得目前登入的用戶
         val user = Firebase.auth.currentUser!!
 
+        val db=Firebase.firestore
+        val docs=ArrayList<String>()
+        db.collection(user.email.toString())
+            .get()
+            .addOnSuccessListener {
+                result->
+                for(document in result){
+                    db.collection(user.email.toString()).document(document.id)
+                        .delete()
+                        .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
+                        .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
+                }
+            }
+            .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
 
         user.delete()
             .addOnCompleteListener { task ->
@@ -489,6 +506,11 @@ private fun itemClick(clickItem:Int){
                     Log.d(TAG, "User account deleted.")
                 }
             }
+        var intent=Intent()
+        intent.setClass(context,MainActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        context.startActivity(intent)
+        activity.finish()
     }
 }
 
