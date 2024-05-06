@@ -487,12 +487,14 @@ fun itemClick(clickItem: Int, context: Context) {
 
         };
         alertDialog.setNeutralButton(
+
 //          設定字體顏色
             Html.fromHtml("<font color='#FF0000'>刪除</font>")
         ){
                 dialog,which->
             //          設定 click 事件
             deleteAccount(context)
+
         }
 //      讓使用者可以點視窗以外的灰色部分回到上一頁
         alertDialog.setCancelable(true)
@@ -500,20 +502,18 @@ fun itemClick(clickItem: Int, context: Context) {
         alertDialog.show()
     }
 //  選擇語言
-    else if(clickItem == R.string.theme){
+    else if (clickItem == R.string.theme) {
 
-    }
-    else if(clickItem == R.string.account){
+    } else if (clickItem == R.string.account) {
 
-    }
-    else if(clickItem == R.string.version){
+    } else if (clickItem == R.string.version) {
 
-    }
-    else if(clickItem == R.string.teach){
+    } else if (clickItem == R.string.teach) {
 
     }
 }
-fun deleteAccount(context: Context){
+
+fun deleteAccount(context: Context) {
     var activity: Activity = context as Activity
     //    取得目前登入的用戶
     val user = Firebase.auth.currentUser!!
@@ -559,19 +559,17 @@ fun deleteAccount(context: Context){
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Log.d(TAG, "User account deleted.")
+                //登出帳號
+                FirebaseAuth.getInstance().signOut()
+                //      切換到 login activity
+                var intent = Intent()
+                intent.setClass(context, MainActivity::class.java)
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                context.startActivity(intent)
+                activity.finish()
             }
         }
 
-
-    //登出帳號
-    FirebaseAuth.getInstance().signOut()
-
-//      切換到 login activity
-    var intent = Intent()
-    intent.setClass(context, MainActivity::class.java)
-    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-    context.startActivity(intent)
-    activity.finish()
 }
 
 //密碼產生器頁面
