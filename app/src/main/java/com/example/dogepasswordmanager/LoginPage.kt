@@ -424,13 +424,32 @@ private fun LogIn(activity: Activity, email: String, password: String) {
 
             } else {
 
-                //登入帳密有誤
-                Toast.makeText(
-                    activity,
-                    activity.getString(R.string.username_password_input_error),
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
+                //登入帳密有誤或者帳號不存在
+                Firebase.firestore.collection("users")
+                    .whereEqualTo("email", email)
+                    .get()
+                    .addOnSuccessListener { result ->
+                        if (result.size() == 0) {
+                            //使用者帳號不存在
+                            Toast.makeText(
+                                activity,
+                                activity.getString(R.string.username_not_exist_error),
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        } else {
+                            //使用者帳號存在，但是帳號密碼錯誤
+                            Toast.makeText(
+                                activity,
+                                activity.getString(R.string.username_password_input_error),
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        }
+
+                    }
+
+
             }
         }
 
@@ -445,7 +464,6 @@ fun biometricHandler(context: FragmentActivity) {
 
     //當前使用者
     val currentUser = auth.currentUser
-
     val db = Firebase.firestore
 
 

@@ -415,15 +415,15 @@ fun passwordRoom(
 
 //設定頁面
 @Composable
-fun settingPage(context: Context){
+fun settingPage(context: Context) {
     val albumlist = ArrayList<Int>()
 
-    val language= (R.string.language)
-    val theme=(R.string.theme)
-    val account=(R.string.account)
-    val version=(R.string.version)
-    val document=(R.string.teach)
-    val deleteAccount=(R.string.deleteAccount)
+    val language = (R.string.language)
+    val theme = (R.string.theme)
+    val account = (R.string.account)
+    val version = (R.string.version)
+    val document = (R.string.teach)
+    val deleteAccount = (R.string.deleteAccount)
 
     albumlist.add(language)
     albumlist.add(theme)
@@ -432,10 +432,9 @@ fun settingPage(context: Context){
     albumlist.add(document)
     albumlist.add(deleteAccount)
 
-    LazyColumn (){
-        items(albumlist){
-            item->
-            Surface (color = Color(255,255,255),
+    LazyColumn() {
+        items(albumlist) { item ->
+            Surface(color = Color(255, 255, 255),
                 modifier = Modifier
                     .clickable {
 //                      設定彈跳視窗
@@ -454,25 +453,28 @@ fun settingPage(context: Context){
                     }
                     .padding(vertical = 4.dp, horizontal = 8.dp)
                     .height(85.dp)
-                    ){
-                Row(modifier = Modifier
-                    .fillMaxSize()) {
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
                     Row(
                         modifier = Modifier.fillMaxSize()
-                    ){
-                        var col=Color.Black
-                        if(item==R.string.deleteAccount){
-                            col=Color.Red
+                    ) {
+                        var col = Color.Black
+                        if (item == R.string.deleteAccount) {
+                            col = Color.Red
+                        } else {
+                            col = Color.Black
                         }
-                        else{
-                            col=Color.Black
-                        }
-                        Text(text = stringResource(item),
+                        Text(
+                            text = stringResource(item),
                             modifier = Modifier
                                 .fillMaxHeight()
                                 .padding(20.dp),
                             fontSize = 30.sp,
-                            color=col)
+                            color = col
+                        )
 
                     }
                 }
@@ -483,24 +485,30 @@ fun settingPage(context: Context){
         }
     }
 }
-fun itemClick(clickItem:Int,context: Context){
-    var activity:Activity = context as Activity
+
+fun itemClick(clickItem: Int, context: Context) {
+    var activity: Activity = context as Activity
     //    點選刪除帳號
-    if(clickItem == R.string.deleteAccount){
+    if (clickItem == R.string.deleteAccount) {
         //    取得目前登入的用戶
         val user = Firebase.auth.currentUser!!
 
 //      讀取存放資料的 database
-        val db=Firebase.firestore
+        val db = Firebase.firestore
 //      刪除使用者的所有資料
         db.collection(user.email.toString())
             .get()
-            .addOnSuccessListener {
-                result->
-                for(document in result){
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    //刪除使用者紀錄
                     db.collection(user.email.toString()).document(document.id)
                         .delete()
-                        .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully deleted!") }
+                        .addOnSuccessListener {
+                            Log.d(
+                                TAG,
+                                "DocumentSnapshot successfully deleted!"
+                            )
+                        }
                         .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
                 }
             }
@@ -510,11 +518,12 @@ fun itemClick(clickItem:Int,context: Context){
         db.collection("users")
             .whereEqualTo("email", userMail)
             .get()
-            .addOnSuccessListener {
-                docs->
-                for(doc in docs){
+            .addOnSuccessListener { docs ->
+                for (doc in docs) {
+
                     db.collection("users").document(doc.id)
                         .delete()
+
                 }
             }
             .addOnFailureListener { }
@@ -528,9 +537,13 @@ fun itemClick(clickItem:Int,context: Context){
                 }
             }
 
+
+        //登出帳號
+        FirebaseAuth.getInstance().signOut()
+
 //      切換到 login activity
-        var intent=Intent()
-        intent.setClass(context,MainActivity::class.java)
+        var intent = Intent()
+        intent.setClass(context, MainActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         context.startActivity(intent)
         activity.finish()
