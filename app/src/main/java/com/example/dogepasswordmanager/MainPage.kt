@@ -485,8 +485,9 @@ fun itemClick(clickItem:Int,context: Context){
         //    取得目前登入的用戶
         val user = Firebase.auth.currentUser!!
 
+//      讀取存放資料的 database
         val db=Firebase.firestore
-        val docs=ArrayList<String>()
+//      刪除使用者的所有資料
         db.collection(user.email.toString())
             .get()
             .addOnSuccessListener {
@@ -500,12 +501,29 @@ fun itemClick(clickItem:Int,context: Context){
             }
             .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
 
+//      刪除 user 內的使用者的 email
+        db.collection("users")
+            .whereEqualTo("email", userMail)
+            .get()
+            .addOnSuccessListener {
+                docs->
+                for(doc in docs){
+                    db.collection("users").document(doc.id)
+                        .delete()
+                }
+            }
+            .addOnFailureListener { }
+
+
+//      刪除使用者帳號
         user.delete()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "User account deleted.")
                 }
             }
+
+//      切換到 login activity
         var intent=Intent()
         intent.setClass(context,MainActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
