@@ -426,7 +426,6 @@ fun settingPage(context: Context) {
     val document = (R.string.teach)
     val deleteAccount = (R.string.deleteAccount)
 
-    albumlist.add(language)
     albumlist.add(theme)
     albumlist.add(account)
     albumlist.add(version)
@@ -483,16 +482,17 @@ fun itemClick(clickItem: Int, context: Context) {
         alertDialog.setTitle("確定刪除帳號？")
         alertDialog.setPositiveButton(
 //          設定字體顏色
-            Html.fromHtml("<font color='#FF0000'>刪除</font>")
+            Html.fromHtml("<font color='#8080802'>取消</font>")
         ) { dialog, which ->
-//          設定 click 事件
-            deleteAccount(context)
+
         };
         alertDialog.setNeutralButton(
-//                          設定字體顏色
-            Html.fromHtml("<font color='#8080802'>取消</font>")
+//          設定字體顏色
+            Html.fromHtml("<font color='#FF0000'>刪除</font>")
         ){
                 dialog,which->
+            //          設定 click 事件
+            deleteAccount(context)
         }
 //      讓使用者可以點視窗以外的灰色部分回到上一頁
         alertDialog.setCancelable(true)
