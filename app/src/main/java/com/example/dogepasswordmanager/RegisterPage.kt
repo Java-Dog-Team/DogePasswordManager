@@ -215,7 +215,7 @@ fun registerPage(context: Context) {
                             if (passwordVisible.value) {
                                 //設定對應Icon
                                 Icon(
-                                    painter = painterResource(id = R.drawable.visible),
+                                    painter = painterResource(id = R.drawable.visible1),
                                     contentDescription = "Visible Icon",
                                     modifier = Modifier
                                         .size(25.dp)
@@ -226,7 +226,7 @@ fun registerPage(context: Context) {
                             } else {
 
                                 Icon(
-                                    painter = painterResource(id = R.drawable.invisible),
+                                    painter = painterResource(id = R.drawable.invisible1),
                                     contentDescription = "Invisible Icon",
                                     modifier = Modifier
                                         .size(25.dp)
@@ -279,7 +279,7 @@ fun registerPage(context: Context) {
                             if (confirmedPasswordVisible.value) {
                                 //設定對應Icon
                                 Icon(
-                                    painter = painterResource(id = R.drawable.visible),
+                                    painter = painterResource(id = R.drawable.visible1),
                                     contentDescription = "Visible Icon",
                                     modifier = Modifier
                                         .size(25.dp)
@@ -291,7 +291,7 @@ fun registerPage(context: Context) {
                             } else {
 
                                 Icon(
-                                    painter = painterResource(id = R.drawable.invisible),
+                                    painter = painterResource(id = R.drawable.invisible1),
                                     contentDescription = "Invisible Icon",
                                     modifier = Modifier
                                         .size(25.dp)

@@ -82,6 +82,7 @@ import com.example.dogepasswordmanager.ui.theme.BackGroundColor
 import com.example.dogepasswordmanager.ui.theme.BrickRed
 import com.example.dogepasswordmanager.ui.theme.ItemColor
 import com.example.dogepasswordmanager.ui.theme.digitsColor
+import com.google.android.gms.common.internal.StringResourceValueReader
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
@@ -479,17 +480,18 @@ fun itemClick(clickItem: Int, context: Context) {
     if (clickItem == R.string.deleteAccount) {
         //  設定彈跳視窗
         val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
-        alertDialog.setTitle("確定刪除帳號？")
+        val p:String= context.resources.getString(R.string.deletePositiveButton)
+        val n:String= context.resources.getString(R.string.deleteNeutralButton)
+        alertDialog.setTitle(R.string.deleteTitle)
         alertDialog.setPositiveButton(
 //          設定字體顏色
-            Html.fromHtml("<font color='#8080802'>取消</font>")
+            Html.fromHtml("<font color='#8080802'>"+p+"</font>")
         ) { dialog, which ->
 
         };
         alertDialog.setNeutralButton(
-
 //          設定字體顏色
-            Html.fromHtml("<font color='#FF0000'>刪除</font>")
+            Html.fromHtml("<font color='#FF0000'>"+n+"</font>")
         ){
                 dialog,which->
             //          設定 click 事件

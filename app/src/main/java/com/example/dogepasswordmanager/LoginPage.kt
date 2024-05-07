@@ -30,10 +30,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -100,6 +104,7 @@ class MainActivity : FragmentActivity() {
 private lateinit var auth: FirebaseAuth
 
 //登入頁面
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun loginPage(context: Context) {
@@ -190,13 +195,13 @@ fun loginPage(context: Context) {
                 ) {
 
                     //帳號輸入框
-                    TextField(
+                    OutlinedTextField(
                         value = userInputUsername.value,
-                        label = { Text(text = stringResource(id = R.string.login_email)) },
-                        singleLine = true,
-                        onValueChange = {
+                        onValueChange =  {
                             userInputUsername.value = it
                         },
+                        label = { Text(text = stringResource(id = R.string.login_email)) },
+                        singleLine = true,
                         isError = usernameError.value,
                         supportingText = {
                             if (usernameError.value)
@@ -204,8 +209,18 @@ fun loginPage(context: Context) {
                                     text = stringResource(id = R.string.login_email_error),
                                     color = MaterialTheme.colorScheme.error
                                 )
-                        }
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedTextColor = Color(247, 181, 56),
+                            unfocusedBorderColor = Color(247, 181, 56),
+                            unfocusedLabelColor = Color(247, 181, 56),
+                            focusedTextColor = Color(247, 181, 56),
+                            focusedBorderColor = Color(247, 181, 56),
+                            focusedLabelColor = Color(247, 181, 56)
+                        )
+
                     )
+
                 }
 
                 //密碼輸入
@@ -217,7 +232,7 @@ fun loginPage(context: Context) {
 
 
                     //密碼輸入欄位
-                    TextField(
+                    OutlinedTextField(
                         value = userInputPassword.value,
                         singleLine = true,
                         visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
@@ -228,7 +243,7 @@ fun loginPage(context: Context) {
                             if (passwordVisible.value) {
                                 //設定對應Icon
                                 Icon(
-                                    painter = painterResource(id = R.drawable.visible),
+                                    painter = painterResource(id = R.drawable.visible1),
                                     contentDescription = "Visible Icon",
                                     modifier = Modifier
                                         .size(25.dp)
@@ -239,7 +254,7 @@ fun loginPage(context: Context) {
                             } else {
 
                                 Icon(
-                                    painter = painterResource(id = R.drawable.invisible),
+                                    painter = painterResource(id = R.drawable.invisible1),
                                     contentDescription = "Invisible Icon",
                                     modifier = Modifier
                                         .size(25.dp)
@@ -260,7 +275,16 @@ fun loginPage(context: Context) {
                                     text = stringResource(id = R.string.login_password_error),
                                     color = MaterialTheme.colorScheme.error
                                 )
-                        }
+                        } ,
+
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedTextColor = Color(247, 181, 56),
+                            unfocusedBorderColor = Color(247, 181, 56),
+                            unfocusedLabelColor = Color(247, 181, 56),
+                            focusedTextColor = Color(247, 181, 56),
+                            focusedBorderColor = Color(247, 181, 56),
+                            focusedLabelColor = Color(247, 181, 56)
+                        )
                     )
                 }
 
