@@ -9,6 +9,7 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.icu.text.ListFormatter.Width
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings.Secure
@@ -19,6 +20,7 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,13 +29,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -100,6 +109,7 @@ class MainActivity : FragmentActivity() {
 private lateinit var auth: FirebaseAuth
 
 //登入頁面
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun loginPage(context: Context) {
@@ -137,45 +147,28 @@ fun loginPage(context: Context) {
 
 
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
-
-
+    Column(verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()) {
         //登入頁面開頭
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1.5f)
-                .padding(top = 20.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = stringResource(id = R.string.login_title),
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-            }
 
-        }
-
+        Image(painter = painterResource(R.drawable.doogemanager),
+            contentDescription = stringResource(id = R.string.login_title),
+            contentScale = ContentScale.FillWidth,
+            modifier = Modifier.fillMaxWidth()
+        )
 
         //帳密輸入欄位、登入按鈕以及註冊 忘記密碼按鈕
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(6f)
                 .padding(bottom = 100.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .padding(top = 10.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -190,13 +183,13 @@ fun loginPage(context: Context) {
                 ) {
 
                     //帳號輸入框
-                    TextField(
+                    OutlinedTextField(
                         value = userInputUsername.value,
-                        label = { Text(text = stringResource(id = R.string.login_email)) },
-                        singleLine = true,
-                        onValueChange = {
+                        onValueChange =  {
                             userInputUsername.value = it
                         },
+                        label = { Text(text = stringResource(id = R.string.login_email)) },
+                        singleLine = true,
                         isError = usernameError.value,
                         supportingText = {
                             if (usernameError.value)
@@ -204,8 +197,20 @@ fun loginPage(context: Context) {
                                     text = stringResource(id = R.string.login_email_error),
                                     color = MaterialTheme.colorScheme.error
                                 )
-                        }
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedTextColor = Color(0, 0, 0),
+                            unfocusedBorderColor = Color(235, 195, 18),
+                            unfocusedLabelColor = Color(235, 195, 18),
+                            focusedTextColor = Color(0, 0, 0),
+                            focusedBorderColor = Color(235, 195, 18),
+                            focusedLabelColor = Color(235, 195, 18)
+                        ),
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.width(275.dp)
+
                     )
+
                 }
 
                 //密碼輸入
@@ -217,7 +222,7 @@ fun loginPage(context: Context) {
 
 
                     //密碼輸入欄位
-                    TextField(
+                        OutlinedTextField(
                         value = userInputPassword.value,
                         singleLine = true,
                         visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
@@ -234,7 +239,10 @@ fun loginPage(context: Context) {
                                         .size(25.dp)
                                         .clickable() {
                                             passwordVisible.value = !passwordVisible.value
-                                        })
+                                        },
+                                    tint=Color(235, 195, 18)
+                                )
+
 
                             } else {
 
@@ -245,7 +253,9 @@ fun loginPage(context: Context) {
                                         .size(25.dp)
                                         .clickable() {
                                             passwordVisible.value = !passwordVisible.value
-                                        })
+                                        },
+                                    tint=Color(235, 195, 18)
+                                )
                             }
 
 
@@ -260,18 +270,32 @@ fun loginPage(context: Context) {
                                     text = stringResource(id = R.string.login_password_error),
                                     color = MaterialTheme.colorScheme.error
                                 )
-                        }
+                        } ,
+
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedTextColor = Color(0, 0, 0),
+                            unfocusedBorderColor = Color(235, 195, 18),
+                            unfocusedLabelColor = Color(235, 195, 18),
+                            focusedTextColor = Color(0, 0, 0),
+                            focusedBorderColor = Color(235, 195, 18),
+                            focusedLabelColor = Color(235, 195, 18)
+                        ),
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.width(275.dp)
                     )
                 }
 
                 //登入按鈕
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 10.dp, end = 10.dp, top = 10.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     //登入按鈕元件
-                    Button(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp),
+                    Button(modifier = Modifier.width(275.dp)
+                        .padding(top = 20.dp),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.buttonColors(Color(235, 195, 18)),
                         onClick = {
                             //按下登入按鈕後的操作
 
@@ -307,6 +331,40 @@ fun loginPage(context: Context) {
 
 
                 //註冊、修改密碼
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 15.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(end = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.forget_password_button_text),
+                                fontSize = 25.sp,
+                                color = Color.Gray,
+                                modifier = Modifier.clickable() {
+                                    //點擊忘記密碼按鈕後的操作
+
+                                    //啟動忘記密碼頁面
+                                    var intent = Intent()
+                                    intent.setClass(context, UpdatePasswordPage::class.java)
+                                    context.startActivity(intent)
+                                })
+
+                        }
+                    }
+                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -350,40 +408,6 @@ fun loginPage(context: Context) {
 
                     }
 
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .weight(1f),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(end = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = stringResource(R.string.forget_password_button_text),
-                                fontSize = 25.sp,
-                                color = Color.Gray,
-                                modifier = Modifier.clickable() {
-                                    //點擊忘記密碼按鈕後的操作
-
-                                    //啟動忘記密碼頁面
-                                    var intent = Intent()
-                                    intent.setClass(context, UpdatePasswordPage::class.java)
-                                    context.startActivity(intent)
-                                })
-
-                        }
-                    }
                 }
 
             }

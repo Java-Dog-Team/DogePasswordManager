@@ -80,4 +80,8 @@
     <string name="version">版本資訊</string>
     <string name="teach">教學文件</string>
     <string name="deleteAccount">刪除帳號</string>
+    <!--  deleteAlert  -->
+    <string name="deleteTitle">確定要刪除帳號？</string>
+    <string name="deletePositiveButton">取消</string>
+    <string name="deleteNeutralButton">刪除</string>
 </resources>

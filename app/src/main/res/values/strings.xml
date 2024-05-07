@@ -79,4 +79,8 @@
     <string name="version">Version</string>
     <string name="teach">Document</string>
     <string name="deleteAccount">Delete Account</string>
+    <!--  deleteAlert  -->
+    <string name="deleteTitle">Do you want to delete the account?</string>
+    <string name="deletePositiveButton">Cancel</string>
+    <string name="deleteNeutralButton">Delete</string>
 </resources>

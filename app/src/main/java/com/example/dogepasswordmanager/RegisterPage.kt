@@ -337,7 +337,6 @@ fun registerPage(context: Context) {
 
                             //對所有輸入欄位進行檢查 以及 帳號存在性檢查
 
-
                             //檢查密碼
                             passwordErrorType.value = checkPassword(userInputPassword.value)
 
