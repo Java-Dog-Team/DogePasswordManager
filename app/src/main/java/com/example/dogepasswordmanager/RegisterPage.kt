@@ -215,7 +215,7 @@ fun registerPage(context: Context) {
                             if (passwordVisible.value) {
                                 //設定對應Icon
                                 Icon(
-                                    painter = painterResource(id = R.drawable.visible1),
+                                    painter = painterResource(id = R.drawable.visible),
                                     contentDescription = "Visible Icon",
                                     modifier = Modifier
                                         .size(25.dp)
@@ -226,7 +226,7 @@ fun registerPage(context: Context) {
                             } else {
 
                                 Icon(
-                                    painter = painterResource(id = R.drawable.invisible1),
+                                    painter = painterResource(id = R.drawable.invisible),
                                     contentDescription = "Invisible Icon",
                                     modifier = Modifier
                                         .size(25.dp)
@@ -279,7 +279,7 @@ fun registerPage(context: Context) {
                             if (confirmedPasswordVisible.value) {
                                 //設定對應Icon
                                 Icon(
-                                    painter = painterResource(id = R.drawable.visible1),
+                                    painter = painterResource(id = R.drawable.visible),
                                     contentDescription = "Visible Icon",
                                     modifier = Modifier
                                         .size(25.dp)
@@ -291,7 +291,7 @@ fun registerPage(context: Context) {
                             } else {
 
                                 Icon(
-                                    painter = painterResource(id = R.drawable.invisible1),
+                                    painter = painterResource(id = R.drawable.invisible),
                                     contentDescription = "Invisible Icon",
                                     modifier = Modifier
                                         .size(25.dp)
@@ -336,7 +336,6 @@ fun registerPage(context: Context) {
                             //按下註冊按鈕後的操作
 
                             //對所有輸入欄位進行檢查 以及 帳號存在性檢查
-
 
                             //檢查密碼
                             passwordErrorType.value = checkPassword(userInputPassword.value)
