@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +41,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -57,6 +59,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -77,7 +80,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.example.dogepasswordmanager.ui.theme.BackGroundColor
 import com.example.dogepasswordmanager.ui.theme.BrickRed
 import com.example.dogepasswordmanager.ui.theme.ItemColor
@@ -115,11 +121,6 @@ class MainPage : ComponentActivity() {
         userMail = auth.currentUser?.email.toString()
 
 
-
-        setContent {
-
-            mainPage(this@MainPage)
-        }
     }
 
     override fun onStart() {
@@ -129,9 +130,27 @@ class MainPage : ComponentActivity() {
         root = storage.reference
         imageRef = root.child("images")
 
-        //載入使用者紀錄，載入完畢後就關閉載入動畫
-        loadUserData()
 
+        setContent {
+            var loaderFlag = remember {
+                mutableStateOf(true)
+            }
+            //載入使用者紀錄，載入完畢後就關閉載入動畫
+            loadUserData(loaderFlag)
+            if (loaderFlag.value) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.width(64.dp)
+                    )
+                }
+
+            } else
+                mainPage(this@MainPage)
+        }
     }
 
     override fun onResume() {
@@ -151,6 +170,7 @@ private lateinit var userMail: String
 
 //使用者紀錄資訊
 var lists = mutableStateListOf<AppData?>()
+var customImgCnt = mutableStateOf(0)
 
 //firebase 儲存空間物件
 private var storage = com.google.firebase.Firebase.storage
@@ -178,7 +198,14 @@ fun mainPage(context: Context) {
     var showingTitle = remember { mutableStateOf(MainPage.PASSWORD_ROOM) }
 
 
+    //是否要顯示載入動畫(在圖片尚未載入完成時顯示)
+    var showLoader = remember {
+        mutableStateOf(false)
+    }
 
+    //使用者客製化圖片的紀錄數量大於0 需要花時間載入圖片
+    if (customImgCnt.value > 0)
+        showLoader.value = true
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -248,16 +275,21 @@ fun mainPage(context: Context) {
                 //密碼庫頁面
                 passwordRoom(
                     context,
-                    dialogShowingFlag = dialogShowingFlag
+                    dialogShowingFlag = dialogShowingFlag,
+                    showLoader
                 )
 
 
             } else if (showingPage.value == MainPage.PASSWORD_GEN) {
                 //密碼產生器頁面
                 passwordGeneratorPage(context)
+
             } else if (showingPage.value == MainPage.SETTING) {
+
                 //設定畫面
                 settingPage(context)
+
+
             }
 
 
@@ -364,32 +396,85 @@ fun mainPage(context: Context) {
 
 
     //顯示對話窗
-    dialogWindow(context, dialogShowingFlag)
+    dialogWindow(context, dialogShowingFlag, showLoader)
 }
 
 //密碼庫頁面
 @Composable
 fun passwordRoom(
     context: Context,
-    dialogShowingFlag: MutableState<Boolean>
+    dialogShowingFlag: MutableState<Boolean>,
+    showLoader: MutableState<Boolean>
 ) {
 
+    //每一個紀錄項目的載入狀態
+    var flagList = remember {
+        mutableStateListOf<MutableState<Boolean>>()
+    }
+    flagList.clear()
     Box {
 
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
 
-            items(lists) { item ->
+        //lazyColumn的modifier 會配合載入動畫做消失和出現
+        var lazyColModifier = Modifier
+            .fillMaxSize()
+            .alpha(1f)
 
-                AppDataBlock(
-                    item!!,
-                    dialogShowingFlag,
-                    context
-                )
-
-
-            }
+        if (showLoader.value) {
+            lazyColModifier = Modifier
+                .fillMaxSize()
+                .alpha(0f)
+        } else {
+            lazyColModifier = Modifier
+                .fillMaxSize()
+                .alpha(1f)
         }
 
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+
+
+            LazyColumn(
+                modifier = lazyColModifier
+            ) {
+
+                items(lists) { item ->
+                    //每項紀錄的圖片是否載入完畢(預設為預設圖片，不需要載入動畫)
+                    var flag = remember { mutableStateOf(true) }
+                    if (item!!.AppImgId != "") {
+                        //使用者使用客製化圖片，需要載入動畫
+                        flag.value = false
+                        flagList.add(flag)
+                    }
+
+                    AppDataBlock(
+                        item!!,
+                        dialogShowingFlag,
+                        context,
+                        flag,
+                        showLoader,
+                        flagList
+                    )
+
+
+                }
+            }
+            if (showLoader.value) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.width(64.dp)
+                    )
+                }
+
+            }
+
+        }
         //新增記錄按鈕
         FloatingActionButton(containerColor = ItemColor,
             contentColor = Color.White,
@@ -404,11 +489,13 @@ fun passwordRoom(
                 intent.setClass(context, AddRecordActivity::class.java)
                 intent.putExtra("email", userMail)
                 context.startActivity(intent)
+
             }) {
 
             Icon(Icons.Filled.Add, "Floating Action Button")
 
         }
+
 
     }
 
@@ -490,8 +577,7 @@ fun itemClick(clickItem: Int, context: Context) {
 
 //          設定字體顏色
             Html.fromHtml("<font color='#FF0000'>刪除</font>")
-        ){
-                dialog,which->
+        ) { dialog, which ->
             //          設定 click 事件
             deleteAccount(context)
 
@@ -994,7 +1080,10 @@ fun passwordGeneratorPage(context: Context) {
 fun AppDataBlock(
     userAppData: AppData,
     dialogShowingState: MutableState<Boolean>,
-    context: Context
+    context: Context,
+    loaderFlag: MutableState<Boolean>,
+    showLoader: MutableState<Boolean>,
+    flagList: MutableList<MutableState<Boolean>>
 ) {
 
 
@@ -1005,6 +1094,9 @@ fun AppDataBlock(
             .clip(RoundedCornerShape(50.dp))
             .height(70.dp)
             .clickable() {
+
+
+
                 appData = userAppData
                 //按下項目條後進入檢視畫面
                 //跳出編輯視窗
@@ -1031,6 +1123,7 @@ fun AppDataBlock(
                     appData!!.AppUsername
                 )
 
+                flagList.clear()
 
                 context.startActivity(newIntent)
                 //關閉此頁面
@@ -1060,15 +1153,34 @@ fun AppDataBlock(
                 }
 
                 //App Icon
-                Image(
-                    painter = rememberAsyncImagePainter(model = img.value),
+
+                AsyncImage(
+                    model = img.value,
                     contentDescription = "App Icon",
-                    contentScale = ContentScale.Crop,
+
                     modifier = Modifier
                         .size(60.dp)
                         .clip(CircleShape)
-                        .border(1.dp, Color.LightGray, CircleShape)
-                )
+                        .border(1.dp, Color.LightGray, CircleShape),
+                    contentScale = ContentScale.Crop,
+                    onSuccess = {
+                        Log.d("MSG", "SUCESSS")
+                        //圖片以載入完畢，不須顯示載入動畫
+                        loaderFlag.value = true
+                        //若所有項目圖片都載入完畢
+                        val result = flagList.all {
+                            it.value
+                        }
+                        Log.d("MSG", "result: " + result.toString())
+                        Log.d("MSG", "Length: " + flagList.size.toString())
+                        if (result == true) {
+                            //關閉loader動畫
+                            showLoader.value = false
+                        }
+                    },
+
+                    )
+
             } else {
                 //App Icon預設圖片
                 Image(
@@ -1154,7 +1266,11 @@ fun AppDataBlock(
 
 //按下選項按鈕後出現的對話窗
 @Composable
-fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
+fun dialogWindow(
+    context: Context,
+    dialogShowingState: MutableState<Boolean>,
+    showLoader: MutableState<Boolean>
+) {
 
     //剪貼簿管理員
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
@@ -1217,6 +1333,8 @@ fun dialogWindow(context: Context, dialogShowingState: MutableState<Boolean>) {
                             .weight(1f)
                             .clickable() {
                                 //按下檢視帳號資訊按鈕後的動作
+
+                                showLoader.value = false
 
                                 //顯示檢視帳號資訊頁面
                                 var intent = Intent()
@@ -1475,16 +1593,15 @@ fun generateSecurePassword(
 
     }
 
-    Log.d("MSG", result)
 
     return result
 }
 
 
-fun loadUserData() {
+fun loadUserData(loaderFlag: MutableState<Boolean>) {
 
     lists.clear()
-
+    customImgCnt.value = 0
     val db = Firebase.firestore
     var docRef = db.collection(userMail)
 
@@ -1502,7 +1619,10 @@ fun loadUserData() {
                         AppPassword = detailData.get("appPassword").toString()
                     )
                 )
+                if (detailData.get("appImgId").toString() != "")
+                    customImgCnt.value += 1
             }
+            loaderFlag.value = false
         }.addOnFailureListener { exception ->
             Log.w(TAG, "Error getting documents: ", exception)
         }
