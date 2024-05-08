@@ -365,6 +365,8 @@ fun loginPage(context: Context) {
                         }
                     }
                 }
+
+                //註冊
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -436,7 +438,7 @@ private fun FastLoginHandler(context: Context) {
 
         //獲取生物辨識偏好設定內容(預設為不開啟)
         val bioPref: Boolean? = context.getSharedPreferences(
-            currentUser.email.toString() + MainActivity.BIOMETRIC_AVAILABLE,
+            currentUser.email.toString() +"_"+ MainActivity.BIOMETRIC_AVAILABLE,
             MODE_PRIVATE
         ).getBoolean(MainActivity.BIOMETRIC_AVAILABLE_KEY, false)
 

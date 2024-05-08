@@ -5,7 +5,9 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.text.Html
@@ -53,10 +55,12 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -513,12 +517,36 @@ fun settingPage(context: Context) {
     val version = (R.string.version)
     val document = (R.string.teach)
     val deleteAccount = (R.string.deleteAccount)
-
+    val biometricAuthentication = R.string.biometricAuthentication
     albumlist.add(theme)
     albumlist.add(account)
     albumlist.add(version)
     albumlist.add(document)
     albumlist.add(deleteAccount)
+    albumlist.add(biometricAuthentication)
+
+    //生物辨識開關狀態
+    var checked by remember { mutableStateOf(false) }
+    //使用者偏好設定:生物辨識開關狀態
+    var bioPref by remember {
+        mutableStateOf(
+            context.getSharedPreferences(
+                auth.currentUser!!.email.toString() + "_" + MainActivity.BIOMETRIC_AVAILABLE,
+                Context.MODE_PRIVATE
+            ).getBoolean(MainActivity.BIOMETRIC_AVAILABLE_KEY, false)
+        )
+    }
+
+    //根據使用者偏好設定設定開關初始值
+    if (bioPref == true)
+        checked = true
+
+    val biometricPref: SharedPreferences = context.getSharedPreferences(
+        auth.currentUser!!.email.toString()+"_" + MainActivity.BIOMETRIC_AVAILABLE,
+        MODE_PRIVATE
+    )
+    val editor: SharedPreferences.Editor = biometricPref.edit()
+
 
     LazyColumn() {
         items(albumlist) { item ->
@@ -534,25 +562,45 @@ fun settingPage(context: Context) {
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        var col = Color.Black
-                        if (item == R.string.deleteAccount) {
-                            col = Color.Red
-                        } else {
-                            col = Color.Black
-                        }
-                        Text(
-                            text = stringResource(item),
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .padding(20.dp),
-                            fontSize = 30.sp,
-                            color = col
-                        )
+                    //若為生物辨識
+                    if (item == R.string.biometricAuthentication) {
 
+
+                        //生物辨識啟動開關
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            Switch(
+                                checked = checked,
+                                onCheckedChange = {
+                                    checked = it
+                                    bioPref = it
+                                    //修改使用者偏好設定
+                                    editor.putBoolean(MainActivity.BIOMETRIC_AVAILABLE_KEY, checked)
+                                    editor.commit()
+                                }
+                            )
+                        }
+                    } else {
+                        Row(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            var col = Color.Black
+                            if (item == R.string.deleteAccount) {
+                                col = Color.Red
+                            } else {
+                                col = Color.Black
+                            }
+                            Text(
+                                text = stringResource(item),
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .padding(20.dp),
+                                fontSize = 30.sp,
+                                color = col
+                            )
+
+                        }
                     }
+
                 }
             }
             Divider(
@@ -560,6 +608,8 @@ fun settingPage(context: Context) {
             )
         }
     }
+
+
 }
 
 fun itemClick(clickItem: Int, context: Context) {
@@ -567,21 +617,20 @@ fun itemClick(clickItem: Int, context: Context) {
     if (clickItem == R.string.deleteAccount) {
         //  設定彈跳視窗
         val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
-        val p:String= context.resources.getString(R.string.deletePositiveButton)
-        val n:String= context.resources.getString(R.string.deleteNeutralButton)
+        val p: String = context.resources.getString(R.string.deletePositiveButton)
+        val n: String = context.resources.getString(R.string.deleteNeutralButton)
         alertDialog.setTitle(R.string.deleteTitle)
         alertDialog.setPositiveButton(
 //          設定字體顏色
-            Html.fromHtml("<font color='#8080802'>"+p+"</font>")
+            Html.fromHtml("<font color='#8080802'>" + p + "</font>")
         ) { dialog, which ->
 
         };
         alertDialog.setNeutralButton(
 //          設定字體顏色
 
-            Html.fromHtml("<font color='#FF0000'>"+n+"</font>")
-        ){
-                dialog,which->
+            Html.fromHtml("<font color='#FF0000'>" + n + "</font>")
+        ) { dialog, which ->
 
             //          設定 click 事件
             deleteAccount(context)
@@ -1099,7 +1148,6 @@ fun AppDataBlock(
             .clip(RoundedCornerShape(50.dp))
             .height(70.dp)
             .clickable() {
-
 
 
                 appData = userAppData
