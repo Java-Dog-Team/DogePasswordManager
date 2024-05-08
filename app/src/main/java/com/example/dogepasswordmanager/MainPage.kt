@@ -2,6 +2,7 @@ package com.example.dogepasswordmanager
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityOptions
 import android.app.AlertDialog
 import android.content.ContentValues.TAG
 import android.content.Context
@@ -15,10 +16,14 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,11 +68,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -81,6 +88,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -235,21 +243,24 @@ fun mainPage(context: Context) {
                         text = stringResource(id = R.string.button_option1),
                         fontSize = 30.sp,
                         color = Color.White,
-                        modifier = Modifier.padding(start = 15.dp)
+                        modifier = Modifier
+                            .padding(start = 15.dp)
                     )
                 else if (showingTitle.value == MainPage.PASSWORD_GEN)
                     Text(
                         text = stringResource(id = R.string.button_option2),
                         fontSize = 30.sp,
                         color = Color.White,
-                        modifier = Modifier.padding(start = 15.dp)
+                        modifier = Modifier
+                            .padding(start = 15.dp)
                     )
                 else if (showingTitle.value == MainPage.SETTING)
                     Text(
                         text = stringResource(id = R.string.button_option3),
                         fontSize = 30.sp,
                         color = Color.White,
-                        modifier = Modifier.padding(start = 15.dp)
+                        modifier = Modifier
+                            .padding(start = 15.dp)
                     )
             }
             //功能圖示
@@ -294,7 +305,6 @@ fun mainPage(context: Context) {
                 //設定畫面
                 settingPage(context)
 
-
             }
 
 
@@ -318,12 +328,16 @@ fun mainPage(context: Context) {
                     .fillMaxSize()
                     .border(1.dp, Color.LightGray)
                     .clickable() {
+
                         //按下按鈕後處理
                         showingTitle.value = MainPage.PASSWORD_ROOM
                         //顯示左上角搜尋、過濾按鈕
                         topLeftButtonVisibleFlag.value = true;
                         //切換顯示密碼庫頁面
                         showingPage.value = MainPage.PASSWORD_ROOM
+
+
+
                     }) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(
@@ -340,6 +354,7 @@ fun mainPage(context: Context) {
                 }
 
             }
+
             //密碼產生器按鈕
             Column(horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -367,6 +382,7 @@ fun mainPage(context: Context) {
                     modifier = Modifier.padding(top = 5.dp)
                 )
             }
+
             //設定按鈕
             Column(horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -402,6 +418,7 @@ fun mainPage(context: Context) {
 
     //顯示對話窗
     dialogWindow(context, dialogShowingFlag, showLoader)
+
 }
 
 //密碼庫頁面
@@ -493,7 +510,11 @@ fun passwordRoom(
                 var intent = Intent()
                 intent.setClass(context, AddRecordActivity::class.java)
                 intent.putExtra("email", userMail)
-                context.startActivity(intent)
+                context.startActivity(
+                    intent,
+                        ActivityOptions.makeCustomAnimation(context as Activity,
+                            androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle()
+                )
 
             }) {
 
@@ -542,7 +563,7 @@ fun settingPage(context: Context) {
         checked = true
 
     val biometricPref: SharedPreferences = context.getSharedPreferences(
-        auth.currentUser!!.email.toString()+"_" + MainActivity.BIOMETRIC_AVAILABLE,
+        auth.currentUser!!.email.toString() + "_" + MainActivity.BIOMETRIC_AVAILABLE,
         MODE_PRIVATE
     )
     val editor: SharedPreferences.Editor = biometricPref.edit()
@@ -705,7 +726,8 @@ fun deleteAccount(context: Context) {
                 var intent = Intent()
                 intent.setClass(context, MainActivity::class.java)
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                context.startActivity(intent)
+                context.startActivity(intent,ActivityOptions.makeCustomAnimation(context as Activity,
+                    androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
                 activity.finish()
             }
         }
@@ -1178,7 +1200,8 @@ fun AppDataBlock(
 
                 flagList.clear()
 
-                context.startActivity(newIntent)
+                context.startActivity(newIntent,ActivityOptions.makeCustomAnimation(context as Activity,
+                    androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
                 //關閉此頁面
             }
 
@@ -1397,7 +1420,8 @@ fun dialogWindow(
                                 intent.putExtra(MainPage.APP_NAME, appData!!.AppName)
                                 intent.putExtra(MainPage.APP_PASSWORD, appData!!.AppPassword)
                                 intent.putExtra(MainPage.APP_USERNAME, appData!!.AppUsername)
-                                context.startActivity(intent)
+                                context.startActivity(intent,ActivityOptions.makeCustomAnimation(context as Activity,
+                                    androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
 
                                 dialogShowingState.value = false
                             }) {
@@ -1682,3 +1706,5 @@ fun loadUserData(loaderFlag: MutableState<Boolean>) {
 
 
 }
+
+

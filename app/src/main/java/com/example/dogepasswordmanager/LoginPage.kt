@@ -3,6 +3,7 @@ package com.example.dogepasswordmanager
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
+import android.app.ActivityOptions
 import android.app.KeyguardManager
 import android.content.ContentResolver
 import android.content.ContentValues.TAG
@@ -359,7 +360,8 @@ fun loginPage(context: Context) {
                                     //啟動忘記密碼頁面
                                     var intent = Intent()
                                     intent.setClass(context, UpdatePasswordPage::class.java)
-                                    context.startActivity(intent)
+                                    context.startActivity(intent,ActivityOptions.makeCustomAnimation(context as Activity,
+                                        androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
                                 })
 
                         }
@@ -472,7 +474,8 @@ private fun LogIn(activity: Activity, email: String, password: String) {
                         MainPage::class.java
                     )
                     //開啟主頁面
-                    activity.startActivity(intent)
+                    activity.startActivity(intent, ActivityOptions.makeCustomAnimation(activity,
+                        androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
                     //關閉登入頁面
                     activity.finish()
                 } else {
@@ -545,7 +548,8 @@ fun biometricHandler(context: FragmentActivity) {
                         //驗證成功後的動作
                         var intent = Intent()
                         intent.setClass(context, MainPage::class.java)
-                        context.startActivity(intent)
+                        context.startActivity(intent,ActivityOptions.makeCustomAnimation(context as Activity,
+                            androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
 
                         context.finish()
                     }.authenticate(getPromptInfo(context))

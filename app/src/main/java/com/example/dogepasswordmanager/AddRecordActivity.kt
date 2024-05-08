@@ -549,7 +549,7 @@ fun updateDbRecord(context: Context, appData: AppData) {
             Log.d("MSG", "DocumentSnapshot added with ID: " + appData.DataId)
             val activity = context as Activity
             //儲存成功後 關閉畫面
-            activity.finish()
+            activity.finishAfterTransition()
         }
         .addOnFailureListener { e ->
             Log.w("MSG", "Error adding document", e)

@@ -1,6 +1,7 @@
 package com.example.dogepasswordmanager
 
 import android.app.Activity
+import android.app.ActivityOptions
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
@@ -340,7 +341,8 @@ fun ViewPage(context: Context) {
                                 intentObj.getStringExtra(MainPage.APP_USERNAME)
                             )
 
-                            context.startActivity(newIntent)
+                            context.startActivity(newIntent, ActivityOptions.makeCustomAnimation(context as Activity,
+                                androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
                             //關閉此頁面
                             activity.finish()
                         },
