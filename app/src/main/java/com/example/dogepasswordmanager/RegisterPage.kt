@@ -449,31 +449,6 @@ fun registerPage(context: Context) {
                                 fontSize = 20.sp)
                         }
                     }
-
-                    //返回登入
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 20.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.register_already_has_account_text),
-                            fontSize = 25.sp
-                        )
-                        Text(
-                            text = stringResource(id = R.string.register_already_has_account_button_text),
-                            fontSize = 22.sp,
-                            modifier = Modifier.clickable() {
-                                //按下返回登入按鈕後的操作
-
-                                //直接結束當前activity
-                                activity?.finish()
-                            },
-                            color = Color.Gray
-                        )
-                    }
                 }
             }
         }
