@@ -38,6 +38,7 @@
     <string name="register_already_has_account_button_text">返回登入</string>
     <string name="register_user_already_exist">帳號已存在</string>
     <string name="register_button">註冊</string>
+    <string name="register_page">用電子郵件註冊</string>
     <!--    ForgetPwdPage-->
     <string name="forget_email_field">電子郵件</string>
     <string name="forget_email_field_error">請確認輸入</string>

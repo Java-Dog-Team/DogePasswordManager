@@ -368,7 +368,6 @@ fun loginPage(context: Context) {
                         modifier = Modifier.clickable() {
                             //點擊註冊按鈕後的操作
 
-
                             //挑轉至註冊頁面
                             var intent = Intent()
                             intent.setClass(

@@ -43,7 +43,8 @@
     <string name="register_already_has_account_text">Already have an account?</string>
     <string name="register_already_has_account_button_text">Login</string>
     <string name="register_user_already_exist">Account is already exists</string>
-    <string name="register_button">Register</string>
+    <string name="register_button">Sign Up</string>
+    <string name="register_page">Sign Up</string>
     <!--    ViewPage-->
     <string name="view_alert_dialog_title">Delete Item</string>
     <string name="view_alert_dialog_content">Delete?</string>
