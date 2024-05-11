@@ -153,7 +153,7 @@ fun loginPage(context: Context) {
     Column(verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
-            .padding(top = 50.dp)) {
+            .padding(top = 35.dp)) {
         //登入頁面開頭
 
         Image(painter = painterResource(R.drawable.doogemanager),
