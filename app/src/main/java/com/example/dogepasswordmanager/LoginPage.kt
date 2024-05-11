@@ -26,6 +26,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -68,6 +69,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import org.checkerframework.common.subtyping.qual.Bottom
 
 
 class MainActivity : FragmentActivity() {
@@ -150,7 +152,8 @@ fun loginPage(context: Context) {
 
     Column(verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()) {
+        modifier = Modifier.fillMaxSize()
+            .padding(top = 50.dp)) {
         //登入頁面開頭
 
         Image(painter = painterResource(R.drawable.doogemanager),
@@ -163,12 +166,13 @@ fun loginPage(context: Context) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 100.dp),
+                .fillMaxHeight(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 10.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -214,77 +218,90 @@ fun loginPage(context: Context) {
 
                 }
 
-                //密碼輸入
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-
-
-                    //密碼輸入欄位
+                //密碼輸入 && 忘記密碼
+                Column (modifier = Modifier.width(275.dp)){
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        horizontalArrangement = Arrangement.SpaceEvenly
+//                    ) {
+                        //密碼輸入欄位
                         OutlinedTextField(
-                        value = userInputPassword.value,
-                        singleLine = true,
-                        visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        label = { Text(text = stringResource(id = R.string.login_password)) },
-                        trailingIcon = {
-                            //可以看到密碼
-                            if (passwordVisible.value) {
-                                //設定對應Icon
-                                Icon(
-                                    painter = painterResource(id = R.drawable.visible),
-                                    contentDescription = "Visible Icon",
-                                    modifier = Modifier
-                                        .size(25.dp)
-                                        .clickable() {
-                                            passwordVisible.value = !passwordVisible.value
-                                        },
-                                    tint=Color(235, 195, 18)
-                                )
+                            value = userInputPassword.value,
+                            singleLine = true,
+                            visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            label = { Text(text = stringResource(id = R.string.login_password)) },
+                            trailingIcon = {
+                                //可以看到密碼
+                                if (passwordVisible.value) {
+                                    //設定對應Icon
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.visible),
+                                        contentDescription = "Visible Icon",
+                                        modifier = Modifier
+                                            .size(25.dp)
+                                            .clickable() {
+                                                passwordVisible.value = !passwordVisible.value
+                                            },
+                                        tint=Color(235, 195, 18)
+                                    )
+                                } else {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.invisible),
+                                        contentDescription = "Invisible Icon",
+                                        modifier = Modifier
+                                            .size(25.dp)
+                                            .clickable() {
+                                                passwordVisible.value = !passwordVisible.value
+                                            },
+                                        tint=Color(235, 195, 18)
+                                    )
+                                }
+                            },
+                            onValueChange = {
+                                userInputPassword.value = it
+                            },
+                            isError = passwordError.value,
+                            supportingText = {
+                                if (passwordError.value)
+                                    Text(
+                                        text = stringResource(id = R.string.login_password_error),
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                            } ,
 
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedTextColor = Color(0, 0, 0),
+                                unfocusedBorderColor = Color(235, 195, 18),
+                                unfocusedLabelColor = Color(235, 195, 18),
+                                focusedTextColor = Color(0, 0, 0),
+                                focusedBorderColor = Color(235, 195, 18),
+                                focusedLabelColor = Color(235, 195, 18)
+                            ),
+                            shape = RoundedCornerShape(20.dp),
+                            modifier = Modifier.width(275.dp)
+                                .padding(bottom = 0.dp)
+                        )
+//                    }
+                    Text(
+                        text = stringResource(R.string.forget_password_button_text),
+                        fontSize = 20.sp,
+                        color = Color.Gray,
+                        modifier = Modifier.clickable() {
+                            //點擊忘記密碼按鈕後的操作
 
-                            } else {
-
-                                Icon(
-                                    painter = painterResource(id = R.drawable.invisible),
-                                    contentDescription = "Invisible Icon",
-                                    modifier = Modifier
-                                        .size(25.dp)
-                                        .clickable() {
-                                            passwordVisible.value = !passwordVisible.value
-                                        },
-                                    tint=Color(235, 195, 18)
-                                )
-                            }
-
-
-                        },
-                        onValueChange = {
-                            userInputPassword.value = it
-                        },
-                        isError = passwordError.value,
-                        supportingText = {
-                            if (passwordError.value)
-                                Text(
-                                    text = stringResource(id = R.string.login_password_error),
-                                    color = MaterialTheme.colorScheme.error
-                                )
-                        } ,
-
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedTextColor = Color(0, 0, 0),
-                            unfocusedBorderColor = Color(235, 195, 18),
-                            unfocusedLabelColor = Color(235, 195, 18),
-                            focusedTextColor = Color(0, 0, 0),
-                            focusedBorderColor = Color(235, 195, 18),
-                            focusedLabelColor = Color(235, 195, 18)
-                        ),
-                        shape = RoundedCornerShape(20.dp),
-                        modifier = Modifier.width(275.dp)
+                            //啟動忘記密碼頁面
+                            var intent = Intent()
+                            intent.setClass(context, UpdatePasswordPage::class.java)
+                            context.startActivity(intent,ActivityOptions.makeCustomAnimation(context as Activity,
+                                androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
+                        }
+                            .align(alignment = Alignment.End)
                     )
                 }
+
+
 
                 //登入按鈕
                 Row(
@@ -293,7 +310,8 @@ fun loginPage(context: Context) {
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     //登入按鈕元件
-                    Button(modifier = Modifier.width(275.dp)
+                    Button(modifier = Modifier
+                        .width(275.dp)
                         .padding(top = 20.dp),
                         shape = RoundedCornerShape(20.dp),
                         colors = ButtonDefaults.buttonColors(Color(235, 195, 18)),
@@ -331,89 +349,39 @@ fun loginPage(context: Context) {
                 }
 
 
-                //註冊、修改密碼
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(top = 15.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(end = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = stringResource(R.string.forget_password_button_text),
-                                fontSize = 25.sp,
-                                color = Color.Gray,
-                                modifier = Modifier.clickable() {
-                                    //點擊忘記密碼按鈕後的操作
-
-                                    //啟動忘記密碼頁面
-                                    var intent = Intent()
-                                    intent.setClass(context, UpdatePasswordPage::class.java)
-                                    context.startActivity(intent,ActivityOptions.makeCustomAnimation(context as Activity,
-                                        androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
-                                })
-
-                        }
-                    }
-                }
-
                 //註冊
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp)
+                    modifier = Modifier.fillMaxHeight()
+                        .padding(bottom = 30.dp),
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .weight(1.5f)
-                            .padding(start = 5.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = stringResource(id = R.string.register_text),
-                                fontSize = 25.sp
+                    Text(
+                        text = stringResource(id = R.string.register_text),
+                        fontSize = 25.sp,
+                        modifier = Modifier.align(alignment = Alignment.Bottom)
+                    )
+                    Text(
+                        text = stringResource(id = R.string.register_button_text),
+                        fontSize = 25.sp,
+                        color = Color.Gray,
+                        modifier = Modifier.clickable() {
+                            //點擊註冊按鈕後的操作
+
+
+                            //挑轉至註冊頁面
+                            var intent = Intent()
+                            intent.setClass(
+                                context,
+                                RegisterPage::class.java
                             )
-                            Text(
-                                text = stringResource(id = R.string.register_button_text),
-                                fontSize = 20.sp,
-                                color = Color.Gray,
-                                modifier = Modifier.clickable() {
-                                    //點擊註冊按鈕後的操作
-
-
-                                    //挑轉至註冊頁面
-                                    var intent = Intent()
-                                    intent.setClass(
-                                        context,
-                                        RegisterPage::class.java
-                                    )
-                                    context.startActivity(intent)
-
-                                })
+                            context.startActivity(intent)
 
                         }
-
-                    }
+                            .align(alignment = Alignment.Bottom)
+                    )
 
                 }
-
             }
         }
 
