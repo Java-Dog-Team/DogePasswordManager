@@ -1,6 +1,7 @@
 package com.example.dogepasswordmanager
 
 import android.app.Activity
+import android.app.ActivityOptions
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -145,6 +147,7 @@ fun registerPage(context: Context) {
 
 
     Scaffold(
+        // 返回按鈕
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -161,7 +164,10 @@ fun registerPage(context: Context) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Localized description",
-                            tint=Color(235, 195, 18)
+                            tint=Color(235, 195, 18),
+                            modifier = Modifier
+                                .width(50.dp)
+                                .height(50.dp)
                         )
                     }
                 },
@@ -256,8 +262,15 @@ fun registerPage(context: Context) {
                         if (passwordErrorType.value == RegisterPage.FORMAT_ERROR) {
                             Text(
                                 text = stringResource(id = R.string.register_password_field_format_error),
-
                                 color = BrickRed,
+                                fontSize = 15.sp,
+                                textAlign = TextAlign.Left
+                            )
+                        }
+                        else{
+                            Text(
+                                text = stringResource(id = R.string.register_password_field_format_error),
+                                color = Color.Gray,
                                 fontSize = 15.sp,
                                 textAlign = TextAlign.Left
                             )
@@ -279,7 +292,6 @@ fun registerPage(context: Context) {
                             )
 
                         } else {
-
                             Icon(
                                 painter = painterResource(id = R.drawable.invisible),
                                 contentDescription = "Invisible Icon",
@@ -384,7 +396,7 @@ fun registerPage(context: Context) {
                 )
             }
 
-            //註冊按鈕、返回登入按鈕
+            //註冊按鈕
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -433,7 +445,8 @@ fun registerPage(context: Context) {
                                         sendAuthenticationMail(
                                             activity = activity,
                                             userInputEmail.value,
-                                            userInputPassword.value
+                                            userInputPassword.value,
+                                            context
                                         )
                                     }
                                 }
@@ -479,13 +492,10 @@ fun checkPassword(password: String): Int {
 
 }
 
-private fun sendAuthenticationMail(activity: Activity, email: String, password: String) {
-
-
+private fun sendAuthenticationMail(activity: Activity, email: String, password: String,context: Context) {
     auth.createUserWithEmailAndPassword(email, password)
         .addOnCompleteListener(activity) { task ->
             if (task.isSuccessful) {
-
 
                 //當前使用者資訊
                 val user = auth.currentUser
@@ -507,8 +517,14 @@ private fun sendAuthenticationMail(activity: Activity, email: String, password: 
                         Log.w(TAG, "Error adding document", e)
                     }
 
-                //跳轉至登入頁面
+                //跳轉至提醒收郵件頁面
                 activity.finish()
+                var intent = Intent()
+                intent.setClass(
+                    context,
+                    CheckEmailPage::class.java
+                )
+                context.startActivity(intent)
 
             } else {
                 Log.w(TAG, "createUserWithEmail:failure", task.exception)

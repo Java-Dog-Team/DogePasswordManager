@@ -87,4 +87,8 @@
     <string name="deleteTitle">確定要刪除帳號？</string>
     <string name="deletePositiveButton">取消</string>
     <string name="deleteNeutralButton">刪除</string>
+    <!--  checkEmailPage  -->
+    <string name="checkEmailTitle">請查收您的電子信箱</string>
+    <string name="checkEmailArtical">我們已將認證信寄至您的信箱，請點擊信件內的驗證連結，即完成帳號開通</string>
+    <string name="checkEmailAddress">我們的 Email : noreply@androiddogepasswordmanager.firebaseapp.com</string>
 </resources>
