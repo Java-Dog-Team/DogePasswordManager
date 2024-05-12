@@ -73,6 +73,8 @@
     <string name="edit_item">Edit</string>
     <string name="copy_item_username">Copy Username</string>
     <string name="copy_item_password">Copy Password</string>
+    <string name="searchbar_hint">Application Name</string>
+
     <!--  SettingPage  -->
     <string name="language">Language</string>
     <string name="theme">Theme</string>

@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.drawable.shapes.Shape
 import android.net.Uri
 import android.os.Bundle
 import android.text.Html
@@ -27,6 +28,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -42,16 +44,22 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
@@ -67,10 +75,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
@@ -78,15 +91,22 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -108,6 +128,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.storage
 import java.security.SecureRandom
+import java.util.Locale
 
 
 class MainPage : ComponentActivity() {
@@ -116,6 +137,7 @@ class MainPage : ComponentActivity() {
         val PASSWORD_ROOM = 0
         val PASSWORD_GEN = 1
         val SETTING = 2
+        val SEARCH_RESULT = 3
         val APP_NAME = "appName"
         val APP_USERNAME = "appUsername"
         val APP_PASSWORD = "appPassword"
@@ -185,6 +207,11 @@ private lateinit var userMail: String
 var lists = mutableStateListOf<AppData?>()
 var customImgCnt = mutableStateOf(0)
 
+
+//使用者輸入搜尋文字
+private var userSearchInput = mutableStateOf("")
+
+
 //firebase 儲存空間物件
 private var storage = com.google.firebase.Firebase.storage
 
@@ -195,6 +222,7 @@ private var root = storage.reference
 private var imageRef = root.child("images")
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun mainPage(context: Context) {
@@ -268,7 +296,13 @@ fun mainPage(context: Context) {
                 modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End
             ) {
 
-                topLeftFunctionButton(isVisible = topLeftButtonVisibleFlag.value)
+                topLeftFunctionButton(
+                    isVisible = topLeftButtonVisibleFlag.value,
+                    showingPage = showingPage,
+                    context = context,
+                    dialogShowingState = dialogShowingFlag,
+                    showLoader = showLoader,
+                )
 
             }
 
@@ -282,6 +316,8 @@ fun mainPage(context: Context) {
                 .fillMaxWidth()
                 .weight(8f)
                 .background(Color.White)
+
+
         ) {
 
 
@@ -292,7 +328,8 @@ fun mainPage(context: Context) {
                 passwordRoom(
                     context,
                     dialogShowingFlag = dialogShowingFlag,
-                    showLoader
+                    showLoader,
+                    showingPage
                 )
 
 
@@ -304,6 +341,10 @@ fun mainPage(context: Context) {
 
                 //設定畫面
                 settingPage(context)
+
+            } else if (showingPage.value == MainPage.SEARCH_RESULT) {
+
+                showSearchResult(userSearchInput.value, dialogShowingFlag, context, showLoader)
 
             }
 
@@ -335,7 +376,6 @@ fun mainPage(context: Context) {
                         topLeftButtonVisibleFlag.value = true;
                         //切換顯示密碼庫頁面
                         showingPage.value = MainPage.PASSWORD_ROOM
-
 
 
                     }) {
@@ -426,7 +466,8 @@ fun mainPage(context: Context) {
 fun passwordRoom(
     context: Context,
     dialogShowingFlag: MutableState<Boolean>,
-    showLoader: MutableState<Boolean>
+    showLoader: MutableState<Boolean>,
+    showingPage: MutableState<Int>
 ) {
 
     //每一個紀錄項目的載入狀態
@@ -434,6 +475,7 @@ fun passwordRoom(
         mutableStateListOf<MutableState<Boolean>>()
     }
     flagList.clear()
+
     Box {
 
 
@@ -451,6 +493,7 @@ fun passwordRoom(
                 .fillMaxSize()
                 .alpha(1f)
         }
+        val focusManager = LocalFocusManager.current
 
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -497,6 +540,8 @@ fun passwordRoom(
             }
 
         }
+
+
         //新增記錄按鈕
         FloatingActionButton(containerColor = ItemColor,
             contentColor = Color.White,
@@ -505,16 +550,23 @@ fun passwordRoom(
                 .align(Alignment.BottomEnd)
                 .padding(20.dp),
             onClick = {
-
+                //清除所有focus狀態
+                focusManager.clearFocus()
+                //清楚使用者輸入
+                userSearchInput.value = ""
                 //按下新增按鈕後的操作
                 var intent = Intent()
                 intent.setClass(context, AddRecordActivity::class.java)
                 intent.putExtra("email", userMail)
                 context.startActivity(
                     intent,
-                        ActivityOptions.makeCustomAnimation(context as Activity,
-                            androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle()
+                    ActivityOptions.makeCustomAnimation(
+                        context as Activity,
+                        androidx.appcompat.R.anim.abc_slide_in_bottom,
+                        androidx.appcompat.R.anim.abc_popup_exit
+                    ).toBundle()
                 )
+
 
             }) {
 
@@ -681,7 +733,9 @@ fun deleteAccount(context: Context) {
 
 //      讀取存放資料的 database
     val db = Firebase.firestore
-//      刪除使用者的所有資料
+
+
+    //      刪除使用者的所有資料
     db.collection(user.email.toString())
         .get()
         .addOnSuccessListener { result ->
@@ -697,39 +751,45 @@ fun deleteAccount(context: Context) {
                     }
                     .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
             }
+
         }
         .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
-
-//      刪除 user 內的使用者的 email
+    //刪除使用者帳號後再刪除資料庫帳號紀錄
+    //      刪除 user 內的使用者的 email
     db.collection("users")
         .whereEqualTo("email", userMail)
         .get()
         .addOnSuccessListener { docs ->
+
             for (doc in docs) {
 
                 db.collection("users").document(doc.id)
                     .delete()
 
             }
-        }
-        .addOnFailureListener { }
 
-
-//      刪除使用者帳號
-    user.delete()
-        .addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d(TAG, "User account deleted.")
-                //登出帳號
-                FirebaseAuth.getInstance().signOut()
-                //      切換到 login activity
-                var intent = Intent()
-                intent.setClass(context, MainActivity::class.java)
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                context.startActivity(intent,ActivityOptions.makeCustomAnimation(context as Activity,
-                    androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
-                activity.finish()
-            }
+            //刪除後再刪除整個帳號
+            //      刪除使用者帳號
+            user.delete()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "User account deleted.")
+                        //登出帳號
+                        FirebaseAuth.getInstance().signOut()
+                        //      切換到 login activity
+                        var intent = Intent()
+                        intent.setClass(context, MainActivity::class.java)
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        context.startActivity(
+                            intent, ActivityOptions.makeCustomAnimation(
+                                context as Activity,
+                                androidx.appcompat.R.anim.abc_slide_in_bottom,
+                                androidx.appcompat.R.anim.abc_popup_exit
+                            ).toBundle()
+                        )
+                        activity.finish()
+                    }
+                }
         }
 
 }
@@ -1162,6 +1222,7 @@ fun AppDataBlock(
     flagList: MutableList<MutableState<Boolean>>
 ) {
 
+    val focusManager = LocalFocusManager.current
 
     Row(
         modifier = Modifier
@@ -1170,7 +1231,9 @@ fun AppDataBlock(
             .clip(RoundedCornerShape(50.dp))
             .height(70.dp)
             .clickable() {
-
+                //清除使用者輸入
+                userSearchInput.value = ""
+                focusManager.clearFocus()
 
                 appData = userAppData
                 //按下項目條後進入檢視畫面
@@ -1200,9 +1263,16 @@ fun AppDataBlock(
 
                 flagList.clear()
 
-                context.startActivity(newIntent,ActivityOptions.makeCustomAnimation(context as Activity,
-                    androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
-                //關閉此頁面
+                context.startActivity(
+                    newIntent,
+                    ActivityOptions
+                        .makeCustomAnimation(
+                            context as Activity,
+                            androidx.appcompat.R.anim.abc_slide_in_bottom,
+                            androidx.appcompat.R.anim.abc_popup_exit
+                        )
+                        .toBundle()
+                )
             }
 
     ) {
@@ -1350,6 +1420,7 @@ fun dialogWindow(
 
     //剪貼簿管理員
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    val focusManager = LocalFocusManager.current
 
     if (dialogShowingState.value) {
         //對話窗內容
@@ -1411,7 +1482,9 @@ fun dialogWindow(
                                 //按下檢視帳號資訊按鈕後的動作
 
                                 showLoader.value = false
-
+                                focusManager.clearFocus()
+                                //清除使用者搜尋輸入
+                                userSearchInput.value = ""
                                 //顯示檢視帳號資訊頁面
                                 var intent = Intent()
                                 intent.setClass(context, AddRecordActivity::class.java)
@@ -1420,8 +1493,16 @@ fun dialogWindow(
                                 intent.putExtra(MainPage.APP_NAME, appData!!.AppName)
                                 intent.putExtra(MainPage.APP_PASSWORD, appData!!.AppPassword)
                                 intent.putExtra(MainPage.APP_USERNAME, appData!!.AppUsername)
-                                context.startActivity(intent,ActivityOptions.makeCustomAnimation(context as Activity,
-                                    androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
+                                context.startActivity(
+                                    intent,
+                                    ActivityOptions
+                                        .makeCustomAnimation(
+                                            context as Activity,
+                                            androidx.appcompat.R.anim.abc_slide_in_bottom,
+                                            androidx.appcompat.R.anim.abc_popup_exit
+                                        )
+                                        .toBundle()
+                                )
 
                                 dialogShowingState.value = false
                             }) {
@@ -1561,8 +1642,16 @@ fun showGeneratePassword(gen_password: String) {
 
 //左上方功能按鈕(搜尋、過濾)
 @Composable
-fun topLeftFunctionButton(isVisible: Boolean) {
+fun topLeftFunctionButton(
+    isVisible: Boolean,
+    showingPage: MutableState<Int>,
+    dialogShowingState: MutableState<Boolean>,
+    context: Context,
+    showLoader: MutableState<Boolean>
+) {
     if (isVisible) {
+
+
         Row {
             Column(modifier = Modifier
                 .padding(start = 5.dp, end = 10.dp)
@@ -1570,15 +1659,23 @@ fun topLeftFunctionButton(isVisible: Boolean) {
                     //搜尋按鈕按下後的操作
                 }) {
 
-                //搜尋圖示
-                Image(
-                    painter = painterResource(id = R.drawable.search),
-                    contentDescription = "Search Icon",
-                    modifier = Modifier.size(35.dp, 35.dp),
-                    colorFilter = ColorFilter.tint(Color.White)
+
+                //搜尋欄
+                SearchBar(hint = stringResource(id = R.string.searchbar_hint), showingPage = showingPage) {
+
+                    //若使用者有輸入內容
+                    if (it.isNotEmpty()) {
+                        //顯示對應的搜尋結果
+                        showingPage.value = MainPage.SEARCH_RESULT
+
+                        userSearchInput.value = it
+                    } else {
+                        //使用者尚未輸入內容
+                        showingPage.value = MainPage.PASSWORD_ROOM
+                    }
+                }
 
 
-                )
             }
         }
     }
@@ -1708,3 +1805,356 @@ fun loadUserData(loaderFlag: MutableState<Boolean>) {
 }
 
 
+@Composable
+fun SearchBar(
+    hint: String,
+    modifier: Modifier = Modifier,
+    isEnabled: (Boolean) = true,
+    showingPage: MutableState<Int>,
+    height: Dp = 40.dp,
+    elevation: Dp = 20.dp,
+    cornerShape: RoundedCornerShape = RoundedCornerShape(20.dp),
+    backgroundColor: Color = Color.White,
+    onSearchClicked: () -> Unit = {},
+    onTextChange: (String) -> Unit = {},
+) {
+    //使用者輸入文字
+    var text by remember { mutableStateOf(TextFieldValue()) }
+    val focusRequester = remember { FocusRequester() }
+
+    Row(
+        modifier = Modifier
+            .height(height)
+            .padding(start = 5.dp, end = 5.dp)
+            .fillMaxWidth()
+            .shadow(elevation = elevation, shape = cornerShape)
+            .background(color = backgroundColor, shape = cornerShape)
+            .clickable { onSearchClicked() },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        BasicTextField(
+            modifier = modifier
+                .weight(5f)
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .onFocusChanged {
+
+                    text = TextFieldValue("")
+                    showingPage.value = MainPage.PASSWORD_ROOM
+                }
+                .focusRequester(focusRequester),
+            value = text,
+
+            onValueChange = {
+                text = it
+                onTextChange(it.text)
+            },
+            enabled = isEnabled,
+            textStyle = TextStyle(
+                color = Color.Black,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            decorationBox = {
+                //搜尋欄內hint顯示
+                    innerTextField ->
+                if (text.text.isEmpty()) {
+                    Text(
+                        text = hint,
+                        color = Color.Gray.copy(alpha = 0.5f),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+
+                }
+                innerTextField()
+            },
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(onSearch = { onSearchClicked() }),
+            singleLine = true
+        )
+        Box(
+            modifier = modifier
+                .weight(1f)
+                .size(50.dp)
+                .background(color = Color.Transparent, shape = CircleShape)
+                .clickable {
+                    //按下搜尋欄位按鈕
+                    //若使用者有輸入，則clear掉輸入內容
+                    if (text.text.isNotEmpty()) {
+                        text = TextFieldValue(text = "")
+                        onTextChange("")
+                    }
+                },
+        ) {
+            if (text.text.isNotEmpty()) {
+                Icon(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(10.dp),
+                    imageVector = Icons.Filled.Clear,
+                    contentDescription = "Clear Icon",
+                    tint = Color.Black,
+                )
+            } else {
+                Icon(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(10.dp),
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Search Icon",
+                    tint = Color.Black,
+                )
+            }
+        }
+    }
+}
+
+
+//顯示使用者搜尋結果顯示
+@Composable
+fun showSearchResult(
+    searchInput: String,
+    dialogShowingState: MutableState<Boolean>,
+    context: Context,
+    showLoader: MutableState<Boolean>
+) {
+
+    //每一個紀錄項目的載入狀態
+    var searchflagList = remember {
+        mutableStateListOf<MutableState<Boolean>>()
+    }
+    searchflagList.clear()
+
+    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+        items(lists) { item ->
+
+
+            //顯示對應結果
+            if (item!!.AppName.lowercase()
+                    .contains(searchInput.lowercase())
+            ) {
+                //每項紀錄的圖片是否載入完畢(預設為預設圖片，不需要載入動畫)
+                var flag = remember { mutableStateOf(true) }
+                if (item!!.AppImgId != "") {
+                    //使用者使用客製化圖片，需要載入動畫
+                    flag.value = false
+                    searchflagList.add(flag)
+
+                }
+
+                //顯示對應結果
+                searchResultItem(
+                    item,
+                    dialogShowingState,
+                    context,
+                    flag,
+                    showLoader,
+                    searchflagList
+                )
+            }
+        }
+    }
+
+}
+
+
+//使用者搜尋結果項目物件
+@Composable
+fun searchResultItem(
+    userAppData: AppData,
+    dialogShowingFlag: MutableState<Boolean>,
+    context: Context,
+    loaderFlag: MutableState<Boolean>,
+    showLoader: MutableState<Boolean>,
+    searchFlagList: MutableList<MutableState<Boolean>>
+) {
+
+    val focusManager = LocalFocusManager.current
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 5.dp, bottom = 7.dp)
+            .clip(RoundedCornerShape(50.dp))
+            .height(70.dp)
+            .clickable() {
+
+                userSearchInput.value = ""
+                focusManager.clearFocus()
+                appData = userAppData
+                //按下項目條後進入檢視畫面
+                //跳出編輯視窗
+                var newIntent = Intent()
+                newIntent.setClass(context, ViewActivity::class.java)
+                newIntent.putExtra(
+                    MainPage.DATA_ID,
+                    appData!!.DataId
+                )
+                newIntent.putExtra(
+                    MainPage.APP_IMG_ID,
+                    appData!!.AppImgId
+                )
+                newIntent.putExtra(
+                    MainPage.APP_NAME,
+                    appData!!.AppName
+                )
+                newIntent.putExtra(
+                    MainPage.APP_PASSWORD,
+                    appData!!.AppPassword
+                )
+                newIntent.putExtra(
+                    MainPage.APP_USERNAME,
+                    appData!!.AppUsername
+                )
+
+                searchFlagList.clear()
+
+                context.startActivity(
+                    newIntent,
+                    ActivityOptions
+                        .makeCustomAnimation(
+                            context as Activity,
+                            androidx.appcompat.R.anim.abc_slide_in_bottom,
+                            androidx.appcompat.R.anim.abc_popup_exit
+                        )
+                        .toBundle()
+                )
+                //關閉此頁面
+            }
+
+    ) {
+        //App圖示
+        Column(
+            modifier = Modifier
+                .weight(1.5f)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+
+            //App Icon圖片
+            //此應用程式圖示為使用者自訂
+            if (userAppData.AppImgId != "") {
+
+                var img = remember {
+                    mutableStateOf<Uri?>(null)
+                }
+
+                imageRef.child(userMail + "/" + userAppData.AppImgId + ".jpg").downloadUrl.addOnCompleteListener { result ->
+                    img.value = result.result
+                }
+
+                //App Icon
+
+                AsyncImage(
+                    model = img.value,
+                    contentDescription = "App Icon",
+
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .border(1.dp, Color.LightGray, CircleShape),
+                    contentScale = ContentScale.Crop,
+                    onSuccess = {
+                        Log.d("MSG", "SUCESSS")
+                        //圖片以載入完畢，不須顯示載入動畫
+                        loaderFlag.value = true
+                        //若所有項目圖片都載入完畢
+                        val result = searchFlagList.all {
+                            it.value
+                        }
+                        Log.d("MSG", "result: " + result.toString())
+                        Log.d("MSG", "Length: " + searchFlagList.size.toString())
+                        if (result == true) {
+                            //關閉loader動畫
+                            showLoader.value = false
+                        }
+                    },
+
+                    )
+
+            } else {
+                //App Icon預設圖片
+                Image(
+                    painter = painterResource(id = R.drawable.default_icon),
+                    contentDescription = "App Icon",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .border(1.dp, Color.LightGray, CircleShape)
+                )
+            }
+
+
+        }
+        //App資訊顯示區塊
+        Column(
+            modifier = Modifier
+                .weight(6f)
+
+                .fillMaxSize()
+        ) {
+            //App名稱
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize(), verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = userAppData.AppName,
+                    fontSize = 26.sp,
+                    fontFamily = FontFamily.Serif,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            //使用者App帳號
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = userAppData.AppUsername,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Serif,
+                    color = Color.DarkGray,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+
+        //選項按鈕
+        Column(
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .padding(end = 20.dp)
+        ) {
+
+            //選項按鈕Icon
+            Image(painter = painterResource(id = R.drawable.option),
+                contentDescription = "Option Icon",
+                colorFilter = ColorFilter.tint(Color.LightGray),
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .size(50.dp)
+                    .clickable {
+                        //跳出對話框
+                        dialogShowingFlag.value = true
+
+                        appData = userAppData
+
+                    })
+        }
+    }
+
+}

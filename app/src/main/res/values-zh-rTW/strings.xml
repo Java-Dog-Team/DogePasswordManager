@@ -74,6 +74,7 @@
     <string name="edit_item">編輯帳號資訊</string>
     <string name="copy_item_username">複製帳號</string>
     <string name="copy_item_password">複製密碼</string>
+    <string name="searchbar_hint">應用程式名稱</string>
     <!--  SettingPage  -->
     <string name="language">選擇語言</string>
     <string name="theme">選擇主題</string>
