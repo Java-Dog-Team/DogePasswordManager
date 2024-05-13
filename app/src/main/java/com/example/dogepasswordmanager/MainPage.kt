@@ -259,12 +259,13 @@ fun mainPage(context: Context) {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(BackGroundColor)
-                .weight(0.7f)
+                .padding(bottom = 15.dp, top = 15.dp)
+
 
         ) {
 
             //頁面名稱
-            Column {
+            Column(modifier = Modifier.padding(end = 20.dp)) {
                 //當前為密碼庫頁面
                 if (showingTitle.value == MainPage.PASSWORD_ROOM)
                     Text(
@@ -1661,7 +1662,10 @@ fun topLeftFunctionButton(
 
 
                 //搜尋欄
-                SearchBar(hint = stringResource(id = R.string.searchbar_hint), showingPage = showingPage) {
+                SearchBar(
+                    hint = stringResource(id = R.string.searchbar_hint),
+                    showingPage = showingPage
+                ) {
 
                     //若使用者有輸入內容
                     if (it.isNotEmpty()) {
