@@ -109,9 +109,9 @@ fun checkEmailPage(context: Context) {
                     text = stringResource(id = R.string.checkEmailArtical),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 20.dp, ),
+                        .padding(20.dp),
                     color = Color.Gray,
-                    fontSize = 25.sp,
+                    fontSize = 20.sp,
                     textAlign = TextAlign.Center
                 )
                 Text(
@@ -119,7 +119,7 @@ fun checkEmailPage(context: Context) {
                     modifier = Modifier
                         .fillMaxWidth(),
                     color = Color.Gray,
-                    fontSize = 25.sp,
+                    fontSize = 15.sp,
                     textAlign = TextAlign.Center
                 )
                 Image(painter = painterResource(R.drawable.recive_email),
