@@ -44,6 +44,8 @@
     <string name="forget_email_field_error">請確認輸入</string>
     <string name="forget_send_reset_password_email">已寄送密碼重設信件至您的信箱</string>
     <string name="forget_send_reset_password_email_button">發送密碼重設郵件</string>
+    <string name="forget_title">忘記密碼</string>
+    <string name="forget_artical">請輸入您的電子郵件，我們將寄送網址讓您重設密碼</string>
 
     <!--    ViewPage-->
     <string name="view_alert_dialog_title">刪除項目</string>

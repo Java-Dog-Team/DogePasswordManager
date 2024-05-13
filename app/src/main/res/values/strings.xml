@@ -33,6 +33,8 @@
     <string name="forget_email_field_error">Please check the email field</string>
     <string name="forget_send_reset_password_email">We send the reset link to your email</string>
     <string name="forget_send_reset_password_email_button">Send reset link</string>
+    <string name="forget_title">Forget Password</string>
+    <string name="forget_artical">Click the link we just sent to reset your password.</string>
     <!--    RegisterPage-->
     <string name="register_email_field">Email</string>
     <string name="register_email_field_format_error">Please input email</string>
