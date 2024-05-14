@@ -93,7 +93,8 @@ fun UpdatePasswordPage(context: Context) {
                 ) {
                     userInputError = true
 
-                } else {
+                }
+                else {
                     //寄送密碼重設郵件
                     Firebase.auth.sendPasswordResetEmail(userInputEmail)
                         .addOnCompleteListener { task ->
@@ -113,9 +114,9 @@ fun UpdatePasswordPage(context: Context) {
                             }
                         }
                 }
-
-
-            }, modifier = Modifier.padding(top = 15.dp)) {
+            },
+                modifier = Modifier.padding(top = 15.dp)
+            ) {
                 Text(text = stringResource(id=R.string.forget_send_reset_password_email_button))
             }
         }

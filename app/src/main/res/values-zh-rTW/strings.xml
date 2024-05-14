@@ -46,6 +46,8 @@
     <string name="forget_send_reset_password_email_button">發送密碼重設郵件</string>
     <string name="forget_title">忘記密碼</string>
     <string name="forget_artical">請輸入您的電子郵件，我們將寄送網址讓您重設密碼</string>
+    <string name="forget_email_success">信件寄送成功</string>
+    <string name="forget_email_success_artical">請點擊信件內的連結，重新設置您的密碼</string>
 
     <!--    ViewPage-->
     <string name="view_alert_dialog_title">刪除項目</string>

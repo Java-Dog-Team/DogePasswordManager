@@ -24,6 +24,7 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -309,8 +310,8 @@ fun loginPage(context: Context) {
                                 .width(275.dp)
                                 .padding(bottom = 0.dp)
                         )
-//                    }
 
+                    //忘記密碼按鈕
                     Text(
                         text = stringResource(R.string.forget_password_button_text),
                         fontSize = 20.sp,
@@ -323,18 +324,6 @@ fun loginPage(context: Context) {
                                 //  設定彈跳視窗
                                 showDialog = true
 
-//                                var intent = Intent()
-//                                intent.setClass(context, UpdatePasswordPage::class.java)
-//                                context.startActivity(
-//                                    intent,
-//                                    ActivityOptions
-//                                        .makeCustomAnimation(
-//                                            context as Activity,
-//                                            androidx.appcompat.R.anim.abc_slide_in_bottom,
-//                                            androidx.appcompat.R.anim.abc_popup_exit
-//                                        )
-//                                        .toBundle()
-//                                )
                             }
                             .align(alignment = Alignment.End)
                     )
@@ -342,6 +331,8 @@ fun loginPage(context: Context) {
                 CustomDialog(
                     showDialog = showDialog,
                     onDismissRequest = { showDialog = false },
+                    title_num = R.string.forget_title,
+                    artical_num = R.string.forget_artical
                 ){
 
                 }
@@ -361,8 +352,6 @@ fun loginPage(context: Context) {
                         colors = ButtonDefaults.buttonColors(Color(235, 195, 18)),
                         onClick = {
                             //按下登入按鈕後的操作
-
-
                             //檢查帳密是否有誤 有誤:顯示錯誤文字
                             if (userInputPassword.value == "") {
                                 passwordError.value = true
@@ -655,8 +644,48 @@ private fun getPromptInfo(context: FragmentActivity): BiometricPrompt.PromptInfo
 fun CustomDialog(
     showDialog: Boolean,
     onDismissRequest: () -> Unit,
+    title_num:Int,
+    artical_num:Int,
     content: @Composable () -> Unit,
 ) {
+    //使用者輸入信箱
+    var userInputEmail by remember {
+        mutableStateOf("")
+    }
+    userInputEmail = ""
+    //使用者是否輸入錯誤
+    var userInputError by remember {
+        mutableStateOf(false)
+    }
+    userInputError = false
+
+    //dialog 的 title
+    var title by remember {
+        mutableStateOf(title_num)
+    }
+    title = title_num
+    //dialog 的內文部分
+    var artical by remember {
+        mutableStateOf(artical_num)
+    }
+    artical = artical_num
+    var title_top_padding by remember {
+        mutableStateOf(0)
+    }
+    title_top_padding = 0
+    var artical_buttom_padding by remember {
+        mutableStateOf(20)
+    }
+    artical_buttom_padding = 20
+    var read by remember {
+        mutableStateOf(false)
+    }
+    read = false
+    var border_color by remember {
+        mutableStateOf(Color(235, 195, 18))
+    }
+    border_color = Color(235, 195, 18)
+
     if (showDialog) {
         Dialog(
             onDismissRequest = onDismissRequest,
@@ -674,8 +703,8 @@ fun CustomDialog(
                     Modifier
                         .pointerInput(Unit) { detectTapGestures { } }
                         .shadow(8.dp, shape = RoundedCornerShape(16.dp))
-                        .width(300.dp)
-                        .height(350.dp)
+                        .width(330.dp)
+                        .height(370.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .background(
                             MaterialTheme.colorScheme.surface,
@@ -713,25 +742,101 @@ fun CustomDialog(
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
-                            modifier = Modifier.padding(innerPadding)
+                            modifier = Modifier
+                                .padding(innerPadding)
                                 .fillMaxWidth()
                         ) {
-                            // 添加标题
+                            // 添加標題
                             Text(
-                                text = stringResource(R.string.forget_title),
+                                text = stringResource(title),
                                 color = Color(237, 197, 49),
-                                fontSize = 30.sp
+                                fontSize = 30.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(top = title_top_padding.dp)
                             )
                             Text(
-                                text = stringResource(R.string.forget_artical),
+                                text = stringResource(artical),
                                 color = Color.Gray,
-                                fontSize = 15.sp,
-                                modifier = Modifier.fillMaxWidth()
-                                    .padding(20.dp)
+                                fontSize = 17.sp,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(
+                                        start = 20.dp,
+                                        end = 20.dp,
+                                        top = 20.dp,
+                                        bottom = artical_buttom_padding.dp
+                                    ),
+                                textAlign = TextAlign.Center
                             )
+                            //  使用者輸入電子郵件
+                            OutlinedTextField(value = userInputEmail,
+                                onValueChange = {
+                                    userInputEmail = it
+                                },
+                                label = {
+                                    Text(text = stringResource(R.string.forget_email_field))
+                                },
+                                isError = userInputError,
+                                supportingText = {
+                                    if (userInputError) {
+                                        Text(text = stringResource(R.string.forget_email_field_error), color = MaterialTheme.colorScheme.error)
+                                    } else {
+                                        userInputError = false
+                                    }
+                                },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    unfocusedTextColor = Color(0, 0, 0),
+                                    unfocusedBorderColor = border_color,
+                                    unfocusedLabelColor = Color(235, 195, 18),
+                                    focusedTextColor = Color(0, 0, 0),
+                                    focusedBorderColor = border_color,
+                                    focusedLabelColor = Color(235, 195, 18)
+                                ),
+                                shape = RoundedCornerShape(20.dp),
+                                singleLine = true,
+                                modifier = Modifier.width(250.dp),
+                                readOnly = read
+                            )
+
+                            // 發送重設密碼郵件按鈕
+                            Button(
+                                onClick = {
+                                    //按下按鈕後的操作
+                                    //檢查輸入
+
+                                    if (userInputEmail.isEmpty() || userInputEmail.isBlank() || checkEmail(
+                                            userInputEmail
+                                        )
+                                    ) {
+
+                                        userInputError = true
+                                    } else {
+                                        //寄送密碼重設郵件
+                                        Firebase.auth.sendPasswordResetEmail(userInputEmail)
+                                            .addOnCompleteListener { task ->
+                                                //顯示寄送成功Toast
+                                                if (task.isSuccessful) {
+                                                    title = R.string.forget_email_success
+                                                    artical = R.string.forget_email_success_artical
+                                                    title_top_padding = 70
+//                                                    artical_buttom_padding = 150
+                                                    read = true
+                                                    border_color = Color(0,0,0,0)
+                                                } else {
+                                                    Log.d("HIIIIIIII","msg")
+                                                    userInputError = true
+                                                }
+                                            }
+                                    }
+                                },
+                                modifier = Modifier.padding(top = 15.dp),
+                                shape = RoundedCornerShape(20.dp),
+                                colors = ButtonDefaults.buttonColors(Color(235, 195, 18)),
+                            ) {
+                                Text(text = stringResource(id=R.string.forget_send_reset_password_email_button))
+                            }
                         }
                     }
-
                 }
 
             }
