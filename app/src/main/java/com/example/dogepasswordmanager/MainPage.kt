@@ -729,7 +729,6 @@ fun itemClick(clickItem: Int, context: Context) {
 //      顯示彈跳視窗
         alertDialog.show()
     }
-//  選擇語言
     else if (clickItem == R.string.theme) {
 
     } else if (clickItem == R.string.account) {

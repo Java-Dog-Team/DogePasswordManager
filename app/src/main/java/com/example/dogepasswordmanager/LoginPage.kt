@@ -18,6 +18,7 @@ import android.provider.Settings.Secure
 import android.provider.Settings.SettingNotFoundException
 import android.text.Html
 import android.util.Log
+import android.view.Window
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -34,22 +35,31 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,6 +72,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -73,6 +84,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.window.DialogWindowProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -638,6 +650,7 @@ private fun getPromptInfo(context: FragmentActivity): BiometricPrompt.PromptInfo
         )
         .build()
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomDialog(
     showDialog: Boolean,
@@ -648,7 +661,9 @@ fun CustomDialog(
         Dialog(
             onDismissRequest = onDismissRequest,
             properties = DialogProperties(
-                usePlatformDefaultWidth = false
+                usePlatformDefaultWidth = false,
+                dismissOnClickOutside = true,
+                dismissOnBackPress = true
             )
         ) {
             Box(
@@ -660,13 +675,56 @@ fun CustomDialog(
                         .pointerInput(Unit) { detectTapGestures { } }
                         .shadow(8.dp, shape = RoundedCornerShape(16.dp))
                         .width(300.dp)
+                        .height(350.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .background(
                             MaterialTheme.colorScheme.surface,
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    content()
+                    Scaffold(
+                        // 叉叉按鈕
+                        // 按下後直接顯示登入頁面
+                        topBar = {
+                            TopAppBar(
+                                colors = TopAppBarDefaults.topAppBarColors(
+                                    containerColor = Color(235, 195, 18,0),
+                                    titleContentColor = Color.White,
+                                ),
+                                title = {
+                                    Text("")
+                                },
+                                navigationIcon = {
+                                    IconButton(onClick = onDismissRequest) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Close,
+                                            contentDescription = "Localized description",
+                                            tint= Color(235, 195, 18),
+                                            modifier = Modifier
+                                                .width(50.dp)
+                                                .height(50.dp)
+                                        )
+                                    }
+                                },
+                                modifier = Modifier.padding(0.dp)
+                            )
+                        },
+                    ) { innerPadding ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(innerPadding)
+                                .fillMaxWidth()
+                        ) {
+                            // 添加标题
+                            Text(
+                                text = stringResource(R.string.forget_title),
+                                color = Color(237, 197, 49),
+                                fontSize = 30.sp
+                            )
+                        }
+                    }
+
                 }
 
             }
