@@ -53,13 +53,16 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
@@ -223,7 +226,7 @@ private var imageRef = root.child("images")
 
 
 @OptIn(ExperimentalComposeUiApi::class)
-@SuppressLint("UnrememberedMutableState")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun mainPage(context: Context) {
 
@@ -248,212 +251,223 @@ fun mainPage(context: Context) {
     if (customImgCnt.value > 0)
         showLoader.value = true
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.End,
-        verticalArrangement = Arrangement.Bottom
+    Scaffold(
+        bottomBar = {
+            BottomAppBar(
+                containerColor = Color.Black,
+                actions = {
+                    //密碼庫按鈕
+                    Column(horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .clickable() {
+
+                                //按下按鈕後處理
+                                showingTitle.value = MainPage.PASSWORD_ROOM
+                                //顯示左上角搜尋、過濾按鈕
+                                topLeftButtonVisibleFlag.value = true;
+                                //切換顯示密碼庫頁面
+                                showingPage.value = MainPage.PASSWORD_ROOM
+
+
+                            }) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Image(
+                                painter = painterResource(id = R.drawable.padlock),
+                                contentDescription = "Padlock Icon",
+                                modifier = Modifier.size(40.dp, 40.dp),
+                                colorFilter = ColorFilter.tint(Color.White)
+                            )
+                            Text(
+                                text = stringResource(id = R.string.button_option1),
+                                color = Color.White,
+                                modifier = Modifier.padding(top = 5.dp)
+                            )
+                        }
+
+                    }
+
+                    //密碼產生器按鈕
+                    Column(horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .clickable() {
+                                //當前頁面名稱
+                                showingTitle.value = MainPage.PASSWORD_GEN
+                                //隱藏左上角搜尋、過濾按鈕
+                                topLeftButtonVisibleFlag.value = false;
+                                //切換顯示密碼產生器頁面
+                                showingPage.value = MainPage.PASSWORD_GEN
+                            }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.sync),
+                            contentDescription = "Generate Password Icon",
+                            modifier = Modifier.size(40.dp, 40.dp),
+                            colorFilter = ColorFilter.tint(Color.White)
+                        )
+                        Text(
+                            text = stringResource(id = R.string.button_option2),
+                            color = Color.White,
+                            modifier = Modifier.padding(top = 5.dp)
+                        )
+                    }
+
+                    //設定按鈕
+                    Column(horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .clickable() {
+                                //按下按鈕後處理
+                                showingTitle.value = MainPage.SETTING
+                                //隱藏左上角搜尋、過濾按鈕
+                                topLeftButtonVisibleFlag.value = false;
+                                //切換顯示設定頁面
+                                showingPage.value = MainPage.SETTING
+                            }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.settings),
+                            contentDescription = "Setting Icon",
+                            modifier = Modifier.size(40.dp, 40.dp),
+                            colorFilter = ColorFilter.tint(Color.White)
+                        )
+                        Text(
+                            text = stringResource(id = R.string.button_option3),
+                            color = Color.White,
+                            modifier = Modifier.padding(top = 5.dp)
+                        )
+                    }
+
+
+                }
+            )
+        }
     ) {
-        //Header
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(BackGroundColor)
-                .padding(bottom = 15.dp, top = 15.dp)
-
-
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.Bottom
         ) {
+            //Header
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(BackGroundColor)
+                    .padding(bottom = 15.dp, top = 15.dp)
 
-            //頁面名稱
-            Column(modifier = Modifier.padding(end = 20.dp)) {
-                //當前為密碼庫頁面
-                if (showingTitle.value == MainPage.PASSWORD_ROOM)
-                    Text(
-                        text = stringResource(id = R.string.button_option1),
-                        fontSize = 30.sp,
-                        color = Color.White,
-                        modifier = Modifier
-                            .padding(start = 15.dp)
-                    )
-                else if (showingTitle.value == MainPage.PASSWORD_GEN)
-                    Text(
-                        text = stringResource(id = R.string.button_option2),
-                        fontSize = 30.sp,
-                        color = Color.White,
-                        modifier = Modifier
-                            .padding(start = 15.dp)
-                    )
-                else if (showingTitle.value == MainPage.SETTING)
-                    Text(
-                        text = stringResource(id = R.string.button_option3),
-                        fontSize = 30.sp,
-                        color = Color.White,
-                        modifier = Modifier
-                            .padding(start = 15.dp)
-                    )
-            }
-            //功能圖示
-            Column(
-                modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End
+
             ) {
 
-                topLeftFunctionButton(
-                    isVisible = topLeftButtonVisibleFlag.value,
-                    showingPage = showingPage,
-                    context = context,
-                    dialogShowingState = dialogShowingFlag,
-                    showLoader = showLoader,
-                )
+                //頁面名稱
+                Column(modifier = Modifier.padding(end = 20.dp)) {
+                    //當前為密碼庫頁面
+                    if (showingTitle.value == MainPage.PASSWORD_ROOM)
+                        Text(
+                            text = stringResource(id = R.string.button_option1),
+                            fontSize = 30.sp,
+                            color = Color.White,
+                            modifier = Modifier
+                                .padding(start = 15.dp)
+                        )
+                    else if (showingTitle.value == MainPage.PASSWORD_GEN)
+                        Text(
+                            text = stringResource(id = R.string.button_option2),
+                            fontSize = 30.sp,
+                            color = Color.White,
+                            modifier = Modifier
+                                .padding(start = 15.dp)
+                        )
+                    else if (showingTitle.value == MainPage.SETTING)
+                        Text(
+                            text = stringResource(id = R.string.button_option3),
+                            fontSize = 30.sp,
+                            color = Color.White,
+                            modifier = Modifier
+                                .padding(start = 15.dp)
+                        )
+                }
+                //功能圖示
+                Column(
+                    modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End
+                ) {
 
-            }
-
-
-        }
-
-
-        //Body(存放密碼紀錄區塊)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(8f)
-                .background(Color.White)
-
-
-        ) {
-
-
-            if (showingPage.value == MainPage.PASSWORD_ROOM) {
-
-
-                //密碼庫頁面
-                passwordRoom(
-                    context,
-                    dialogShowingFlag = dialogShowingFlag,
-                    showLoader,
-                    showingPage
-                )
-
-
-            } else if (showingPage.value == MainPage.PASSWORD_GEN) {
-                //密碼產生器頁面
-                passwordGeneratorPage(context)
-
-            } else if (showingPage.value == MainPage.SETTING) {
-
-                //設定畫面
-                settingPage(context)
-
-            } else if (showingPage.value == MainPage.SEARCH_RESULT) {
-
-                showSearchResult(userSearchInput.value, dialogShowingFlag, context, showLoader)
-
-            }
-
-
-        }
-
-
-        //功能按鈕
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-                .weight(1f)
-                .border(1.dp, Color.LightGray)
-        ) {
-
-            //密碼庫按鈕
-            Column(horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize()
-                    .border(1.dp, Color.LightGray)
-                    .clickable() {
-
-                        //按下按鈕後處理
-                        showingTitle.value = MainPage.PASSWORD_ROOM
-                        //顯示左上角搜尋、過濾按鈕
-                        topLeftButtonVisibleFlag.value = true;
-                        //切換顯示密碼庫頁面
-                        showingPage.value = MainPage.PASSWORD_ROOM
-
-
-                    }) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Image(
-                        painter = painterResource(id = R.drawable.padlock),
-                        contentDescription = "Padlock Icon",
-                        modifier = Modifier.size(40.dp, 40.dp),
-                        colorFilter = ColorFilter.tint(Color.Gray)
+                    topLeftFunctionButton(
+                        isVisible = topLeftButtonVisibleFlag.value,
+                        showingPage = showingPage,
+                        context = context,
+                        dialogShowingState = dialogShowingFlag,
+                        showLoader = showLoader,
                     )
-                    Text(
-                        text = stringResource(id = R.string.button_option1),
-                        color = Color.Gray,
-                        modifier = Modifier.padding(top = 5.dp)
-                    )
+
                 }
 
+
             }
 
-            //密碼產生器按鈕
-            Column(horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
+
+            //Body(存放密碼紀錄區塊)
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize()
-                    .border(1.dp, Color.LightGray)
-                    .clickable() {
-                        //當前頁面名稱
-                        showingTitle.value = MainPage.PASSWORD_GEN
-                        //隱藏左上角搜尋、過濾按鈕
-                        topLeftButtonVisibleFlag.value = false;
-                        //切換顯示密碼產生器頁面
-                        showingPage.value = MainPage.PASSWORD_GEN
-                    }) {
-                Image(
-                    painter = painterResource(id = R.drawable.sync),
-                    contentDescription = "Generate Password Icon",
-                    modifier = Modifier.size(40.dp, 40.dp),
-                    colorFilter = ColorFilter.tint(Color.Gray)
-                )
-                Text(
-                    text = stringResource(id = R.string.button_option2),
-                    color = Color.Gray,
-                    modifier = Modifier.padding(top = 5.dp)
-                )
+                    .fillMaxWidth()
+                    .weight(8f)
+                    .background(Color.White)
+
+
+            ) {
+
+
+                if (showingPage.value == MainPage.PASSWORD_ROOM) {
+
+
+                    //密碼庫頁面
+                    passwordRoom(
+                        context,
+                        dialogShowingFlag = dialogShowingFlag,
+                        showLoader,
+                        showingPage
+                    )
+
+
+                } else if (showingPage.value == MainPage.PASSWORD_GEN) {
+                    //密碼產生器頁面
+                    passwordGeneratorPage(context)
+
+                } else if (showingPage.value == MainPage.SETTING) {
+
+                    //設定畫面
+                    settingPage(context)
+
+                } else if (showingPage.value == MainPage.SEARCH_RESULT) {
+
+                    showSearchResult(userSearchInput.value, dialogShowingFlag, context, showLoader)
+
+                }
+
+
             }
 
-            //設定按鈕
-            Column(horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize()
-                    .border(1.dp, Color.LightGray)
-                    .clickable() {
-                        //按下按鈕後處理
-                        showingTitle.value = MainPage.SETTING
-                        //隱藏左上角搜尋、過濾按鈕
-                        topLeftButtonVisibleFlag.value = false;
-                        //切換顯示設定頁面
-                        showingPage.value = MainPage.SETTING
-                    }) {
-                Image(
-                    painter = painterResource(id = R.drawable.settings),
-                    contentDescription = "Setting Icon",
-                    modifier = Modifier.size(40.dp, 40.dp),
-                    colorFilter = ColorFilter.tint(Color.Gray)
-                )
-                Text(
-                    text = stringResource(id = R.string.button_option3),
-                    color = Color.Gray,
-                    modifier = Modifier.padding(top = 5.dp)
-                )
-            }
+
+//            //功能按鈕
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .background(Color.White)
+//                    .weight(1f)
+//                    .border(1.dp, Color.LightGray)
+//            ) {
+//
+//
+//
+//            }
+
+
         }
-
-
     }
 
 
