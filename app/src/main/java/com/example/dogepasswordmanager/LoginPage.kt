@@ -722,6 +722,13 @@ fun CustomDialog(
                                 color = Color(237, 197, 49),
                                 fontSize = 30.sp
                             )
+                            Text(
+                                text = stringResource(R.string.forget_artical),
+                                color = Color.Gray,
+                                fontSize = 15.sp,
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(20.dp)
+                            )
                         }
                     }
 
