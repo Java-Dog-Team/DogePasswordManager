@@ -67,6 +67,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -223,11 +224,18 @@ fun loginPage(context: Context) {
                         singleLine = true,
                         isError = usernameError.value,
                         supportingText = {
-                            if (usernameError.value)
+                            if (usernameError.value) {
                                 Text(
                                     text = stringResource(id = R.string.login_email_error),
                                     color = MaterialTheme.colorScheme.error
                                 )
+                            }
+                            else{
+                                Text(
+                                    text = stringResource(id = R.string.login_email_error),
+                                    color = Color(0,0,0,1)
+                                )
+                            }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
                             unfocusedTextColor = Color(0, 0, 0),
@@ -290,11 +298,18 @@ fun loginPage(context: Context) {
                             },
                             isError = passwordError.value,
                             supportingText = {
-                                if (passwordError.value)
+                                if (passwordError.value) {
                                     Text(
                                         text = stringResource(id = R.string.login_password_error),
                                         color = MaterialTheme.colorScheme.error
                                     )
+                                }
+                                else{
+                                    Text(
+                                        text = stringResource(id = R.string.login_password_error),
+                                        color = Color(0,0,0,1)
+                                    )
+                                }
                             } ,
 
                             colors = OutlinedTextFieldDefaults.colors(
@@ -681,10 +696,10 @@ fun CustomDialog(
         mutableStateOf(false)
     }
     read = false
-    var border_color by remember {
-        mutableStateOf(Color(235, 195, 18))
+    var aph by remember {
+        mutableStateOf(1f)
     }
-    border_color = Color(235, 195, 18)
+    aph = 1f
 
     if (showDialog) {
         Dialog(
@@ -782,19 +797,22 @@ fun CustomDialog(
                                         Text(text = stringResource(R.string.forget_email_field_error), color = MaterialTheme.colorScheme.error)
                                     } else {
                                         userInputError = false
+                                        Text(text = "")
                                     }
                                 },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     unfocusedTextColor = Color(0, 0, 0),
-                                    unfocusedBorderColor = border_color,
+                                    unfocusedBorderColor = Color(235, 195, 18),
                                     unfocusedLabelColor = Color(235, 195, 18),
                                     focusedTextColor = Color(0, 0, 0),
-                                    focusedBorderColor = border_color,
+                                    focusedBorderColor = Color(235, 195, 18),
                                     focusedLabelColor = Color(235, 195, 18)
                                 ),
                                 shape = RoundedCornerShape(20.dp),
                                 singleLine = true,
-                                modifier = Modifier.width(250.dp),
+                                modifier = Modifier
+                                    .width(250.dp)
+                                    .alpha(aph),
                                 readOnly = read
                             )
 
@@ -819,9 +837,9 @@ fun CustomDialog(
                                                     title = R.string.forget_email_success
                                                     artical = R.string.forget_email_success_artical
                                                     title_top_padding = 70
-//                                                    artical_buttom_padding = 150
+                                                    artical_buttom_padding = 150
                                                     read = true
-                                                    border_color = Color(0,0,0,0)
+                                                    aph=0f
                                                 } else {
                                                     Log.d("HIIIIIIII","msg")
                                                     userInputError = true
@@ -829,7 +847,9 @@ fun CustomDialog(
                                             }
                                     }
                                 },
-                                modifier = Modifier.padding(top = 15.dp),
+                                modifier = Modifier
+                                    .padding(top = 15.dp)
+                                    .alpha(aph),
                                 shape = RoundedCornerShape(20.dp),
                                 colors = ButtonDefaults.buttonColors(Color(235, 195, 18)),
                             ) {

@@ -217,11 +217,11 @@ fun registerPage(context: Context) {
                         if (emailError.value) {
                             Text(
                                 text = stringResource(id = R.string.register_email_field_format_error),
-                                modifier = Modifier.fillMaxWidth(),
-                                color = BrickRed,
-                                fontSize = 15.sp
+                                color = MaterialTheme.colorScheme.error
                             )
-
+                        }
+                        else{
+                            Text(text = " ")
                         }
                     },
                     colors = OutlinedTextFieldDefaults.colors(
@@ -262,17 +262,13 @@ fun registerPage(context: Context) {
                         if (passwordErrorType.value == RegisterPage.FORMAT_ERROR) {
                             Text(
                                 text = stringResource(id = R.string.register_password_field_format_error),
-                                color = BrickRed,
-                                fontSize = 15.sp,
-                                textAlign = TextAlign.Left
+                                color = MaterialTheme.colorScheme.error
                             )
                         }
                         else{
                             Text(
                                 text = stringResource(id = R.string.register_password_field_format_error),
                                 color = Color.Gray,
-                                fontSize = 15.sp,
-                                textAlign = TextAlign.Left
                             )
                         }
                     },
@@ -342,11 +338,14 @@ fun registerPage(context: Context) {
                         if (confirmedPasswordError.value) {
                             Text(
                                 text = stringResource(id = R.string.register_confirmed_password_field_format_error),
-                                modifier = Modifier.fillMaxWidth(),
-                                color = BrickRed,
-                                fontSize = 15.sp
+                                color = MaterialTheme.colorScheme.error
                             )
-
+                        }
+                        else{
+                            Text(
+                                text = stringResource(id = R.string.register_confirmed_password_field_format_error),
+                                color = Color(0,0,0,1)
+                            )
                         }
                     },
                     trailingIcon = {
