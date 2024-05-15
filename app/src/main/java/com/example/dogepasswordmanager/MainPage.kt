@@ -58,6 +58,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -251,7 +252,41 @@ fun mainPage(context: Context) {
     if (customImgCnt.value > 0)
         showLoader.value = true
 
+    val focusManager = LocalFocusManager.current
     Scaffold(
+        floatingActionButton = {
+            //新增記錄按鈕
+            FloatingActionButton(containerColor = BackGroundColor,
+                contentColor = Color.White,
+                shape = CircleShape,
+                modifier = Modifier
+                    .padding(10.dp),
+                onClick = {
+                    //清除所有focus狀態
+                    focusManager.clearFocus()
+                    //清楚使用者輸入
+                    userSearchInput.value = ""
+                    //按下新增按鈕後的操作
+                    var intent = Intent()
+                    intent.setClass(context, AddRecordActivity::class.java)
+                    intent.putExtra("email", userMail)
+                    context.startActivity(
+                        intent,
+                        ActivityOptions.makeCustomAnimation(
+                            context as Activity,
+                            androidx.appcompat.R.anim.abc_slide_in_bottom,
+                            androidx.appcompat.R.anim.abc_popup_exit
+                        ).toBundle()
+                    )
+
+
+                }) {
+
+                Icon(Icons.Filled.Add, "Floating Action Button")
+
+            }
+        },
+        floatingActionButtonPosition = FabPosition.End,
         bottomBar = {
             BottomAppBar(
                 containerColor = Color.Black,
@@ -348,8 +383,10 @@ fun mainPage(context: Context) {
             )
         }
     ) {
+        innerPadding ->
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .padding(innerPadding),
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.Bottom
         ) {
@@ -415,10 +452,8 @@ fun mainPage(context: Context) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(8f)
+                    .weight(7f)
                     .background(Color.White)
-
-
             ) {
 
 
@@ -557,37 +592,7 @@ fun passwordRoom(
         }
 
 
-        //新增記錄按鈕
-        FloatingActionButton(containerColor = ItemColor,
-            contentColor = Color.White,
-            shape = CircleShape,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(20.dp),
-            onClick = {
-                //清除所有focus狀態
-                focusManager.clearFocus()
-                //清楚使用者輸入
-                userSearchInput.value = ""
-                //按下新增按鈕後的操作
-                var intent = Intent()
-                intent.setClass(context, AddRecordActivity::class.java)
-                intent.putExtra("email", userMail)
-                context.startActivity(
-                    intent,
-                    ActivityOptions.makeCustomAnimation(
-                        context as Activity,
-                        androidx.appcompat.R.anim.abc_slide_in_bottom,
-                        androidx.appcompat.R.anim.abc_popup_exit
-                    ).toBundle()
-                )
 
-
-            }) {
-
-            Icon(Icons.Filled.Add, "Floating Action Button")
-
-        }
 
 
     }
