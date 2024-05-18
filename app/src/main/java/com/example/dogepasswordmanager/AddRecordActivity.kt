@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -353,9 +354,10 @@ fun AddRecordPage(context: Context) {
 
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp, start = 100.dp, end = 100.dp),
-                    contentAlignment = Alignment.BottomEnd
+                        .width(150.dp)
+                        .padding(top = 20.dp)
+                        .height(150.dp),
+                    contentAlignment = Alignment.Center
 //                    verticalArrangement = Arrangement.Center,
 //                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -400,22 +402,24 @@ fun AddRecordPage(context: Context) {
                     //選擇圖片按鈕
                     ElevatedButton(onClick = {
                         //按下選擇圖片按鈕後的操作
-
                         //啟動圖片庫
                         photoPicker.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
 
-                    }, shape = CircleShape,
+                    },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.LightGray
+                            containerColor = Color(192,192,192)
                         ),
-                        modifier = Modifier.size(50.dp)
+                        modifier = Modifier.padding(top = 90.dp, start = 90.dp)
+                            .size(65.dp)
+                            .border(0.dp, Color.Gray, CircleShape)
                     ) {
                             Image(
-                                painter = painterResource(id = R.drawable.gallery),
+                                painter = painterResource(id = R.drawable.pen),
                                 contentDescription = "Gallery Icon",
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.width(65.dp)
+                                    .height(65.dp)
                             )
-                        }
+                    }
 
                 }
 
