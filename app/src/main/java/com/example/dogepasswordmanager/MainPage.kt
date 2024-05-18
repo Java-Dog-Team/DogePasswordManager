@@ -153,12 +153,9 @@ class MainPage : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
-
-
         auth = Firebase.auth
 
         userMail = auth.currentUser?.email.toString()
-
 
     }
 

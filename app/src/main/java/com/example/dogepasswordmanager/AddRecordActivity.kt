@@ -22,19 +22,27 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -343,18 +351,16 @@ fun AddRecordPage(context: Context) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                Column(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 10.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .padding(top = 20.dp, start = 100.dp, end = 100.dp),
+                    contentAlignment = Alignment.BottomEnd
+//                    verticalArrangement = Arrangement.Center,
+//                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
-
                     //尚未選擇圖片
                     if (selectedImg == null && selectedImg2 == null) {
-
                         Image(
                             painter = painterResource(id = R.drawable.default_icon),
                             contentDescription = "Default Icon",
@@ -392,19 +398,25 @@ fun AddRecordPage(context: Context) {
                     }
 
                     //選擇圖片按鈕
-                    Button(onClick = {
+                    ElevatedButton(onClick = {
                         //按下選擇圖片按鈕後的操作
 
                         //啟動圖片庫
                         photoPicker.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
 
-                    }, shape = RectangleShape, modifier = Modifier.padding(top = 10.dp)) {
-                        Image(
-                            painter = painterResource(id = R.drawable.gallery),
-                            contentDescription = "Gallery Icon",
-                            modifier = Modifier.size(50.dp)
-                        )
-                    }
+                    }, shape = CircleShape,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.LightGray
+                        ),
+                        modifier = Modifier.size(50.dp)
+                    ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.gallery),
+                                contentDescription = "Gallery Icon",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+
                 }
 
             }
@@ -432,7 +444,7 @@ fun AddRecordPage(context: Context) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        TextField(
+                        OutlinedTextField(
                             value = userInputAppName.value,
                             onValueChange = {
                                 userInputAppName.value = it
@@ -447,9 +459,23 @@ fun AddRecordPage(context: Context) {
                                     )
 
                                 } else {
+                                    Text(
+                                        text = stringResource(id = R.string.addPage_app_name_field_error),
+                                        color = Color(0,0,0,1)
+                                    )
                                     appNameInputError = false
                                 }
-                            }
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedTextColor = Color(0, 0, 0),
+                                unfocusedBorderColor = Color(235, 195, 18),
+                                unfocusedLabelColor = Color(235, 195, 18),
+                                focusedTextColor = Color(0, 0, 0),
+                                focusedBorderColor = Color(235, 195, 18),
+                                focusedLabelColor = Color(235, 195, 18)
+                            ),
+                            shape = RoundedCornerShape(20.dp),
+                            modifier = Modifier.width(275.dp)
                         )
                     }
 
@@ -461,7 +487,7 @@ fun AddRecordPage(context: Context) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        TextField(value = userInputUsername.value!!, onValueChange = {
+                        OutlinedTextField(value = userInputUsername.value!!, onValueChange = {
                             userInputUsername.value = it
                         },
                             label = { Text(text = stringResource(id = R.string.addPage_app_username_field)) },
@@ -475,8 +501,23 @@ fun AddRecordPage(context: Context) {
 
                                 } else {
                                     usernameInputError = false
+                                    Text(
+                                        text = stringResource(id = R.string.addPage_app_username_field_error),
+                                        color = Color(0,0,0,1)
+                                    )
                                 }
-                            })
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedTextColor = Color(0, 0, 0),
+                                unfocusedBorderColor = Color(235, 195, 18),
+                                unfocusedLabelColor = Color(235, 195, 18),
+                                focusedTextColor = Color(0, 0, 0),
+                                focusedBorderColor = Color(235, 195, 18),
+                                focusedLabelColor = Color(235, 195, 18)
+                            ),
+                            shape = RoundedCornerShape(20.dp),
+                            modifier = Modifier.width(275.dp)
+                        )
                     }
                     //應用程式密碼
                     Row(
@@ -486,7 +527,7 @@ fun AddRecordPage(context: Context) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        TextField(value = userInputPassword.value!!, onValueChange = {
+                        OutlinedTextField(value = userInputPassword.value!!, onValueChange = {
                             userInputPassword.value = it
                         },
                             label = { Text(text = stringResource(id = R.string.addPage_app_password_field)) },
@@ -500,8 +541,23 @@ fun AddRecordPage(context: Context) {
 
                                 } else {
                                     passwordInputError = false
+                                    Text(
+                                        text = stringResource(id = R.string.addPage_app_password_field_error),
+                                        color = Color(0,0,0,1)
+                                    )
                                 }
-                            })
+                            },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedTextColor = Color(0, 0, 0),
+                                unfocusedBorderColor = Color(235, 195, 18),
+                                unfocusedLabelColor = Color(235, 195, 18),
+                                focusedTextColor = Color(0, 0, 0),
+                                focusedBorderColor = Color(235, 195, 18),
+                                focusedLabelColor = Color(235, 195, 18)
+                            ),
+                            shape = RoundedCornerShape(20.dp),
+                            modifier = Modifier.width(275.dp)
+                        )
                     }
                 }
 
@@ -529,7 +585,6 @@ fun uploadImg(context: Context, img: Uri, imgId: String, appData: AppData) {
 
 //更新使用者紀錄
 fun updateDbRecord(context: Context, appData: AppData) {
-
 
     val data = hashMapOf(
         "dataId" to appData.DataId,
