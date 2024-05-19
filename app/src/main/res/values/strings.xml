@@ -62,6 +62,7 @@
     <string name="addPage_edit_title">Edit Item</string>
     <string name="addPage_add_title">Add Item</string>
     <string name="addPage_add_button">Save</string>
+    <string name="addPage_cancel_button">Cancel</string>
     <string name="addPage_app_name_field">App Name</string>
     <string name="addPage_app_name_field_error">Please fill the app name field</string>
     <string name="addPage_app_username_field">App Username</string>

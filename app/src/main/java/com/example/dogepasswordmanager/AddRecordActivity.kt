@@ -9,6 +9,7 @@ import android.media.Image
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -369,7 +370,12 @@ fun AddRecordPage(context: Context) {
                             modifier = Modifier
                                 .border(2.dp, Color.Gray, CircleShape)
                                 .size(150.dp)
-                                .clip(CircleShape),
+                                .clip(CircleShape)
+                                .clickable {
+                                    //按下選擇圖片按鈕後的操作
+                                    //啟動圖片庫
+                                    photoPicker.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
+                                },
                             contentScale = ContentScale.Crop
                         )
 
@@ -382,7 +388,12 @@ fun AddRecordPage(context: Context) {
                             modifier = Modifier
                                 .border(2.dp, Color.Gray, CircleShape)
                                 .size(150.dp)
-                                .clip(CircleShape),
+                                .clip(CircleShape)
+                                .clickable {
+                                    //按下選擇圖片按鈕後的操作
+                                    //啟動圖片庫
+                                    photoPicker.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
+                                },
                             contentScale = ContentScale.Crop
                         )
 
@@ -394,32 +405,34 @@ fun AddRecordPage(context: Context) {
                             modifier = Modifier
                                 .border(2.dp, Color.Gray, CircleShape)
                                 .size(150.dp)
-                                .clip(CircleShape),
+                                .clip(CircleShape)
+                                .clickable {
+                                    //按下選擇圖片按鈕後的操作
+                                    //啟動圖片庫
+                                    photoPicker.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
+                                },
                             contentScale = ContentScale.Crop
                         )
                     }
 
                     //選擇圖片按鈕
-                    ElevatedButton(onClick = {
-                        //按下選擇圖片按鈕後的操作
-                        //啟動圖片庫
-                        photoPicker.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    Image(
+                        painter = painterResource(id = R.drawable.pen),
+                        contentDescription = "Gallery Icon",
+                        modifier = Modifier
+                            .width(50.dp)
+                            .height(50.dp)
+                            .clip(CircleShape)
+                            .clickable {
+                                //按下選擇圖片按鈕後的操作
+                                //啟動圖片庫
+                                photoPicker.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            }
+                            .background(color = Color.White, shape = CircleShape)
+                            .align(Alignment.BottomStart)
+                            .border(width = 1.dp, color = Color.Black, CircleShape),
 
-                    },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(192,192,192)
-                        ),
-                        modifier = Modifier.padding(top = 90.dp, start = 90.dp)
-                            .size(65.dp)
-                            .border(0.dp, Color.Gray, CircleShape)
-                    ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.pen),
-                                contentDescription = "Gallery Icon",
-                                modifier = Modifier.width(65.dp)
-                                    .height(65.dp)
-                            )
-                    }
+                    )
 
                 }
 
@@ -562,6 +575,103 @@ fun AddRecordPage(context: Context) {
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.width(275.dp)
                         )
+                    }
+                    Row(){
+                        Button(onClick = {
+
+                        }){
+
+                        }
+                        Button(onClick = {
+                            //按下儲存按鈕後的操作
+
+                            //檢查使用者是否有輸入每一欄位
+                            if (userInputAppName.value == "") {
+                                usernameInputError = true
+                            } else
+                                usernameInputError = false
+
+                            if (userInputPassword.value == "") {
+                                passwordInputError = true
+                            } else
+                                passwordInputError = false
+
+                            if (userInputAppName.value == "") {
+                                appNameInputError = true
+                            } else
+                                appNameInputError = false
+
+                            //輸入均正確
+                            if (!usernameInputError && !passwordInputError && !appNameInputError) {
+                                var imgId = System
+                                    .currentTimeMillis()
+                                    .toString()
+                                //此紀錄的id
+
+                                var dataId: String? = null
+
+
+                                //為編輯項目
+                                if (!intentObj
+                                        .getStringExtra(MainPage.DATA_ID)
+                                        .isNullOrEmpty()
+                                ) {
+                                    dataId = intentObj.getStringExtra(MainPage.DATA_ID)
+                                } else {
+                                    dataId = System
+                                        .currentTimeMillis()
+                                        .toString()
+                                }
+
+                                //使用者新選的圖片
+                                if (selectedImg2 != null) {
+                                    //存照片到該使用者的雲端儲存庫
+                                    uploadImg(
+                                        context,
+                                        selectedImg2!!, imgId, AppData(
+                                            DataId = dataId!!,
+                                            userEmail = userEmail!!,
+                                            AppName = userInputAppName.value!!,
+                                            AppUsername = userInputUsername.value!!,
+                                            AppPassword = userInputPassword.value!!,
+                                            AppImgId = imgId
+                                        )
+                                    )
+                                    //有更新圖片的話 就讓上傳圖片的listener去更新資料庫，避免先存資料庫結果找不到圖片的問題
+                                    updateFlag = false
+                                } else if (selectedImg != null)
+                                    imgId = intentObj
+                                        .getStringExtra(MainPage.APP_IMG_ID)
+                                        .toString()
+                                else
+                                    imgId = ""
+
+
+                                //將此項紀錄覆蓋或新增到資料庫
+
+                                if (updateFlag)
+                                    updateDbRecord(
+                                        context,
+                                        AppData(
+                                            DataId = dataId!!,
+                                            userEmail = userEmail!!,
+                                            AppName = userInputAppName.value!!,
+                                            AppUsername = userInputUsername.value!!,
+                                            AppPassword = userInputPassword.value!!,
+                                            AppImgId = imgId
+                                        )
+
+                                    )
+
+
+                            }
+                        },
+                            shape = RoundedCornerShape(20.dp),
+                            colors = ButtonDefaults.buttonColors(Color(235, 195, 18)),
+                        ) {
+                            Text(text = stringResource(id = R.string.addPage_add_button),
+                                fontSize = 20.sp)
+                        }
                     }
                 }
 

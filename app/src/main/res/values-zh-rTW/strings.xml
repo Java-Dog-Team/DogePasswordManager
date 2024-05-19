@@ -63,6 +63,7 @@
     <string name="addPage_edit_title">編輯項目</string>
     <string name="addPage_add_title">新增項目</string>
     <string name="addPage_add_button">儲存</string>
+    <string name="addPage_cancel_button">取消</string>
     <string name="addPage_app_name_field">應用程式名稱</string>
     <string name="addPage_app_name_field_error">應用程式名稱請勿留白</string>
     <string name="addPage_app_username_field">應用程式使用者名稱</string>
