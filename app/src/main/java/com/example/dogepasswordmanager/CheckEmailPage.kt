@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.dogepasswordmanager.ui.theme.ItemColor
 
 class CheckEmailPage : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,7 +74,7 @@ fun checkEmailPage(context: Context) {
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = "Localized description",
-                            tint= Color(235, 195, 18),
+                            tint= ItemColor,
                             modifier = Modifier
                                 .width(50.dp)
                                 .height(50.dp)

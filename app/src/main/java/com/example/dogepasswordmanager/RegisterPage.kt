@@ -58,6 +58,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dogepasswordmanager.ui.theme.BrickRed
+import com.example.dogepasswordmanager.ui.theme.ItemColor
 import com.google.android.gms.common.internal.StringResourceValueReader
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.actionCodeSettings
@@ -164,7 +165,7 @@ fun registerPage(context: Context) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Localized description",
-                            tint=Color(235, 195, 18),
+                            tint=ItemColor,
                             modifier = Modifier
                                 .width(50.dp)
                                 .height(50.dp)
@@ -226,11 +227,11 @@ fun registerPage(context: Context) {
                     },
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedTextColor = Color(0, 0, 0),
-                        unfocusedBorderColor = Color(235, 195, 18),
-                        unfocusedLabelColor = Color(235, 195, 18),
+                        unfocusedBorderColor = ItemColor,
+                        unfocusedLabelColor = ItemColor,
                         focusedTextColor = Color(0, 0, 0),
-                        focusedBorderColor = Color(235, 195, 18),
-                        focusedLabelColor = Color(235, 195, 18)
+                        focusedBorderColor = ItemColor,
+                        focusedLabelColor = ItemColor
                     ),
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.width(275.dp)
@@ -284,7 +285,7 @@ fun registerPage(context: Context) {
                                     .clickable() {
                                         passwordVisible.value = !passwordVisible.value
                                     },
-                                tint=Color(235, 195, 18)
+                                tint=ItemColor
                             )
 
                         } else {
@@ -296,7 +297,7 @@ fun registerPage(context: Context) {
                                     .clickable() {
                                         passwordVisible.value = !passwordVisible.value
                                     },
-                                tint=Color(235, 195, 18)
+                                tint=ItemColor
                             )
                         }
                     },
@@ -305,11 +306,11 @@ fun registerPage(context: Context) {
                     },
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedTextColor = Color(0, 0, 0),
-                        unfocusedBorderColor = Color(235, 195, 18),
-                        unfocusedLabelColor = Color(235, 195, 18),
+                        unfocusedBorderColor = ItemColor,
+                        unfocusedLabelColor = ItemColor,
                         focusedTextColor = Color(0, 0, 0),
-                        focusedBorderColor = Color(235, 195, 18),
-                        focusedLabelColor = Color(235, 195, 18)
+                        focusedBorderColor = ItemColor,
+                        focusedLabelColor = ItemColor
                     ),
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.width(275.dp)
@@ -361,7 +362,7 @@ fun registerPage(context: Context) {
                                         confirmedPasswordVisible.value =
                                             !confirmedPasswordVisible.value
                                     },
-                                tint=Color(235, 195, 18)
+                                tint=ItemColor
                             )
 
                         } else {
@@ -375,7 +376,7 @@ fun registerPage(context: Context) {
                                         confirmedPasswordVisible.value =
                                             !confirmedPasswordVisible.value
                                     },
-                                tint=Color(235, 195, 18)
+                                tint=ItemColor
                             )
                         }
                     },
@@ -384,11 +385,11 @@ fun registerPage(context: Context) {
                     },
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedTextColor = Color(0, 0, 0),
-                        unfocusedBorderColor = Color(235, 195, 18),
-                        unfocusedLabelColor = Color(235, 195, 18),
+                        unfocusedBorderColor = ItemColor,
+                        unfocusedLabelColor = ItemColor,
                         focusedTextColor = Color(0, 0, 0),
-                        focusedBorderColor = Color(235, 195, 18),
-                        focusedLabelColor = Color(235, 195, 18)
+                        focusedBorderColor = ItemColor,
+                        focusedLabelColor = ItemColor
                     ),
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.width(275.dp)
@@ -455,7 +456,7 @@ fun registerPage(context: Context) {
                                 .fillMaxWidth()
                                 .padding(top = 20.dp),
                             shape = RoundedCornerShape(20.dp),
-                            colors = ButtonDefaults.buttonColors(Color(235, 195, 18)),
+                            colors = ButtonDefaults.buttonColors(ItemColor),
                         ) {
                             Text(text = stringResource(id = R.string.register_button),
                                 fontSize = 20.sp)

@@ -78,6 +78,7 @@ import androidx.core.view.WindowInsetsCompat
 import coil.compose.AsyncImage
 import com.example.dogepasswordmanager.ui.theme.BackGroundColor
 import com.example.dogepasswordmanager.ui.theme.BrickRed
+import com.example.dogepasswordmanager.ui.theme.ItemColor
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -238,7 +239,7 @@ fun AddRecordPage(context: Context) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(235, 195, 18))
+                    .background(ItemColor)
                     .padding(top = 10.dp, bottom = 10.dp)
             ) {
                 //標題文字
@@ -278,7 +279,7 @@ fun AddRecordPage(context: Context) {
                             painter = painterResource(id = R.drawable.doge),
                             contentDescription = "Default Icon",
                             modifier = Modifier
-                                .border(2.dp, Color(235, 195, 18), CircleShape)
+                                .border(2.dp, ItemColor, CircleShape)
                                 .size(150.dp)
                                 .clip(CircleShape)
                                 .clickable {
@@ -296,7 +297,7 @@ fun AddRecordPage(context: Context) {
                             model = selectedImg2,
                             contentDescription = "App Icon",
                             modifier = Modifier
-                                .border(2.dp, Color(235, 195, 18), CircleShape)
+                                .border(2.dp, ItemColor, CircleShape)
                                 .size(150.dp)
                                 .clip(CircleShape)
                                 .clickable {
@@ -313,7 +314,7 @@ fun AddRecordPage(context: Context) {
                             model = selectedImg,
                             contentDescription = "App Icon",
                             modifier = Modifier
-                                .border(2.dp, Color(235, 195, 18), CircleShape)
+                                .border(2.dp, ItemColor, CircleShape)
                                 .size(150.dp)
                                 .clip(CircleShape)
                                 .clickable {
@@ -340,7 +341,7 @@ fun AddRecordPage(context: Context) {
                             }
                             .background(color = Color.White, shape = CircleShape)
                             .align(Alignment.BottomStart)
-                            .border(width = 1.dp, color = Color(235, 195, 18), CircleShape),
+                            .border(width = 1.dp, color = ItemColor, CircleShape),
                     )
 
                 }
@@ -392,11 +393,11 @@ fun AddRecordPage(context: Context) {
                             },
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedTextColor = Color(0, 0, 0),
-                                unfocusedBorderColor = Color(235, 195, 18),
-                                unfocusedLabelColor = Color(235, 195, 18),
+                                unfocusedBorderColor = ItemColor,
+                                unfocusedLabelColor = ItemColor,
                                 focusedTextColor = Color(0, 0, 0),
-                                focusedBorderColor = Color(235, 195, 18),
-                                focusedLabelColor = Color(235, 195, 18)
+                                focusedBorderColor = ItemColor,
+                                focusedLabelColor = ItemColor
                             ),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.width(275.dp),
@@ -434,11 +435,11 @@ fun AddRecordPage(context: Context) {
                             },
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedTextColor = Color(0, 0, 0),
-                                unfocusedBorderColor = Color(235, 195, 18),
-                                unfocusedLabelColor = Color(235, 195, 18),
+                                unfocusedBorderColor = ItemColor,
+                                unfocusedLabelColor = ItemColor,
                                 focusedTextColor = Color(0, 0, 0),
-                                focusedBorderColor = Color(235, 195, 18),
-                                focusedLabelColor = Color(235, 195, 18)
+                                focusedBorderColor = ItemColor,
+                                focusedLabelColor = ItemColor
                             ),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.width(275.dp),
@@ -475,11 +476,11 @@ fun AddRecordPage(context: Context) {
                             },
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedTextColor = Color(0, 0, 0),
-                                unfocusedBorderColor = Color(235, 195, 18),
-                                unfocusedLabelColor = Color(235, 195, 18),
+                                unfocusedBorderColor = ItemColor,
+                                unfocusedLabelColor = ItemColor,
                                 focusedTextColor = Color(0, 0, 0),
-                                focusedBorderColor = Color(235, 195, 18),
-                                focusedLabelColor = Color(235, 195, 18)
+                                focusedBorderColor = ItemColor,
+                                focusedLabelColor = ItemColor
                             ),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.width(275.dp),
@@ -500,7 +501,7 @@ fun AddRecordPage(context: Context) {
                             openDialog=true
                         },
                             colors = ButtonDefaults.outlinedButtonColors(Color(255, 255, 255)),
-                            border = BorderStroke(1.dp,Color(235, 195, 18)),
+                            border = BorderStroke(1.dp,ItemColor),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier.padding(end = 5.dp)
                                 .height(46.dp)
@@ -509,7 +510,7 @@ fun AddRecordPage(context: Context) {
                         ) {
                             Text(text = stringResource(id = R.string.addPage_app_password_field_cancel),
                                 fontSize = 20.sp,
-                                color = Color(235, 195, 18))
+                                color = ItemColor)
                         }
 
                         //點選取消按鈕
@@ -635,7 +636,7 @@ fun AddRecordPage(context: Context) {
                             }
                         },
                             shape = RoundedCornerShape(20.dp),
-                            colors = ButtonDefaults.buttonColors(Color(235, 195, 18)),
+                            colors = ButtonDefaults.buttonColors(ItemColor),
                             modifier = Modifier.padding(start = 5.dp)
                                 .height(46.dp)
                                 .width(120.dp)

@@ -89,6 +89,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.example.dogepasswordmanager.ui.theme.ItemColor
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
@@ -239,11 +240,11 @@ fun loginPage(context: Context) {
                         },
                         colors = OutlinedTextFieldDefaults.colors(
                             unfocusedTextColor = Color(0, 0, 0),
-                            unfocusedBorderColor = Color(235, 195, 18),
-                            unfocusedLabelColor = Color(235, 195, 18),
+                            unfocusedBorderColor = ItemColor,
+                            unfocusedLabelColor = ItemColor,
                             focusedTextColor = Color(0, 0, 0),
-                            focusedBorderColor = Color(235, 195, 18),
-                            focusedLabelColor = Color(235, 195, 18)
+                            focusedBorderColor = ItemColor,
+                            focusedLabelColor = ItemColor
                         ),
                         shape = RoundedCornerShape(20.dp),
                         modifier = Modifier.width(275.dp)
@@ -273,7 +274,7 @@ fun loginPage(context: Context) {
                                             .clickable() {
                                                 passwordVisible.value = !passwordVisible.value
                                             },
-                                        tint=Color(235, 195, 18)
+                                        tint=ItemColor
                                     )
                                 } else {
                                     Icon(
@@ -284,7 +285,7 @@ fun loginPage(context: Context) {
                                             .clickable() {
                                                 passwordVisible.value = !passwordVisible.value
                                             },
-                                        tint=Color(235, 195, 18)
+                                        tint=ItemColor
                                     )
                                 }
                             },
@@ -309,11 +310,11 @@ fun loginPage(context: Context) {
 
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedTextColor = Color(0, 0, 0),
-                                unfocusedBorderColor = Color(235, 195, 18),
-                                unfocusedLabelColor = Color(235, 195, 18),
+                                unfocusedBorderColor = ItemColor,
+                                unfocusedLabelColor = ItemColor,
                                 focusedTextColor = Color(0, 0, 0),
-                                focusedBorderColor = Color(235, 195, 18),
-                                focusedLabelColor = Color(235, 195, 18)
+                                focusedBorderColor = ItemColor,
+                                focusedLabelColor = ItemColor
                             ),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier
@@ -359,7 +360,7 @@ fun loginPage(context: Context) {
                         .width(275.dp)
                         .padding(top = 20.dp),
                         shape = RoundedCornerShape(20.dp),
-                        colors = ButtonDefaults.buttonColors(Color(235, 195, 18)),
+                        colors = ButtonDefaults.buttonColors(ItemColor),
                         onClick = {
                             //按下登入按鈕後的操作
                             //檢查帳密是否有誤 有誤:顯示錯誤文字
@@ -738,7 +739,7 @@ fun CustomDialog(
                                         Icon(
                                             imageVector = Icons.Filled.Close,
                                             contentDescription = "Localized description",
-                                            tint= Color(235, 195, 18),
+                                            tint= ItemColor,
                                             modifier = Modifier
                                                 .width(50.dp)
                                                 .height(50.dp)
@@ -797,11 +798,11 @@ fun CustomDialog(
                                 },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     unfocusedTextColor = Color(0, 0, 0),
-                                    unfocusedBorderColor = Color(235, 195, 18),
-                                    unfocusedLabelColor = Color(235, 195, 18),
+                                    unfocusedBorderColor = ItemColor,
+                                    unfocusedLabelColor = ItemColor,
                                     focusedTextColor = Color(0, 0, 0),
-                                    focusedBorderColor = Color(235, 195, 18),
-                                    focusedLabelColor = Color(235, 195, 18)
+                                    focusedBorderColor = ItemColor,
+                                    focusedLabelColor = ItemColor
                                 ),
                                 shape = RoundedCornerShape(20.dp),
                                 singleLine = true,
@@ -846,7 +847,7 @@ fun CustomDialog(
                                     .padding(top = 15.dp)
                                     .alpha(aph),
                                 shape = RoundedCornerShape(20.dp),
-                                colors = ButtonDefaults.buttonColors(Color(235, 195, 18)),
+                                colors = ButtonDefaults.buttonColors(ItemColor),
                             ) {
                                 Text(text = stringResource(id=R.string.forget_send_reset_password_email_button))
                             }

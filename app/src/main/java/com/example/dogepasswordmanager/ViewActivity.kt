@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.dogepasswordmanager.ui.theme.BrickRed
+import com.example.dogepasswordmanager.ui.theme.ItemColor
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -180,8 +181,8 @@ fun ViewPage(context: Context) {
             topBar = {
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color(235, 195, 18),
-                        titleContentColor = Color(235, 195, 18),
+                        containerColor = ItemColor,
+                        titleContentColor = ItemColor,
                     ),
                     title = {
                         Text(
@@ -298,7 +299,7 @@ fun ViewPage(context: Context) {
                                 }
                                 .size(35.dp)
                                 .padding(bottom = 5.dp),
-                            tint = Color(235, 195, 18)
+                            tint = ItemColor
                         )
 
                     }
@@ -365,7 +366,7 @@ fun ViewPage(context: Context) {
                                 }
                                 .size(35.dp)
                                 .padding(bottom = 5.dp),
-                            tint = Color(235, 195, 18)
+                            tint = ItemColor
                         )
                     }
 
@@ -430,7 +431,7 @@ fun ViewPage(context: Context) {
                                 activity.finish()
                             },
                             shape = CircleShape,
-                            containerColor = Color(235, 195, 18),
+                            containerColor = ItemColor,
                             contentColor = Color.White,
                             modifier = Modifier.padding(start = 10.dp, end = 10.dp)
                         ) {

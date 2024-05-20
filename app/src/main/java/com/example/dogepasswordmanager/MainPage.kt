@@ -254,7 +254,7 @@ fun mainPage(context: Context) {
         floatingActionButton = {
             if(showingPage.value==MainPage.PASSWORD_ROOM){
                 //新增記錄按鈕
-                FloatingActionButton(containerColor = Color(235, 195, 18),
+                FloatingActionButton(containerColor = ItemColor,
                     contentColor = Color.White,
                     shape = CircleShape,
                     modifier = Modifier
@@ -289,7 +289,7 @@ fun mainPage(context: Context) {
         floatingActionButtonPosition = FabPosition.End,
         bottomBar = {
             BottomAppBar(
-                containerColor = Color(235, 195, 18),
+                containerColor = ItemColor,
                 actions = {
                     //密碼庫按鈕
                     Column(horizontalAlignment = Alignment.CenterHorizontally,
@@ -395,7 +395,7 @@ fun mainPage(context: Context) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(235, 195, 18))
+                    .background(ItemColor)
                     .padding(bottom = 15.dp, top = 15.dp)
             ) {
 
