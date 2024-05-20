@@ -21,20 +21,27 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -86,6 +93,21 @@ private lateinit var auth: FirebaseAuth
 //使用者信箱
 private lateinit var userEmail: String
 
+fun deleteRecord(activity: Activity) {
+//    刪除記錄
+    intentObj.getStringExtra(MainPage.DATA_ID)?.let {
+        db.collection(userEmail).document(it)
+            .delete()
+            .addOnSuccessListener {
+                Log.d(TAG, "DocumentSnapshot successfully deleted!")
+                //關閉檢視頁面
+                activity.finish()
+            }
+            .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ViewPage(context: Context) {
     var openDialog by remember {
@@ -106,13 +128,17 @@ fun ViewPage(context: Context) {
                     Icon(Icons.Filled.Warning, contentDescription = "Example Icon")
                 },
                 title = {
-                    Text(text = stringResource(id = R.string.view_alert_dialog_title), fontSize = 30.sp)
+                    Text(
+                        text = stringResource(id = R.string.view_alert_dialog_title),
+                        fontSize = 30.sp
+                    )
                 },
                 text = {
-                    Text(modifier=Modifier.fillMaxWidth(),
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
                         text = stringResource(id = R.string.view_alert_dialog_content),
                         fontSize = 20.sp,
-                        textAlign= TextAlign.Center
+                        textAlign = TextAlign.Center
                     )
                 },
                 onDismissRequest = {
@@ -144,250 +170,290 @@ fun ViewPage(context: Context) {
             )
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 10.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
+        Scaffold(
+            // 返回按鈕
+            topBar = {
+                TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color(235, 195, 18, 0),
+                        titleContentColor = Color.White,
+                    ),
+                    title = {
+                        Text(
+                            text = stringResource(id = R.string.view_title),
+                            color = Color.Blue,
+                            fontSize = 20.sp
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            activity?.finish()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Localized description",
+                                tint = Color(235, 195, 18),
+                                modifier = Modifier
+                                    .width(50.dp)
+                                    .height(50.dp)
+                            )
+                        }
+                    },
+                    modifier = Modifier.padding(0.dp)
+                )
+            },
+        ) { innerPadding ->
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp, bottom = 10.dp, start = 5.dp)
+                    .padding(innerPadding),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = stringResource(id=R.string.view_title), color = Color.Blue, fontSize = 20.sp)
-            }
-            //應用程式名稱
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
-            ) {
-
-                Column(modifier = Modifier.fillMaxWidth()) {
-
-                    Text(text = stringResource(R.string.view_app_name), color = Color.Gray, fontSize = 15.sp)
-
-                    intentObj.getStringExtra(MainPage.APP_NAME)
-                        ?.let { Text(text = it, fontSize = 25.sp) }
-                }
-
-
-            }
-            Divider(
-                modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-                color = Color.LightGray
-            )
-            //使用者名稱(帳號)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                //資訊顯示
-                Column(modifier = Modifier.weight(1f)) {
-
-                    Text(text = stringResource(id=R.string.view_app_username), color = Color.Gray, fontSize = 15.sp)
-
-                    intentObj.getStringExtra(MainPage.APP_USERNAME)
-                        ?.let { Text(text = it, fontSize = 25.sp) }
-                }
-                //複製按鈕
-                Column(
+                //應用程式名稱
+                Row(
                     modifier = Modifier
-                        .weight(1f),
+                        .fillMaxWidth()
+                        .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
+                ) {
+
+                    Column(modifier = Modifier.fillMaxWidth()) {
+
+                        Text(
+                            text = stringResource(R.string.view_app_name),
+                            color = Color.Gray,
+                            fontSize = 15.sp
+                        )
+
+                        intentObj.getStringExtra(MainPage.APP_NAME)
+                            ?.let { Text(text = it, fontSize = 25.sp) }
+                    }
+
+
+                }
+                Divider(
+                    modifier = Modifier.padding(start = 10.dp, end = 10.dp),
+                    color = Color.LightGray
+                )
+                //使用者名稱(帳號)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    //資訊顯示
+                    Column(modifier = Modifier.weight(1f)) {
+
+                        Text(
+                            text = stringResource(id = R.string.view_app_username),
+                            color = Color.Gray,
+                            fontSize = 15.sp
+                        )
+
+                        intentObj.getStringExtra(MainPage.APP_USERNAME)
+                            ?.let { Text(text = it, fontSize = 25.sp) }
+                    }
+                    //複製按鈕
+                    Column(
+                        modifier = Modifier
+                            .weight(1f),
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.End
+                    ) {
+
+                        //複製按鈕icon
+                        Icon(
+                            painter = painterResource(id = R.drawable.copy),
+                            contentDescription = "Copy Icon",
+                            modifier = Modifier
+                                .clickable() {
+                                    //複製帳號到剪貼簿
+                                    intentObj
+                                        .getStringExtra(
+                                            MainPage.APP_USERNAME
+                                        )
+                                        ?.let {
+                                            clipboardManager.setText(
+                                                AnnotatedString(
+                                                    it
+                                                )
+                                            )
+
+                                        }
+
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            context.getString(R.string.copy_success),
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                }
+                                .size(35.dp)
+                                .padding(bottom = 5.dp),
+                            tint = Color.Blue
+                        )
+
+                    }
+                }
+
+                Divider(
+                    modifier = Modifier.padding(start = 10.dp, end = 10.dp),
+                    color = Color.LightGray
+                )
+                //密碼
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Column(modifier = Modifier.weight(1f)) {
+
+                        Text(
+                            text = stringResource(id = R.string.view_app_password),
+                            color = Color.Gray,
+                            fontSize = 15.sp
+                        )
+
+                        intentObj.getStringExtra(MainPage.APP_PASSWORD)
+                            ?.let { Text(text = it, fontSize = 25.sp) }
+                    }
+
+                    //複製按鈕
+                    Column(
+                        modifier = Modifier
+                            .weight(1f),
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        //複製按鈕icon
+                        Icon(
+                            painter = painterResource(id = R.drawable.copy),
+                            contentDescription = "Copy Icon",
+                            modifier = Modifier
+                                .clickable() {
+                                    //複製帳號到剪貼簿
+                                    intentObj
+                                        .getStringExtra(
+                                            MainPage.APP_PASSWORD
+                                        )
+                                        ?.let {
+                                            clipboardManager.setText(
+                                                AnnotatedString(
+                                                    it
+                                                )
+                                            )
+
+                                        }
+
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            context.getString(R.string.copy_success),
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                }
+                                .size(35.dp)
+                                .padding(bottom = 5.dp),
+                            tint = Color.Blue
+                        )
+                    }
+
+                }
+                Divider(
+                    modifier = Modifier.padding(start = 10.dp, end = 10.dp),
+                    color = Color.LightGray
+                )
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.Bottom,
                     horizontalAlignment = Alignment.End
                 ) {
-
-                    //複製按鈕icon
-                    Icon(
-                        painter = painterResource(id = R.drawable.copy),
-                        contentDescription = "Copy Icon",
+                    //刪除、修改按鈕
+                    Row(
                         modifier = Modifier
-                            .clickable() {
-                                //複製帳號到剪貼簿
-                                intentObj
-                                    .getStringExtra(
-                                        MainPage.APP_USERNAME
-                                    )
-                                    ?.let {
-                                        clipboardManager.setText(
-                                            AnnotatedString(
-                                                it
-                                            )
-                                        )
+                            .fillMaxSize()
+                            .padding(bottom = 20.dp, end = 10.dp),
+                        verticalAlignment = Alignment.Bottom,
+                        horizontalArrangement = Arrangement.End
 
-                                    }
-
-                                Toast
-                                    .makeText(context, context.getString(R.string.copy_success), Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                            .size(35.dp)
-                            .padding(bottom = 5.dp),
-                        tint = Color.Blue
-                    )
-
-                }
-            }
-
-            Divider(
-                modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-                color = Color.LightGray
-            )
-            //密碼
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Column(modifier = Modifier.weight(1f)) {
-
-                    Text(text = stringResource(id=R.string.view_app_password), color = Color.Gray, fontSize = 15.sp)
-
-                    intentObj.getStringExtra(MainPage.APP_PASSWORD)
-                        ?.let { Text(text = it, fontSize = 25.sp) }
-                }
-
-                //複製按鈕
-                Column(
-                    modifier = Modifier
-                        .weight(1f),
-                    verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.End
-                ) {
-                    //複製按鈕icon
-                    Icon(
-                        painter = painterResource(id = R.drawable.copy),
-                        contentDescription = "Copy Icon",
-                        modifier = Modifier
-                            .clickable() {
-                                //複製帳號到剪貼簿
-                                intentObj
-                                    .getStringExtra(
-                                        MainPage.APP_PASSWORD
-                                    )
-                                    ?.let {
-                                        clipboardManager.setText(
-                                            AnnotatedString(
-                                                it
-                                            )
-                                        )
-
-                                    }
-
-                                Toast
-                                    .makeText(context, context.getString(R.string.copy_success), Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                            .size(35.dp)
-                            .padding(bottom = 5.dp),
-                        tint = Color.Blue
-                    )
-                }
-
-            }
-            Divider(
-                modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-                color = Color.LightGray
-            )
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.Bottom,
-                horizontalAlignment = Alignment.End
-            ) {
-                //刪除、修改按鈕
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(bottom = 20.dp, end = 10.dp),
-                    verticalAlignment = Alignment.Bottom,
-                    horizontalArrangement = Arrangement.End
-
-                ) {
-
-                    //編輯按鈕
-                    FloatingActionButton(
-                        onClick = {
-                            //按下編輯按鈕後的操作
-
-                            //跳出編輯視窗
-                            var newIntent = Intent()
-                            newIntent.setClass(context, AddRecordActivity::class.java)
-                            newIntent.putExtra(
-                                MainPage.DATA_ID,
-                                intentObj.getStringExtra(MainPage.DATA_ID)
-                            )
-                            newIntent.putExtra(
-                                MainPage.APP_IMG_ID,
-                                intentObj.getStringExtra(MainPage.APP_IMG_ID)
-                            )
-                            newIntent.putExtra(
-                                MainPage.APP_NAME,
-                                intentObj.getStringExtra(MainPage.APP_NAME)
-                            )
-                            newIntent.putExtra(
-                                MainPage.APP_PASSWORD,
-                                intentObj.getStringExtra(MainPage.APP_PASSWORD)
-                            )
-                            newIntent.putExtra(
-                                MainPage.APP_USERNAME,
-                                intentObj.getStringExtra(MainPage.APP_USERNAME)
-                            )
-
-                            context.startActivity(newIntent, ActivityOptions.makeCustomAnimation(context as Activity,
-                                androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
-                            //關閉此頁面
-                            activity.finish()
-                        },
-                        shape = CircleShape,
-                        containerColor = Color.Blue,
-                        contentColor = Color.White,
-                        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
                     ) {
-                        Icon(imageVector = Icons.Filled.Edit, contentDescription = "Edit Icon")
-                    }
 
-                    //刪除按鈕
-                    FloatingActionButton(
-                        onClick = {
-                            //按下刪除按鈕後的操作
-                            openDialog = true
+                        //編輯按鈕
+                        FloatingActionButton(
+                            onClick = {
+                                //按下編輯按鈕後的操作
 
-                        },
-                        shape = CircleShape,
-                        containerColor = BrickRed,
-                        contentColor = Color.White,
-                        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-                    ) {
-                        Icon(imageVector = Icons.Filled.Delete, contentDescription = "Edit Icon")
+                                //跳出編輯視窗
+                                var newIntent = Intent()
+                                newIntent.setClass(context, AddRecordActivity::class.java)
+                                newIntent.putExtra(
+                                    MainPage.DATA_ID,
+                                    intentObj.getStringExtra(MainPage.DATA_ID)
+                                )
+                                newIntent.putExtra(
+                                    MainPage.APP_IMG_ID,
+                                    intentObj.getStringExtra(MainPage.APP_IMG_ID)
+                                )
+                                newIntent.putExtra(
+                                    MainPage.APP_NAME,
+                                    intentObj.getStringExtra(MainPage.APP_NAME)
+                                )
+                                newIntent.putExtra(
+                                    MainPage.APP_PASSWORD,
+                                    intentObj.getStringExtra(MainPage.APP_PASSWORD)
+                                )
+                                newIntent.putExtra(
+                                    MainPage.APP_USERNAME,
+                                    intentObj.getStringExtra(MainPage.APP_USERNAME)
+                                )
+
+                                context.startActivity(
+                                    newIntent, ActivityOptions.makeCustomAnimation(
+                                        context as Activity,
+                                        androidx.appcompat.R.anim.abc_slide_in_bottom,
+                                        androidx.appcompat.R.anim.abc_popup_exit
+                                    ).toBundle()
+                                )
+                                //關閉此頁面
+                                activity.finish()
+                            },
+                            shape = CircleShape,
+                            containerColor = Color.Blue,
+                            contentColor = Color.White,
+                            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                        ) {
+                            Icon(imageVector = Icons.Filled.Edit, contentDescription = "Edit Icon")
+                        }
+
+                        //刪除按鈕
+                        FloatingActionButton(
+                            onClick = {
+                                //按下刪除按鈕後的操作
+                                openDialog = true
+
+                            },
+                            shape = CircleShape,
+                            containerColor = BrickRed,
+                            contentColor = Color.White,
+                            modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "Edit Icon"
+                            )
+                        }
                     }
                 }
             }
-
-
         }
-
     }
 }
 
 
-fun deleteRecord(activity: Activity) {
-//    刪除記錄
-    intentObj.getStringExtra(MainPage.DATA_ID)?.let {
-        db.collection(userEmail).document(it)
-            .delete()
-            .addOnSuccessListener {
-                Log.d(TAG, "DocumentSnapshot successfully deleted!")
-                //關閉檢視頁面
-                activity.finish()
-            }
-            .addOnFailureListener { e -> Log.w(TAG, "Error deleting document", e) }
-    }
-}
