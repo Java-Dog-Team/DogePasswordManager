@@ -2,12 +2,14 @@ package com.example.dogepasswordmanager
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.media.Image
 import android.net.Uri
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
@@ -18,6 +20,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,6 +29,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -43,6 +47,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -216,7 +221,6 @@ fun AddRecordPage(context: Context) {
 
 
     Row(modifier = Modifier.fillMaxSize()) {
-
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -226,7 +230,7 @@ fun AddRecordPage(context: Context) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(BackGroundColor)
+                    .background(Color(235, 195, 18))
                     .padding(top = 10.dp, bottom = 10.dp)
             ) {
                 //標題文字
@@ -242,113 +246,12 @@ fun AddRecordPage(context: Context) {
                         modifier = Modifier.padding(start = 20.dp)
                     )
                 }
-
-                //儲存按鈕
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable() {
-
-                            //按下儲存按鈕後的操作
-
-                            //檢查使用者是否有輸入每一欄位
-                            if (userInputAppName.value == "") {
-                                usernameInputError = true
-                            } else
-                                usernameInputError = false
-
-                            if (userInputPassword.value == "") {
-                                passwordInputError = true
-                            } else
-                                passwordInputError = false
-
-                            if (userInputAppName.value == "") {
-                                appNameInputError = true
-                            } else
-                                appNameInputError = false
-
-                            //輸入均正確
-                            if (!usernameInputError && !passwordInputError && !appNameInputError) {
-                                var imgId = System
-                                    .currentTimeMillis()
-                                    .toString()
-                                //此紀錄的id
-
-                                var dataId: String? = null
-
-
-                                //為編輯項目
-                                if (!intentObj
-                                        .getStringExtra(MainPage.DATA_ID)
-                                        .isNullOrEmpty()
-                                ) {
-                                    dataId = intentObj.getStringExtra(MainPage.DATA_ID)
-                                } else {
-                                    dataId = System
-                                        .currentTimeMillis()
-                                        .toString()
-                                }
-
-                                //使用者新選的圖片
-                                if (selectedImg2 != null) {
-                                    //存照片到該使用者的雲端儲存庫
-                                    uploadImg(
-                                        context,
-                                        selectedImg2!!, imgId, AppData(
-                                            DataId = dataId!!,
-                                            userEmail = userEmail!!,
-                                            AppName = userInputAppName.value!!,
-                                            AppUsername = userInputUsername.value!!,
-                                            AppPassword = userInputPassword.value!!,
-                                            AppImgId = imgId
-                                        )
-                                    )
-                                    //有更新圖片的話 就讓上傳圖片的listener去更新資料庫，避免先存資料庫結果找不到圖片的問題
-                                    updateFlag = false
-                                } else if (selectedImg != null)
-                                    imgId = intentObj
-                                        .getStringExtra(MainPage.APP_IMG_ID)
-                                        .toString()
-                                else
-                                    imgId = ""
-
-
-                                //將此項紀錄覆蓋或新增到資料庫
-
-                                if (updateFlag)
-                                    updateDbRecord(
-                                        context,
-                                        AppData(
-                                            DataId = dataId!!,
-                                            userEmail = userEmail!!,
-                                            AppName = userInputAppName.value!!,
-                                            AppUsername = userInputUsername.value!!,
-                                            AppPassword = userInputPassword.value!!,
-                                            AppImgId = imgId
-                                        )
-
-                                    )
-
-
-                            }
-
-
-                        },
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.addPage_add_button),
-                        color = Color.White,
-                        fontSize = 30.sp,
-                        modifier = Modifier.padding(end = 20.dp)
-                    )
-                }
             }
 
             //應用程式圖示
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .padding(top = 40.dp, bottom = 20.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -356,7 +259,6 @@ fun AddRecordPage(context: Context) {
                 Box(
                     modifier = Modifier
                         .width(150.dp)
-                        .padding(top = 20.dp)
                         .height(150.dp),
                     contentAlignment = Alignment.Center
 //                    verticalArrangement = Arrangement.Center,
@@ -365,10 +267,10 @@ fun AddRecordPage(context: Context) {
                     //尚未選擇圖片
                     if (selectedImg == null && selectedImg2 == null) {
                         Image(
-                            painter = painterResource(id = R.drawable.default_icon),
+                            painter = painterResource(id = R.drawable.doge),
                             contentDescription = "Default Icon",
                             modifier = Modifier
-                                .border(2.dp, Color.Gray, CircleShape)
+                                .border(2.dp, Color(235, 195, 18), CircleShape)
                                 .size(150.dp)
                                 .clip(CircleShape)
                                 .clickable {
@@ -386,7 +288,7 @@ fun AddRecordPage(context: Context) {
                             model = selectedImg2,
                             contentDescription = "App Icon",
                             modifier = Modifier
-                                .border(2.dp, Color.Gray, CircleShape)
+                                .border(2.dp, Color(235, 195, 18), CircleShape)
                                 .size(150.dp)
                                 .clip(CircleShape)
                                 .clickable {
@@ -403,7 +305,7 @@ fun AddRecordPage(context: Context) {
                             model = selectedImg,
                             contentDescription = "App Icon",
                             modifier = Modifier
-                                .border(2.dp, Color.Gray, CircleShape)
+                                .border(2.dp, Color(235, 195, 18), CircleShape)
                                 .size(150.dp)
                                 .clip(CircleShape)
                                 .clickable {
@@ -430,8 +332,7 @@ fun AddRecordPage(context: Context) {
                             }
                             .background(color = Color.White, shape = CircleShape)
                             .align(Alignment.BottomStart)
-                            .border(width = 1.dp, color = Color.Black, CircleShape),
-
+                            .border(width = 1.dp, color = Color(235, 195, 18), CircleShape),
                     )
 
                 }
@@ -446,11 +347,9 @@ fun AddRecordPage(context: Context) {
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.Top
             ) {
-
-
                 Column(
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Top,
+                    verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     //應用程式名稱
@@ -576,12 +475,52 @@ fun AddRecordPage(context: Context) {
                             modifier = Modifier.width(275.dp)
                         )
                     }
-                    Row(){
-                        Button(onClick = {
+                    Row(
+                        modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth()
+                        .padding(bottom = 55.dp),
+                        verticalAlignment = Alignment.Bottom,
+                        horizontalArrangement = Arrangement.Center
+                    ){
+                        // 取消按鈕
+                        OutlinedButton(onClick = {
+                            //  設定彈跳視窗
+                            val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
+                            val p: String = context.resources.getString(R.string.addPage_app_password_field_delete)
+                            val n: String = context.resources.getString(R.string.addPage_app_password_field_cancel)
+                            alertDialog.setTitle(R.string.addPage_app_password_field_title)
+                            alertDialog.setPositiveButton(
+                                //          設定字體顏色
+                                Html.fromHtml("<font color='#FF0000'>" + p + "</font>")
+                            ) { dialog, which ->
+                                // 設定按了"捨棄"後的事件
+                                activity.finish()
+                            };
+                            alertDialog.setNeutralButton(
+                            //          設定字體顏色
+                                Html.fromHtml("<font color='#8080802'>" + n + "</font>")
+                            ) { dialog, which ->
+                                //          設定 click 事件
+                            }
+                            //      讓使用者可以點視窗以外的灰色部分回到上一頁
+                            alertDialog.setCancelable(true)
+                            //      顯示彈跳視窗
+                            alertDialog.show()
+                        },
+                            colors = ButtonDefaults.outlinedButtonColors(Color(255, 255, 255)),
+                            border = BorderStroke(1.dp,Color(235, 195, 18)),
+                            shape = RoundedCornerShape(20.dp),
+                            modifier = Modifier.padding(end = 5.dp)
+                                .height(46.dp)
+                                .width(120.dp)
 
-                        }){
-
+                        ) {
+                            Text(text = stringResource(id = R.string.addPage_app_password_field_cancel),
+                                fontSize = 20.sp,
+                                color = Color(235, 195, 18))
                         }
+                        // 儲存按鈕
                         Button(onClick = {
                             //按下儲存按鈕後的操作
 
@@ -662,12 +601,13 @@ fun AddRecordPage(context: Context) {
                                         )
 
                                     )
-
-
                             }
                         },
                             shape = RoundedCornerShape(20.dp),
                             colors = ButtonDefaults.buttonColors(Color(235, 195, 18)),
+                            modifier = Modifier.padding(start = 5.dp)
+                                .height(46.dp)
+                                .width(120.dp)
                         ) {
                             Text(text = stringResource(id = R.string.addPage_add_button),
                                 fontSize = 20.sp)

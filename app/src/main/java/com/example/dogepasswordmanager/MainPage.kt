@@ -253,7 +253,7 @@ fun mainPage(context: Context) {
     Scaffold(
         floatingActionButton = {
             //新增記錄按鈕
-            FloatingActionButton(containerColor = BackGroundColor,
+            FloatingActionButton(containerColor = Color(235, 195, 18),
                 contentColor = Color.White,
                 shape = CircleShape,
                 modifier = Modifier
@@ -286,7 +286,7 @@ fun mainPage(context: Context) {
         floatingActionButtonPosition = FabPosition.End,
         bottomBar = {
             BottomAppBar(
-                containerColor = Color.Black,
+                containerColor = Color(235, 195, 18),
                 actions = {
                     //密碼庫按鈕
                     Column(horizontalAlignment = Alignment.CenterHorizontally,
@@ -392,7 +392,7 @@ fun mainPage(context: Context) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(BackGroundColor)
+                    .background(Color(235, 195, 18))
                     .padding(bottom = 15.dp, top = 15.dp)
 
 
@@ -1243,9 +1243,9 @@ fun AppDataBlock(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 5.dp, bottom = 7.dp)
+            .border(width = 1.dp, color = Color.LightGray)
             .clip(RoundedCornerShape(50.dp))
-            .height(70.dp)
+            .height(80.dp)
             .clickable() {
                 //清除使用者輸入
                 userSearchInput.value = ""
@@ -1295,7 +1295,8 @@ fun AppDataBlock(
         //App圖示
         Column(
             modifier = Modifier
-                .weight(1.5f)
+                .weight(2f)
+                .padding(top = 10.dp, bottom = 10.dp)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -1321,7 +1322,7 @@ fun AppDataBlock(
                     contentDescription = "App Icon",
 
                     modifier = Modifier
-                        .size(60.dp)
+                        .size(70.dp)
                         .clip(CircleShape)
                         .border(1.dp, Color.LightGray, CircleShape),
                     contentScale = ContentScale.Crop,
@@ -1346,11 +1347,11 @@ fun AppDataBlock(
             } else {
                 //App Icon預設圖片
                 Image(
-                    painter = painterResource(id = R.drawable.default_icon),
+                    painter = painterResource(id = R.drawable.doge),
                     contentDescription = "App Icon",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(60.dp)
+                        .size(70.dp)
                         .clip(CircleShape)
                         .border(1.dp, Color.LightGray, CircleShape)
                 )
@@ -1362,8 +1363,9 @@ fun AppDataBlock(
         Column(
             modifier = Modifier
                 .weight(6f)
-
+                .padding(top = 5.dp, start = 3.dp)
                 .fillMaxSize()
+
         ) {
             //App名稱
             Row(

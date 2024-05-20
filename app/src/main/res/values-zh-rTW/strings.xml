@@ -70,6 +70,9 @@
     <string name="addPage_app_username_field_error">應用程式使用者名稱請勿留白</string>
     <string name="addPage_app_password_field">應用程式密碼</string>
     <string name="addPage_app_password_field_error">應用程式密碼請勿留白</string>
+    <string name="addPage_app_password_field_title">要捨棄編輯中的內容嗎?</string>
+    <string name="addPage_app_password_field_delete">捨棄</string>
+    <string name="addPage_app_password_field_cancel">取消</string>
     <!--    MainPage-->
     <string name="button_option1">密碼庫</string>
     <string name="button_option2">密碼產生器</string>

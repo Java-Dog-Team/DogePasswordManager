@@ -69,6 +69,9 @@
     <string name="addPage_app_username_field_error">Please fill the app username field</string>
     <string name="addPage_app_password_field">App Password</string>
     <string name="addPage_app_password_field_error">Please fill the app password field</string>
+    <string name="addPage_app_password_field_title">Do you want to discard the content you are editing?</string>
+    <string name="addPage_app_password_field_delete">Discard</string>
+    <string name="addPage_app_password_field_cancel">Cancel</string>
     <!--    MainPage-->
     <string name="button_option1">Room</string>
     <string name="button_option2">Generator</string>
