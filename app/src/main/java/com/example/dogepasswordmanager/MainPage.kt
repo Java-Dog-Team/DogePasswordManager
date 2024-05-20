@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.drawable.shapes.Shape
 import android.net.Uri
 import android.os.Bundle
 import android.text.Html
@@ -17,18 +16,13 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -40,7 +34,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -61,8 +54,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -81,7 +72,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -91,12 +81,10 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -106,25 +94,18 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
-import coil.request.CachePolicy
-import coil.request.ImageRequest
-import com.example.dogepasswordmanager.ui.theme.BackGroundColor
 import com.example.dogepasswordmanager.ui.theme.BrickRed
 import com.example.dogepasswordmanager.ui.theme.ItemColor
 import com.example.dogepasswordmanager.ui.theme.digitsColor
-import com.google.android.gms.common.internal.StringResourceValueReader
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
@@ -132,7 +113,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.google.firebase.storage.storage
 import java.security.SecureRandom
-import java.util.Locale
 
 
 class MainPage : ComponentActivity() {
@@ -547,8 +527,6 @@ fun passwordRoom(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-
-
             LazyColumn(
                 modifier = lazyColModifier
             ) {
@@ -588,10 +566,7 @@ fun passwordRoom(
             }
 
         }
-
-
     }
-
 }
 
 //設定頁面
@@ -604,12 +579,14 @@ fun settingPage(context: Context) {
     val account = (R.string.account)
     val version = (R.string.version)
     val document = (R.string.teach)
+    val logout = (R.string.logout)
     val deleteAccount = (R.string.deleteAccount)
     val biometricAuthentication = R.string.biometricAuthentication
     albumlist.add(theme)
     albumlist.add(account)
     albumlist.add(version)
     albumlist.add(document)
+    albumlist.add(logout)
     albumlist.add(deleteAccount)
     albumlist.add(biometricAuthentication)
 
@@ -701,6 +678,8 @@ fun settingPage(context: Context) {
 }
 
 fun itemClick(clickItem: Int, context: Context) {
+
+    val activity = context as Activity
     //    點選刪除帳號
     if (clickItem == R.string.deleteAccount) {
         //  設定彈跳視窗
@@ -728,7 +707,17 @@ fun itemClick(clickItem: Int, context: Context) {
         alertDialog.setCancelable(true)
 //      顯示彈跳視窗
         alertDialog.show()
-    } else if (clickItem == R.string.theme) {
+    }else if(clickItem == R.string.logout){
+        activity.finish()
+        val intent = Intent()
+        intent.setClass(activity,MainActivity::class.java)
+        //開啟登入頁面
+        activity.startActivity(intent, ActivityOptions.makeCustomAnimation(activity,
+            androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
+        //關閉頁面
+        activity.finish()
+    }
+    else if (clickItem == R.string.theme) {
 
 
     } else if (clickItem == R.string.account) {
@@ -2117,14 +2106,14 @@ fun searchResultItem(
         Column(
             modifier = Modifier
                 .weight(6f)
-                .padding(top=10.dp,start=3.dp)
+                .padding(top = 10.dp, start = 3.dp)
                 .fillMaxSize()
         ) {
             //App名稱
             Row(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end=3.dp)
+                    .padding(end = 3.dp)
                     .fillMaxSize(), verticalAlignment = Alignment.Top
             ) {
                 Text(
@@ -2139,7 +2128,7 @@ fun searchResultItem(
             Row(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end=3.dp)
+                    .padding(end = 3.dp)
                     .fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically
             ) {

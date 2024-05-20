@@ -89,6 +89,7 @@
     <string name="account">Account</string>
     <string name="version">Version</string>
     <string name="teach">Document</string>
+    <string name="logout">Logout</string>
     <string name="deleteAccount">Delete Account</string>
     <string name="biometricAuthentication">Biometric Authentication</string>
 
