@@ -252,36 +252,39 @@ fun mainPage(context: Context) {
     val focusManager = LocalFocusManager.current
     Scaffold(
         floatingActionButton = {
-            //新增記錄按鈕
-            FloatingActionButton(containerColor = Color(235, 195, 18),
-                contentColor = Color.White,
-                shape = CircleShape,
-                modifier = Modifier
-                    .padding(10.dp),
-                onClick = {
-                    //清除所有focus狀態
-                    focusManager.clearFocus()
-                    //清楚使用者輸入
-                    userSearchInput.value = ""
-                    //按下新增按鈕後的操作
-                    var intent = Intent()
-                    intent.setClass(context, AddRecordActivity::class.java)
-                    intent.putExtra("email", userMail)
-                    context.startActivity(
-                        intent,
-                        ActivityOptions.makeCustomAnimation(
-                            context as Activity,
-                            androidx.appcompat.R.anim.abc_slide_in_bottom,
-                            androidx.appcompat.R.anim.abc_popup_exit
-                        ).toBundle()
-                    )
+            if(showingPage.value==MainPage.PASSWORD_ROOM){
+                //新增記錄按鈕
+                FloatingActionButton(containerColor = Color(235, 195, 18),
+                    contentColor = Color.White,
+                    shape = CircleShape,
+                    modifier = Modifier
+                        .padding(10.dp),
+                    onClick = {
+                        //清除所有focus狀態
+                        focusManager.clearFocus()
+                        //清楚使用者輸入
+                        userSearchInput.value = ""
+                        //按下新增按鈕後的操作
+                        var intent = Intent()
+                        intent.setClass(context, AddRecordActivity::class.java)
+                        intent.putExtra("email", userMail)
+                        context.startActivity(
+                            intent,
+                            ActivityOptions.makeCustomAnimation(
+                                context as Activity,
+                                androidx.appcompat.R.anim.abc_slide_in_bottom,
+                                androidx.appcompat.R.anim.abc_popup_exit
+                            ).toBundle()
+                        )
 
 
-                }) {
+                    }) {
 
-                Icon(Icons.Filled.Add, "Floating Action Button")
+                    Icon(Icons.Filled.Add, "Floating Action Button")
 
+                }
             }
+
         },
         floatingActionButtonPosition = FabPosition.End,
         bottomBar = {
@@ -379,10 +382,10 @@ fun mainPage(context: Context) {
                 }
             )
         }
-    ) {
-        innerPadding ->
+    ) { innerPadding ->
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(innerPadding),
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.Bottom
@@ -589,9 +592,6 @@ fun passwordRoom(
         }
 
 
-
-
-
     }
 
 }
@@ -730,8 +730,7 @@ fun itemClick(clickItem: Int, context: Context) {
         alertDialog.setCancelable(true)
 //      顯示彈跳視窗
         alertDialog.show()
-    }
-    else if (clickItem == R.string.theme) {
+    } else if (clickItem == R.string.theme) {
 
     } else if (clickItem == R.string.account) {
 
@@ -1243,9 +1242,9 @@ fun AppDataBlock(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .border(width = 1.dp, color = Color.LightGray)
+            .padding(top = 3.dp, bottom = 3.dp)
             .clip(RoundedCornerShape(50.dp))
-            .height(80.dp)
+            .height(90.dp)
             .clickable() {
                 //清除使用者輸入
                 userSearchInput.value = ""
@@ -1296,7 +1295,6 @@ fun AppDataBlock(
         Column(
             modifier = Modifier
                 .weight(2f)
-                .padding(top = 10.dp, bottom = 10.dp)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -1363,7 +1361,7 @@ fun AppDataBlock(
         Column(
             modifier = Modifier
                 .weight(6f)
-                .padding(top = 5.dp, start = 3.dp)
+                .padding(top = 10.dp, start = 3.dp)
                 .fillMaxSize()
 
         ) {
@@ -1371,6 +1369,7 @@ fun AppDataBlock(
             Row(
                 modifier = Modifier
                     .weight(1f)
+                    .padding(end = 3.dp)
                     .fillMaxSize(), verticalAlignment = Alignment.Top
             ) {
                 Text(
@@ -1385,6 +1384,7 @@ fun AppDataBlock(
             Row(
                 modifier = Modifier
                     .weight(1f)
+                    .padding(end = 3.dp)
                     .fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -1425,6 +1425,9 @@ fun AppDataBlock(
         }
     }
 
+    Divider(
+        modifier = Modifier.padding(start = 5.dp, end = 5.dp)
+    )
 
 }
 
@@ -1998,9 +2001,9 @@ fun searchResultItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 5.dp, bottom = 7.dp)
+            .padding(top = 3.dp, bottom = 3.dp)
             .clip(RoundedCornerShape(50.dp))
-            .height(70.dp)
+            .height(90.dp)
             .clickable() {
 
                 userSearchInput.value = ""
@@ -2050,13 +2053,11 @@ fun searchResultItem(
         //App圖示
         Column(
             modifier = Modifier
-                .weight(1.5f)
+                .weight(2f)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-
             //App Icon圖片
             //此應用程式圖示為使用者自訂
             if (userAppData.AppImgId != "") {
@@ -2076,7 +2077,7 @@ fun searchResultItem(
                     contentDescription = "App Icon",
 
                     modifier = Modifier
-                        .size(60.dp)
+                        .size(70.dp)
                         .clip(CircleShape)
                         .border(1.dp, Color.LightGray, CircleShape),
                     contentScale = ContentScale.Crop,
@@ -2101,11 +2102,11 @@ fun searchResultItem(
             } else {
                 //App Icon預設圖片
                 Image(
-                    painter = painterResource(id = R.drawable.default_icon),
+                    painter = painterResource(id = R.drawable.doge),
                     contentDescription = "App Icon",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(60.dp)
+                        .size(70.dp)
                         .clip(CircleShape)
                         .border(1.dp, Color.LightGray, CircleShape)
                 )
@@ -2117,13 +2118,14 @@ fun searchResultItem(
         Column(
             modifier = Modifier
                 .weight(6f)
-
+                .padding(top=10.dp,start=3.dp)
                 .fillMaxSize()
         ) {
             //App名稱
             Row(
                 modifier = Modifier
                     .weight(1f)
+                    .padding(end=3.dp)
                     .fillMaxSize(), verticalAlignment = Alignment.Top
             ) {
                 Text(
@@ -2138,6 +2140,7 @@ fun searchResultItem(
             Row(
                 modifier = Modifier
                     .weight(1f)
+                    .padding(end=3.dp)
                     .fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -2177,5 +2180,8 @@ fun searchResultItem(
                     })
         }
     }
+    Divider(
+        modifier = Modifier.padding(start = 5.dp, end = 5.dp)
+    )
 
 }

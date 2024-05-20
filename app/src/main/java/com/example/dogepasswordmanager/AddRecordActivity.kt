@@ -391,7 +391,8 @@ fun AddRecordPage(context: Context) {
                                 focusedLabelColor = Color(235, 195, 18)
                             ),
                             shape = RoundedCornerShape(20.dp),
-                            modifier = Modifier.width(275.dp)
+                            modifier = Modifier.width(275.dp),
+                            singleLine = true
                         )
                     }
 
@@ -432,7 +433,8 @@ fun AddRecordPage(context: Context) {
                                 focusedLabelColor = Color(235, 195, 18)
                             ),
                             shape = RoundedCornerShape(20.dp),
-                            modifier = Modifier.width(275.dp)
+                            modifier = Modifier.width(275.dp),
+                            singleLine = true
                         )
                     }
                     //應用程式密碼
@@ -472,7 +474,8 @@ fun AddRecordPage(context: Context) {
                                 focusedLabelColor = Color(235, 195, 18)
                             ),
                             shape = RoundedCornerShape(20.dp),
-                            modifier = Modifier.width(275.dp)
+                            modifier = Modifier.width(275.dp),
+                            singleLine = true
                         )
                     }
                     Row(
