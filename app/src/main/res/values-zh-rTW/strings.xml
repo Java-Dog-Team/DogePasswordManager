@@ -52,7 +52,7 @@
     <!--    ViewPage-->
     <string name="view_alert_dialog_title">刪除項目</string>
     <string name="view_alert_dialog_content">您確定要刪除此項目嗎?</string>
-    <string name="view_alert_dialog_confirm_button">確認</string>
+    <string name="view_alert_dialog_confirm_button">刪除</string>
     <string name="view_alert_dialog_cancel_button">取消</string>
     <string name="view_title">項目資訊</string>
     <string name="view_app_name">名稱</string>

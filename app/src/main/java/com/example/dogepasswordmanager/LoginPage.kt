@@ -254,11 +254,6 @@ fun loginPage(context: Context) {
 
                 //密碼輸入 && 忘記密碼
                 Column (modifier = Modifier.width(275.dp)){
-//                    Row(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        horizontalArrangement = Arrangement.SpaceEvenly
-//                    ) {
                         //密碼輸入欄位
                         OutlinedTextField(
                             value = userInputPassword.value,

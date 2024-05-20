@@ -51,8 +51,8 @@
     <string name="register_page">Sign Up</string>
     <!--    ViewPage-->
     <string name="view_alert_dialog_title">Delete Item</string>
-    <string name="view_alert_dialog_content">Delete?</string>
-    <string name="view_alert_dialog_confirm_button">Confirm</string>
+    <string name="view_alert_dialog_content">Do you want to delete this item?</string>
+    <string name="view_alert_dialog_confirm_button">Delete</string>
     <string name="view_alert_dialog_cancel_button">Cancel</string>
     <string name="view_title">Item Information</string>
     <string name="view_app_name">App Name</string>
@@ -93,7 +93,7 @@
     <string name="biometricAuthentication">Biometric Authentication</string>
 
     <!--  deleteAlert  -->
-    <string name="deleteTitle">Do you want to delete the account?</string>
+    <string name="deleteTitle">Do you want to delete this account?</string>
     <string name="deletePositiveButton">Cancel</string>
     <string name="deleteNeutralButton">Delete</string>
     <!--  checkEmailPage  -->

@@ -41,6 +41,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -51,6 +53,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -67,12 +70,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import coil.compose.AsyncImage
 import com.example.dogepasswordmanager.ui.theme.BackGroundColor
+import com.example.dogepasswordmanager.ui.theme.BrickRed
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -217,6 +222,9 @@ fun AddRecordPage(context: Context) {
 
     var updateFlag by remember {
         mutableStateOf(true)
+    }
+    var openDialog by remember {
+        mutableStateOf(false)
     }
 
 
@@ -489,27 +497,7 @@ fun AddRecordPage(context: Context) {
                         // 取消按鈕
                         OutlinedButton(onClick = {
                             //  設定彈跳視窗
-                            val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
-                            val p: String = context.resources.getString(R.string.addPage_app_password_field_delete)
-                            val n: String = context.resources.getString(R.string.addPage_app_password_field_cancel)
-                            alertDialog.setTitle(R.string.addPage_app_password_field_title)
-                            alertDialog.setPositiveButton(
-                                //          設定字體顏色
-                                Html.fromHtml("<font color='#FF0000'>" + p + "</font>")
-                            ) { dialog, which ->
-                                // 設定按了"捨棄"後的事件
-                                activity.finish()
-                            };
-                            alertDialog.setNeutralButton(
-                            //          設定字體顏色
-                                Html.fromHtml("<font color='#8080802'>" + n + "</font>")
-                            ) { dialog, which ->
-                                //          設定 click 事件
-                            }
-                            //      讓使用者可以點視窗以外的灰色部分回到上一頁
-                            alertDialog.setCancelable(true)
-                            //      顯示彈跳視窗
-                            alertDialog.show()
+                            openDialog=true
                         },
                             colors = ButtonDefaults.outlinedButtonColors(Color(255, 255, 255)),
                             border = BorderStroke(1.dp,Color(235, 195, 18)),
@@ -523,6 +511,46 @@ fun AddRecordPage(context: Context) {
                                 fontSize = 20.sp,
                                 color = Color(235, 195, 18))
                         }
+
+                        //點選取消按鈕
+                        if (openDialog) {
+                            AlertDialog(
+                                title = {
+                                    Text(
+                                        text = stringResource(id = R.string.addPage_app_password_field_title),
+                                        fontSize = 25.sp
+                                    )
+                                },
+                                onDismissRequest = {
+                                    openDialog = false
+                                },
+                                confirmButton = {
+                                    TextButton(
+                                        onClick = {
+                                            //按下確認捨棄後的事件
+                                            openDialog = false
+                                            activity.finish()
+                                        }
+                                    ) {
+                                        Text(stringResource(id = R.string.addPage_app_password_field_delete),
+                                            color = BrickRed)
+                                    }
+                                },
+                                dismissButton = {
+                                    TextButton(
+                                        onClick = {
+                                            //按下取消刪除後的操作
+                                            openDialog = false
+                                        }
+                                    ) {
+                                        Text(stringResource(id = R.string.view_alert_dialog_cancel_button),
+                                            color = Color.Gray)
+                                    }
+                                },
+                                containerColor = Color(253, 248, 225)
+                            )
+                        }
+
                         // 儲存按鈕
                         Button(onClick = {
                             //按下儲存按鈕後的操作

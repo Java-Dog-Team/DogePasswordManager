@@ -397,8 +397,6 @@ fun mainPage(context: Context) {
                     .fillMaxWidth()
                     .background(Color(235, 195, 18))
                     .padding(bottom = 15.dp, top = 15.dp)
-
-
             ) {
 
                 //頁面名稱
@@ -732,6 +730,7 @@ fun itemClick(clickItem: Int, context: Context) {
         alertDialog.show()
     } else if (clickItem == R.string.theme) {
 
+
     } else if (clickItem == R.string.account) {
 
     } else if (clickItem == R.string.version) {
@@ -890,7 +889,7 @@ fun passwordGeneratorPage(context: Context) {
                                 )
                                 .show()
                         },
-                    colorFilter = ColorFilter.tint(ItemColor)
+                    colorFilter = ColorFilter.tint(ItemColor),
                 )
             }
 

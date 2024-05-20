@@ -125,7 +125,9 @@ fun ViewPage(context: Context) {
         if (openDialog) {
             AlertDialog(
                 icon = {
-                    Icon(Icons.Filled.Warning, contentDescription = "Example Icon")
+                    Icon(Icons.Filled.Warning,
+                        contentDescription = "Example Icon",
+                        tint = BrickRed,)
                 },
                 title = {
                     Text(
@@ -154,7 +156,8 @@ fun ViewPage(context: Context) {
                             deleteRecord(activity)
                         }
                     ) {
-                        Text(stringResource(id = R.string.view_alert_dialog_confirm_button))
+                        Text(stringResource(id = R.string.view_alert_dialog_confirm_button),
+                            color = BrickRed)
                     }
                 },
                 dismissButton = {
@@ -164,9 +167,11 @@ fun ViewPage(context: Context) {
                             openDialog = false
                         }
                     ) {
-                        Text(stringResource(id = R.string.view_alert_dialog_cancel_button))
+                        Text(stringResource(id = R.string.view_alert_dialog_cancel_button),
+                            color = Color.Gray)
                     }
-                }
+                },
+                containerColor = Color(253, 248, 225)
             )
         }
 
@@ -175,14 +180,14 @@ fun ViewPage(context: Context) {
             topBar = {
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color(235, 195, 18, 0),
-                        titleContentColor = Color.White,
+                        containerColor = Color(235, 195, 18),
+                        titleContentColor = Color(235, 195, 18),
                     ),
                     title = {
                         Text(
                             text = stringResource(id = R.string.view_title),
-                            color = Color.Blue,
-                            fontSize = 20.sp
+                            color = Color.White,
+                            fontSize = 30.sp
                         )
                     },
                     navigationIcon = {
@@ -192,7 +197,7 @@ fun ViewPage(context: Context) {
                             Icon(
                                 imageVector = Icons.Filled.ArrowBack,
                                 contentDescription = "Localized description",
-                                tint = Color(235, 195, 18),
+                                tint = Color.White,
                                 modifier = Modifier
                                     .width(50.dp)
                                     .height(50.dp)
@@ -207,14 +212,14 @@ fun ViewPage(context: Context) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(innerPadding),
-                verticalArrangement = Arrangement.Top,
+                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 //應用程式名稱
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp)
+                        .padding(start = 5.dp, end = 5.dp, top = 30.dp, bottom = 10.dp)
                 ) {
 
                     Column(modifier = Modifier.fillMaxWidth()) {
@@ -293,7 +298,7 @@ fun ViewPage(context: Context) {
                                 }
                                 .size(35.dp)
                                 .padding(bottom = 5.dp),
-                            tint = Color.Blue
+                            tint = Color(235, 195, 18)
                         )
 
                     }
@@ -360,7 +365,7 @@ fun ViewPage(context: Context) {
                                 }
                                 .size(35.dp)
                                 .padding(bottom = 5.dp),
-                            tint = Color.Blue
+                            tint = Color(235, 195, 18)
                         )
                     }
 
@@ -425,7 +430,7 @@ fun ViewPage(context: Context) {
                                 activity.finish()
                             },
                             shape = CircleShape,
-                            containerColor = Color.Blue,
+                            containerColor = Color(235, 195, 18),
                             contentColor = Color.White,
                             modifier = Modifier.padding(start = 10.dp, end = 10.dp)
                         ) {
