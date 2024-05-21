@@ -12,6 +12,5 @@ data class AppData(
     var AppName: String,
     var AppUsername: String,
     var AppPassword: String,
-    var AppImgUri: Uri? = null,
-    var Theme: String = "Origin"
+    var AppImgUri: Uri? = null
 )
