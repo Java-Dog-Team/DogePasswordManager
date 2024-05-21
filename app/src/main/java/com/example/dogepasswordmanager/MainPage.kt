@@ -20,6 +20,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,15 +46,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -61,6 +70,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -81,6 +92,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -102,6 +114,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.example.dogepasswordmanager.ui.theme.BrickRed
 import com.example.dogepasswordmanager.ui.theme.ItemColor
@@ -572,6 +585,7 @@ fun passwordRoom(
 //設定頁面
 @Composable
 fun settingPage(context: Context) {
+    var showDialog by remember { mutableStateOf(false) }
     val albumlist = ArrayList<Int>()
 
     val language = (R.string.language)
@@ -589,6 +603,8 @@ fun settingPage(context: Context) {
     albumlist.add(logout)
     albumlist.add(deleteAccount)
     albumlist.add(biometricAuthentication)
+
+
 
     //生物辨識開關狀態
     var checked by remember { mutableStateOf(false) }
@@ -618,7 +634,9 @@ fun settingPage(context: Context) {
             Surface(color = Color(255, 255, 255),
                 modifier = Modifier
                     .clickable {
-                        itemClick(item, context)
+                        if(item == theme)
+                            showDialog=true
+                        itemClick(item, context, showDialog)
                     }
                     .padding(vertical = 4.dp, horizontal = 8.dp)
                     .height(85.dp)
@@ -629,7 +647,6 @@ fun settingPage(context: Context) {
                 ) {
                     //若為生物辨識
                     if (item == R.string.biometricAuthentication) {
-
 
                         //生物辨識啟動開關
                         Row(modifier = Modifier.fillMaxWidth()) {
@@ -673,13 +690,20 @@ fun settingPage(context: Context) {
             )
         }
     }
+    CustomDialog(
+        showDialog = showDialog,
+        onDismissRequest = { showDialog = false },
+    ){
+
+    }
 
 
 }
 
-fun itemClick(clickItem: Int, context: Context) {
+fun itemClick(clickItem: Int, context: Context, showDialog: Boolean) {
 
     val activity = context as Activity
+
     //    點選刪除帳號
     if (clickItem == R.string.deleteAccount) {
         //  設定彈跳視窗
@@ -717,10 +741,10 @@ fun itemClick(clickItem: Int, context: Context) {
         //關閉頁面
         activity.finish()
     }
-    else if (clickItem == R.string.theme) {
-
-
-    } else if (clickItem == R.string.account) {
+//    else if (clickItem == R.string.theme) {
+//      參數傳入後無法改值，所以在傳入前就做好了
+//    }
+    else if (clickItem == R.string.account) {
 
     } else if (clickItem == R.string.version) {
 
@@ -728,6 +752,105 @@ fun itemClick(clickItem: Int, context: Context) {
 
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomDialog(
+    showDialog: Boolean,
+    onDismissRequest:() ->Unit,
+    content: @Composable () -> Unit
+) {
+
+    if (showDialog) {
+        Dialog(
+            onDismissRequest = onDismissRequest,
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                dismissOnClickOutside = true,
+                dismissOnBackPress = true
+            )
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    Modifier
+                        .pointerInput(Unit) { detectTapGestures { } }
+                        .shadow(8.dp, shape = RoundedCornerShape(16.dp))
+                        .width(330.dp)
+                        .height(370.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(
+                            MaterialTheme.colorScheme.surface,
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Scaffold(
+                        // 叉叉按鈕
+                        // 按下後直接顯示登入頁面
+                        topBar = {
+                            TopAppBar(
+                                colors = TopAppBarDefaults.topAppBarColors(
+                                    containerColor = Color(235, 195, 18,0),
+                                    titleContentColor = Color.White,
+                                ),
+                                title = {
+                                    Text("")
+                                },
+                                navigationIcon = {
+                                    IconButton(onClick = onDismissRequest) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Close,
+                                            contentDescription = "Localized description",
+                                            tint= ItemColor,
+                                            modifier = Modifier
+                                                .width(50.dp)
+                                                .height(50.dp)
+                                        )
+                                    }
+                                },
+                                modifier = Modifier.padding(0.dp)
+                            )
+                        },
+                    ) { innerPadding ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxWidth()
+                        ) {
+                            // 添加標題
+                            Text(
+                                text = stringResource(R.string.theme),
+                                color = Color(237, 197, 49),
+                                fontSize = 30.sp,
+                                textAlign = TextAlign.Center,
+                            )
+                            Text(
+                                text = stringResource(R.string.choosetheme_artical),
+                                color = Color.Gray,
+                                fontSize = 17.sp,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(
+                                        start = 20.dp,
+                                        end = 20.dp,
+                                        top = 20.dp
+                                    ),
+                                textAlign = TextAlign.Center
+                            )
+                            
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+}
+
 
 fun deleteAccount(context: Context) {
     var activity: Activity = context as Activity

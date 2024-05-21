@@ -101,4 +101,8 @@
     <string name="checkEmailTitle">Check you email box</string>
     <string name="checkEmailArtical">Cilck the link we just sent to complete your account setup.</string>
     <string name="checkEmailAddress">Our Email : noreply@androiddogepasswordmanager.firebaseapp.com</string>
+    <!--  choseTheme  -->
+    <string name="choosetheme_artical">Choose a theme you like...</string>
+    <string name="choosetheme1">Original</string>
+    <string name="choosetheme2">Dark</string>
 </resources>
