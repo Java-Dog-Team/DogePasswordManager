@@ -245,7 +245,7 @@ fun mainPage(context: Context) {
     val focusManager = LocalFocusManager.current
     Scaffold(
         floatingActionButton = {
-            if(showingPage.value==MainPage.PASSWORD_ROOM){
+            if (showingPage.value == MainPage.PASSWORD_ROOM) {
                 //新增記錄按鈕
                 FloatingActionButton(containerColor = ItemColor,
                     contentColor = Color.White,
@@ -328,6 +328,8 @@ fun mainPage(context: Context) {
                                 showingTitle.value = MainPage.PASSWORD_GEN
                                 //隱藏左上角搜尋、過濾按鈕
                                 topLeftButtonVisibleFlag.value = false;
+                                //切換顯示密碼產生器頁面
+                                showingPage.value = MainPage.PASSWORD_GEN
                                 //切換顯示密碼產生器頁面
                                 showingPage.value = MainPage.PASSWORD_GEN
                             }) {
@@ -479,18 +481,7 @@ fun mainPage(context: Context) {
             }
 
 
-//            //功能按鈕
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .background(Color.White)
-//                    .weight(1f)
-//                    .border(1.dp, Color.LightGray)
-//            ) {
-//
-//
-//
-//            }
+
 
 
         }
@@ -605,7 +596,6 @@ fun settingPage(context: Context) {
     albumlist.add(biometricAuthentication)
 
 
-
     //生物辨識開關狀態
     var checked by remember { mutableStateOf(false) }
     //使用者偏好設定:生物辨識開關狀態
@@ -634,8 +624,8 @@ fun settingPage(context: Context) {
             Surface(color = Color(255, 255, 255),
                 modifier = Modifier
                     .clickable {
-                        if(item == theme)
-                            showDialog=true
+                        if (item == theme)
+                            showDialog = true
                         itemClick(item, context, showDialog)
                     }
                     .padding(vertical = 4.dp, horizontal = 8.dp)
@@ -693,7 +683,7 @@ fun settingPage(context: Context) {
     CustomDialog(
         showDialog = showDialog,
         onDismissRequest = { showDialog = false },
-    ){
+    ) {
 
     }
 
@@ -731,13 +721,18 @@ fun itemClick(clickItem: Int, context: Context, showDialog: Boolean) {
         alertDialog.setCancelable(true)
 //      顯示彈跳視窗
         alertDialog.show()
-    }else if(clickItem == R.string.logout){
+    } else if (clickItem == R.string.logout) {
         activity.finish()
         val intent = Intent()
-        intent.setClass(activity,MainActivity::class.java)
+        intent.setClass(activity, MainActivity::class.java)
         //開啟登入頁面
-        activity.startActivity(intent, ActivityOptions.makeCustomAnimation(activity,
-            androidx.appcompat.R.anim.abc_slide_in_bottom, androidx.appcompat.R.anim.abc_popup_exit).toBundle())
+        activity.startActivity(
+            intent, ActivityOptions.makeCustomAnimation(
+                activity,
+                androidx.appcompat.R.anim.abc_slide_in_bottom,
+                androidx.appcompat.R.anim.abc_popup_exit
+            ).toBundle()
+        )
         //關閉頁面
         activity.finish()
     }
@@ -757,7 +752,7 @@ fun itemClick(clickItem: Int, context: Context, showDialog: Boolean) {
 @Composable
 fun CustomDialog(
     showDialog: Boolean,
-    onDismissRequest:() ->Unit,
+    onDismissRequest: () -> Unit,
     content: @Composable () -> Unit
 ) {
 
@@ -792,7 +787,7 @@ fun CustomDialog(
                         topBar = {
                             TopAppBar(
                                 colors = TopAppBarDefaults.topAppBarColors(
-                                    containerColor = Color(235, 195, 18,0),
+                                    containerColor = Color(235, 195, 18, 0),
                                     titleContentColor = Color.White,
                                 ),
                                 title = {
@@ -803,7 +798,7 @@ fun CustomDialog(
                                         Icon(
                                             imageVector = Icons.Filled.Close,
                                             contentDescription = "Localized description",
-                                            tint= ItemColor,
+                                            tint = ItemColor,
                                             modifier = Modifier
                                                 .width(50.dp)
                                                 .height(50.dp)
@@ -841,7 +836,7 @@ fun CustomDialog(
                                     ),
                                 textAlign = TextAlign.Center
                             )
-                            
+
                         }
                     }
                 }
@@ -1797,7 +1792,6 @@ fun topLeftFunctionButton(
                     hint = stringResource(id = R.string.searchbar_hint),
                     showingPage = showingPage
                 ) {
-
                     //若使用者有輸入內容
                     if (it.isNotEmpty()) {
                         //顯示對應的搜尋結果
@@ -1805,8 +1799,11 @@ fun topLeftFunctionButton(
 
                         userSearchInput.value = it
                     } else {
+
                         //使用者尚未輸入內容
                         showingPage.value = MainPage.PASSWORD_ROOM
+
+
                     }
                 }
 
@@ -1975,7 +1972,6 @@ fun SearchBar(
                 .onFocusChanged {
 
                     text = TextFieldValue("")
-                    showingPage.value = MainPage.PASSWORD_ROOM
                 }
                 .focusRequester(focusRequester),
             value = text,
