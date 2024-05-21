@@ -13,6 +13,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -36,6 +38,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -63,6 +66,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -117,6 +122,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.example.dogepasswordmanager.ui.theme.BrickRed
+import com.example.dogepasswordmanager.ui.theme.ChooseItemColor
 import com.example.dogepasswordmanager.ui.theme.ItemColor
 import com.example.dogepasswordmanager.ui.theme.digitsColor
 import com.google.firebase.auth.FirebaseAuth
@@ -237,6 +243,7 @@ fun mainPage(context: Context) {
     var showLoader = remember {
         mutableStateOf(false)
     }
+    val radiogroup:RadioGroup
 
     //使用者客製化圖片的紀錄數量大於0 需要花時間載入圖片
     if (customImgCnt.value > 0)
@@ -603,7 +610,7 @@ fun settingPage(context: Context) {
         mutableStateOf(
             context.getSharedPreferences(
                 auth.currentUser!!.email.toString() + "_" + MainActivity.BIOMETRIC_AVAILABLE,
-                Context.MODE_PRIVATE
+                MODE_PRIVATE
             ).getBoolean(MainActivity.BIOMETRIC_AVAILABLE_KEY, false)
         )
     }
@@ -683,6 +690,7 @@ fun settingPage(context: Context) {
     CustomDialog(
         showDialog = showDialog,
         onDismissRequest = { showDialog = false },
+        context = context
     ) {
 
     }
@@ -753,8 +761,20 @@ fun itemClick(clickItem: Int, context: Context, showDialog: Boolean) {
 fun CustomDialog(
     showDialog: Boolean,
     onDismissRequest: () -> Unit,
+    context: Context,
     content: @Composable () -> Unit
 ) {
+
+    val theme:List<String> = listOf(stringResource(id = R.string.choosetheme1),
+        stringResource(id = R.string.choosetheme2))
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(theme[0] ) }
+
+    val pref: SharedPreferences = context.getSharedPreferences(
+        "THEME",
+        MODE_PRIVATE
+    )
+
+    val editor: SharedPreferences.Editor = pref.edit()
 
     if (showDialog) {
         Dialog(
@@ -794,7 +814,10 @@ fun CustomDialog(
                                     Text("")
                                 },
                                 navigationIcon = {
-                                    IconButton(onClick = onDismissRequest) {
+                                    IconButton(onClick = {
+                                        onDismissRequest
+
+                                    }) {
                                         Icon(
                                             imageVector = Icons.Filled.Close,
                                             contentDescription = "Localized description",
@@ -836,7 +859,46 @@ fun CustomDialog(
                                     ),
                                 textAlign = TextAlign.Center
                             )
-
+                            theme.forEach { text ->
+                                Row(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .selectable(
+                                            selected = (text == selectedOption),
+                                            onClick = {
+                                                onOptionSelected(text)
+                                                editor.putString("theme", selectedOption)
+                                                for(i in 0..2){
+                                                    if(pref.getString("theme","Original") == theme[i]){
+                                                        ItemColor= ChooseItemColor[i]
+                                                        break
+                                                    }
+                                                }
+                                                editor.commit()
+                                            }
+                                        )
+                                        .padding(horizontal = 16.dp)
+                                ) {
+                                    RadioButton(selected = (text == selectedOption),
+                                        onClick = { onOptionSelected(text)
+                                            editor.putString("theme", selectedOption)
+                                            for(i in 0..2){
+                                                if(pref.getString("theme","Original") == theme[i]){
+                                                    ItemColor= ChooseItemColor[i]
+                                                    break
+                                                }
+                                            }
+                                            editor.commit()},
+                                        colors = RadioButtonDefaults.colors(
+                                            ItemColor
+                                        )
+                                    )
+                                    Text(
+                                        text = text,
+                                        modifier = Modifier.padding(start = 16.dp, top = 15.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -844,6 +906,7 @@ fun CustomDialog(
             }
         }
     }
+
 }
 
 
