@@ -11,6 +11,7 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.content.SharedPreferences
 import android.icu.text.ListFormatter.Width
 import android.os.Build
 import android.os.Bundle
@@ -89,6 +90,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.example.dogepasswordmanager.ui.theme.ChooseItemColor
 import com.example.dogepasswordmanager.ui.theme.ItemColor
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -174,8 +176,22 @@ fun loginPage(context: Context) {
 
     var showDialog by remember { mutableStateOf(false) }
 
-
-
+    //儲存偏好設定(主題部分)
+    val pref: SharedPreferences = context.getSharedPreferences(
+        "THEME",
+        MODE_PRIVATE
+    )
+    val editor: SharedPreferences.Editor = pref.edit()
+    val theme:List<String> = listOf(stringResource(id = R.string.choosetheme1),
+        stringResource(id = R.string.choosetheme2))
+    for(i in 0..1){
+        if(context.getSharedPreferences(
+            "THEME",
+            MODE_PRIVATE
+        ).getString("theme", "Original").toString() == theme[i]){
+            ItemColor= ChooseItemColor[i]
+        }
+    }
 
     Column(verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -724,7 +740,7 @@ fun CustomDialog(
                 ) {
                     Scaffold(
                         // 叉叉按鈕
-                        // 按下後直接顯示登入頁面
+                        // 按下後直接顯示原本頁面
                         topBar = {
                             TopAppBar(
                                 colors = TopAppBarDefaults.topAppBarColors(

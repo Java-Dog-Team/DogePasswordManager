@@ -105,4 +105,6 @@
     <string name="choosetheme_artical">Choose a theme you like...</string>
     <string name="choosetheme1">Original</string>
     <string name="choosetheme2">Dark</string>
+    <!--  Account Page  -->
+    <string name="UpdatePassword">Update your password!</string>
 </resources>

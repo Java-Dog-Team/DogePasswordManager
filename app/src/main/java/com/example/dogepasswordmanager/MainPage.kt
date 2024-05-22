@@ -47,6 +47,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
@@ -184,7 +185,7 @@ class MainPage : ComponentActivity() {
                 }
 
             } else
-                mainPage(this@MainPage)
+                mainPage(this@MainPage, false)
         }
     }
 
@@ -225,7 +226,7 @@ private var imageRef = root.child("images")
 @OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun mainPage(context: Context) {
+fun mainPage(context: Context, refresh:Boolean) {
 
     //顯示畫面內容 default:密碼庫頁面
     var showingPage = remember { mutableStateOf(MainPage.PASSWORD_ROOM) }
@@ -494,10 +495,20 @@ fun mainPage(context: Context) {
         }
     }
 
-
     //顯示對話窗
     dialogWindow(context, dialogShowingFlag, showLoader)
+    if(refresh){
 
+
+        //按下按鈕後處理
+        showingTitle.value = MainPage.SETTING
+        //隱藏左上角搜尋、過濾按鈕
+        topLeftButtonVisibleFlag.value = false;
+        //切換顯示設定頁面
+        showingPage.value = MainPage.SETTING
+        //設定畫面
+        settingPage(context)
+    }
 }
 
 //密碼庫頁面
@@ -625,7 +636,7 @@ fun settingPage(context: Context) {
     )
     val editor: SharedPreferences.Editor = biometricPref.edit()
 
-
+    var chooseItem=0
     LazyColumn() {
         items(albumlist) { item ->
             Surface(color = Color(255, 255, 255),
@@ -633,7 +644,7 @@ fun settingPage(context: Context) {
                     .clickable {
                         if (item == theme)
                             showDialog = true
-                        itemClick(item, context, showDialog)
+                        chooseItem = item
                     }
                     .padding(vertical = 4.dp, horizontal = 8.dp)
                     .height(85.dp)
@@ -689,21 +700,19 @@ fun settingPage(context: Context) {
     }
     CustomDialog(
         showDialog = showDialog,
-        onDismissRequest = { showDialog = false },
+        onDismissRequest = {
+            showDialog = false
+
+            val activity = context as Activity
+            activity.recreate()},
         context = context
     ) {
 
     }
-
-
-}
-
-fun itemClick(clickItem: Int, context: Context, showDialog: Boolean) {
-
     val activity = context as Activity
 
     //    點選刪除帳號
-    if (clickItem == R.string.deleteAccount) {
+    if (chooseItem == R.string.deleteAccount) {
         //  設定彈跳視窗
         val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
         val p: String = context.resources.getString(R.string.deletePositiveButton)
@@ -729,7 +738,7 @@ fun itemClick(clickItem: Int, context: Context, showDialog: Boolean) {
         alertDialog.setCancelable(true)
 //      顯示彈跳視窗
         alertDialog.show()
-    } else if (clickItem == R.string.logout) {
+    } else if (chooseItem == R.string.logout) {
         activity.finish()
         val intent = Intent()
         intent.setClass(activity, MainActivity::class.java)
@@ -747,16 +756,17 @@ fun itemClick(clickItem: Int, context: Context, showDialog: Boolean) {
 //    else if (clickItem == R.string.theme) {
 //      參數傳入後無法改值，所以在傳入前就做好了
 //    }
-    else if (clickItem == R.string.account) {
+    else if (chooseItem == R.string.account) {
+        accountInformation(activity = activity,context = context)
+    } else if (chooseItem == R.string.version) {
 
-    } else if (clickItem == R.string.version) {
-
-    } else if (clickItem == R.string.teach) {
+    } else if (chooseItem == R.string.teach) {
 
     }
-}
 
+}
 @OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun CustomDialog(
     showDialog: Boolean,
@@ -764,17 +774,15 @@ fun CustomDialog(
     context: Context,
     content: @Composable () -> Unit
 ) {
-
-    val theme:List<String> = listOf(stringResource(id = R.string.choosetheme1),
-        stringResource(id = R.string.choosetheme2))
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(theme[0] ) }
-
+    //儲存偏好設定(主題部分)
     val pref: SharedPreferences = context.getSharedPreferences(
         "THEME",
         MODE_PRIVATE
     )
-
     val editor: SharedPreferences.Editor = pref.edit()
+    val theme:List<String> = listOf(stringResource(id = R.string.choosetheme1),
+        stringResource(id = R.string.choosetheme2))
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(pref.getString("theme","Original") ) }
 
     if (showDialog) {
         Dialog(
@@ -814,10 +822,7 @@ fun CustomDialog(
                                     Text("")
                                 },
                                 navigationIcon = {
-                                    IconButton(onClick = {
-                                        onDismissRequest
-
-                                    }) {
+                                    IconButton(onClick = onDismissRequest) {
                                         Icon(
                                             imageVector = Icons.Filled.Close,
                                             contentDescription = "Localized description",
@@ -842,7 +847,7 @@ fun CustomDialog(
                             // 添加標題
                             Text(
                                 text = stringResource(R.string.theme),
-                                color = Color(237, 197, 49),
+                                color = ItemColor,
                                 fontSize = 30.sp,
                                 textAlign = TextAlign.Center,
                             )
@@ -867,28 +872,38 @@ fun CustomDialog(
                                             selected = (text == selectedOption),
                                             onClick = {
                                                 onOptionSelected(text)
-                                                editor.putString("theme", selectedOption)
-                                                for(i in 0..2){
-                                                    if(pref.getString("theme","Original") == theme[i]){
-                                                        ItemColor= ChooseItemColor[i]
+                                                editor.putString("theme", text)
+                                                editor.commit()
+                                                for (i in 0..1) {
+                                                    if (pref.getString(
+                                                            "theme",
+                                                            "Original"
+                                                        ) == theme[i]
+                                                    ) {
+                                                        ItemColor = ChooseItemColor[i]
                                                         break
                                                     }
                                                 }
-                                                editor.commit()
                                             }
                                         )
                                         .padding(horizontal = 16.dp)
                                 ) {
                                     RadioButton(selected = (text == selectedOption),
-                                        onClick = { onOptionSelected(text)
-                                            editor.putString("theme", selectedOption)
-                                            for(i in 0..2){
-                                                if(pref.getString("theme","Original") == theme[i]){
-                                                    ItemColor= ChooseItemColor[i]
+                                        onClick = {
+                                            onOptionSelected(text)
+                                            editor.putString("theme", text)
+                                            editor.commit()
+                                            val s: String =
+                                                pref.getString("theme", "Original").toString()
+                                            Log.d("Theme be choose:", s)
+                                            for (i in 0..1) {
+                                                if (s == theme[i]) {
+                                                    ItemColor = ChooseItemColor[i]
                                                     break
                                                 }
                                             }
-                                            editor.commit()},
+
+                                        },
                                         colors = RadioButtonDefaults.colors(
                                             ItemColor
                                         )
@@ -902,13 +917,280 @@ fun CustomDialog(
                         }
                     }
                 }
+            }
+        }
+        mainPage(context = context, refresh = true)
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun accountInformation(activity: Activity,context: Context) {
+    //剪貼簿管理員物件
+    val clipboardManager: ClipboardManager = LocalClipboardManager.current
+    var showDialog by remember { mutableStateOf(false) }
+    Scaffold(
+        // 返回按鈕
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = ItemColor,
+                    titleContentColor = ItemColor,
+                ),
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.view_title),
+                        color = Color.White,
+                        fontSize = 30.sp
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        activity?.finish()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Localized description",
+                            tint = Color.White,
+                            modifier = Modifier
+                                .width(50.dp)
+                                .height(50.dp)
+                        )
+                    }
+                },
+                modifier = Modifier.padding(0.dp)
+            )
+        },
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            //使用者名稱(帳號)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                //資訊顯示
+                Column(modifier = Modifier.weight(1f)) {
+
+                    Text(
+                        text = stringResource(id = R.string.view_app_username),
+                        color = Color.Gray,
+                        fontSize = 15.sp
+                    )
+
+                    Text(text = auth.currentUser?.email.toString(), fontSize = 25.sp)
+                }
+                //複製按鈕
+                Column(
+                    modifier = Modifier
+                        .weight(1f),
+                    verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = Alignment.End
+                ) {
+
+                    //複製按鈕icon
+                    Icon(
+                        painter = painterResource(id = R.drawable.copy),
+                        contentDescription = "Copy Icon",
+                        modifier = Modifier
+                            .clickable() {
+                                //複製帳號到剪貼簿
+
+                                clipboardManager.setText(
+                                    AnnotatedString(
+                                        auth.currentUser?.email.toString()
+                                    )
+                                )
+
+                                Toast
+                                    .makeText(
+                                        context,
+                                        context.getString(R.string.copy_success),
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    .show()
+                            }
+                            .size(35.dp)
+                            .padding(bottom = 5.dp),
+                        tint = ItemColor
+                    )
+
+                }
+            }
+
+            Divider(
+                modifier = Modifier.padding(start = 10.dp, end = 10.dp),
+                color = Color.LightGray
+            )
+            //密碼
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Column(modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center) {
+                    Text(
+                        text = stringResource(id = R.string.UpdatePassword),
+                        color = ItemColor,
+                        fontSize = 20.sp,
+                        modifier = Modifier.clickable {
+                            val userInputEmail = auth.currentUser?.email.toString()
+                            var userInputError = false
+                            //按下按鈕後的操作
+                            //檢查輸入
+
+                            if (userInputEmail.isEmpty() || userInputEmail.isBlank() || checkEmail(
+                                    userInputEmail
+                                )
+                            ) {
+
+                                userInputError = true
+                            } else {
+                                //寄送密碼重設郵件
+                                Firebase.auth.sendPasswordResetEmail(userInputEmail)
+                                    .addOnCompleteListener { task ->
+                                        //寄送成功
+                                        if (task.isSuccessful) {
+                                            showDialog = true
+                                        } else {
+                                            Log.d("HIIIIIIII","msg")
+                                            userInputError = true
+                                        }
+                                    }
+                            }
+
+                        }
+                    )
+                }
+            }
+        }
+    }
+    resetPassword(
+        showDialog = showDialog,
+        onDismissRequest = { showDialog = false },
+        title_num = R.string.forget_email_success,
+        artical_num = R.string.forget_email_success_artical
+    ){
+
+    }
+}
+//檢查電子郵件格式
+private fun checkEmail(email: String = ""): Boolean {
+    return !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun resetPassword(
+    showDialog: Boolean,
+    onDismissRequest: () -> Unit,
+    title_num:Int,
+    artical_num:Int,
+    content: @Composable () -> Unit,
+) {
+
+    if (showDialog) {
+        Dialog(
+            onDismissRequest = onDismissRequest,
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                dismissOnClickOutside = true,
+                dismissOnBackPress = true
+            )
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    Modifier
+                        .pointerInput(Unit) { detectTapGestures { } }
+                        .shadow(8.dp, shape = RoundedCornerShape(16.dp))
+                        .width(330.dp)
+                        .height(370.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(
+                            MaterialTheme.colorScheme.surface,
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Scaffold(
+                        // 叉叉按鈕
+                        // 按下後直接顯示原本頁面
+                        topBar = {
+                            TopAppBar(
+                                colors = TopAppBarDefaults.topAppBarColors(
+                                    containerColor = Color(235, 195, 18,0),
+                                    titleContentColor = Color.White,
+                                ),
+                                title = {
+                                    Text("")
+                                },
+                                navigationIcon = {
+                                    IconButton(onClick = onDismissRequest) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Close,
+                                            contentDescription = "Localized description",
+                                            tint= ItemColor,
+                                            modifier = Modifier
+                                                .width(50.dp)
+                                                .height(50.dp)
+                                        )
+                                    }
+                                },
+                                modifier = Modifier.padding(0.dp)
+                            )
+                        },
+                    ) { innerPadding ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxWidth()
+                        ) {
+                            // 添加標題
+                            Text(
+                                text = stringResource(title_num),
+                                color = Color(237, 197, 49),
+                                fontSize = 30.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(top = 70.dp)
+                            )
+                            Text(
+                                text = stringResource(artical_num),
+                                color = Color.Gray,
+                                fontSize = 17.sp,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(
+                                        start = 20.dp,
+                                        end = 20.dp,
+                                        top = 20.dp,
+                                        bottom = 150.dp
+                                    ),
+                                textAlign = TextAlign.Center
+                            )
+
+
+                        }
+                    }
+                }
 
             }
         }
     }
-
 }
-
 
 fun deleteAccount(context: Context) {
     var activity: Activity = context as Activity

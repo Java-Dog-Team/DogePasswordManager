@@ -105,4 +105,6 @@
     <string name="choosetheme_artical">選擇您喜歡的主題</string>
     <string name="choosetheme1">預設</string>
     <string name="choosetheme2">深色模式</string>
+    <!--  Account Page  -->
+    <string name="UpdatePassword">更新您的密碼!</string>
 </resources>

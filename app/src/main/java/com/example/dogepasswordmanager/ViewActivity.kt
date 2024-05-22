@@ -237,6 +237,7 @@ fun ViewPage(context: Context) {
 
 
                 }
+
                 Divider(
                     modifier = Modifier.padding(start = 10.dp, end = 10.dp),
                     color = Color.LightGray
