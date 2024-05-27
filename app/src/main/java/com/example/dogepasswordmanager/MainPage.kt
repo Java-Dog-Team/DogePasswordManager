@@ -595,24 +595,22 @@ fun passwordRoom(
 @Composable
 fun settingPage(context: Context) {
     var showDialog by remember { mutableStateOf(false) }
+    var acc by remember { mutableStateOf(false) }
     val albumlist = ArrayList<Int>()
 
     val language = (R.string.language)
     val theme = (R.string.theme)
     val account = (R.string.account)
-    val version = (R.string.version)
     val document = (R.string.teach)
     val logout = (R.string.logout)
     val deleteAccount = (R.string.deleteAccount)
     val biometricAuthentication = R.string.biometricAuthentication
     albumlist.add(theme)
     albumlist.add(account)
-    albumlist.add(version)
+    albumlist.add(biometricAuthentication)
     albumlist.add(document)
     albumlist.add(logout)
     albumlist.add(deleteAccount)
-    albumlist.add(biometricAuthentication)
-
 
     //生物辨識開關狀態
     var checked by remember { mutableStateOf(false) }
@@ -644,7 +642,10 @@ fun settingPage(context: Context) {
                     .clickable {
                         if (item == theme)
                             showDialog = true
+                        else if (item == account)
+                            acc = true
                         chooseItem = item
+                        Click(chooseItem, context)
                     }
                     .padding(vertical = 4.dp, horizontal = 8.dp)
                     .height(85.dp)
@@ -658,6 +659,15 @@ fun settingPage(context: Context) {
 
                         //生物辨識啟動開關
                         Row(modifier = Modifier.fillMaxWidth()) {
+                            var col = Color.Black
+                            Text(
+                                text = stringResource(item),
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .padding(23.dp),
+                                fontSize = 25.sp,
+                                color = col
+                            )
                             Switch(
                                 checked = checked,
                                 onCheckedChange = {
@@ -666,7 +676,9 @@ fun settingPage(context: Context) {
                                     //修改使用者偏好設定
                                     editor.putBoolean(MainActivity.BIOMETRIC_AVAILABLE_KEY, checked)
                                     editor.commit()
-                                }
+                                },
+                                modifier = Modifier.padding(23.dp),
+                                colors = SwitchDefaults.colors(ItemColor)
                             )
                         }
                     } else {
@@ -674,6 +686,7 @@ fun settingPage(context: Context) {
                             modifier = Modifier.fillMaxSize()
                         ) {
                             var col = Color.Black
+                            // 若為刪除帳號或登出帳號
                             if (item == R.string.deleteAccount) {
                                 col = Color.Red
                             } else {
@@ -710,7 +723,22 @@ fun settingPage(context: Context) {
 
     }
     val activity = context as Activity
+    accountInformation(
+        acc = acc,
+        activity = activity,
+        onDismissRequest = {acc = false },
+        context = context){
 
+    }
+
+    if (chooseItem == R.string.teach) {
+
+    }
+
+}
+
+fun Click(chooseItem: Int, context: Context){
+    val activity=context as Activity
     //    點選刪除帳號
     if (chooseItem == R.string.deleteAccount) {
         //  設定彈跳視窗
@@ -753,20 +781,8 @@ fun settingPage(context: Context) {
         //關閉頁面
         activity.finish()
     }
-//    else if (clickItem == R.string.theme) {
-//      參數傳入後無法改值，所以在傳入前就做好了
-//    }
-    else if (chooseItem == R.string.account) {
-        accountInformation(activity = activity,context = context)
-    } else if (chooseItem == R.string.version) {
-
-    } else if (chooseItem == R.string.teach) {
-
-    }
-
 }
 @OptIn(ExperimentalMaterial3Api::class)
-
 @Composable
 fun CustomDialog(
     showDialog: Boolean,
@@ -924,167 +940,206 @@ fun CustomDialog(
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun accountInformation(activity: Activity,context: Context) {
+fun accountInformation(
+    acc:Boolean,
+    activity: Activity,
+    onDismissRequest: () -> Unit,
+    context: Context,
+    content: @Composable () -> Unit) {
     //剪貼簿管理員物件
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
     var showDialog by remember { mutableStateOf(false) }
-    Scaffold(
-        // 返回按鈕
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = ItemColor,
-                    titleContentColor = ItemColor,
-                ),
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.view_title),
-                        color = Color.White,
-                        fontSize = 30.sp
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        activity?.finish()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Localized description",
-                            tint = Color.White,
-                            modifier = Modifier
-                                .width(50.dp)
-                                .height(50.dp)
-                        )
-                    }
-                },
-                modifier = Modifier.padding(0.dp)
+    var accc by remember { mutableStateOf(true) }
+    if(accc && acc){
+        Dialog(
+            onDismissRequest = onDismissRequest,
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                dismissOnClickOutside = true,
+                dismissOnBackPress = true
             )
-        },
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            //使用者名稱(帳號)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-
-                //資訊顯示
-                Column(modifier = Modifier.weight(1f)) {
-
-                    Text(
-                        text = stringResource(id = R.string.view_app_username),
-                        color = Color.Gray,
-                        fontSize = 15.sp
-                    )
-
-                    Text(text = auth.currentUser?.email.toString(), fontSize = 25.sp)
-                }
-                //複製按鈕
-                Column(
-                    modifier = Modifier
-                        .weight(1f),
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.End
+                Box(
+                    Modifier
+                        .pointerInput(Unit) { detectTapGestures { } }
+                        .shadow(8.dp, shape = RoundedCornerShape(16.dp))
+                        .width(330.dp)
+                        .height(350.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(
+                            MaterialTheme.colorScheme.surface,
+                        ),
+                    contentAlignment = Alignment.Center
                 ) {
+                    Scaffold(
+                        // 叉叉按鈕
+                        // 按下後直接顯示登入頁面
+                        topBar = {
+                            TopAppBar(
+                                colors = TopAppBarDefaults.topAppBarColors(
+                                    containerColor = Color(235, 195, 18, 0),
+                                    titleContentColor = Color.White,
+                                ),
+                                title = {
+                                    Text("")
+                                },
+                                navigationIcon = {
+                                    IconButton(onClick = onDismissRequest) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Close,
+                                            contentDescription = "Localized description",
+                                            tint = ItemColor,
+                                            modifier = Modifier
+                                                .width(50.dp)
+                                                .height(50.dp)
+                                        )
+                                    }
+                                },
+                                modifier = Modifier.padding(0.dp)
+                            )
+                        },
+                    ) { innerPadding ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxWidth()
+                        ) {
+                            // 添加標題
+                            Text(
+                                text = stringResource(R.string.account),
+                                color = ItemColor,
+                                fontSize = 30.sp,
+                                textAlign = TextAlign.Center,
+                            )
 
-                    //複製按鈕icon
-                    Icon(
-                        painter = painterResource(id = R.drawable.copy),
-                        contentDescription = "Copy Icon",
-                        modifier = Modifier
-                            .clickable() {
-                                //複製帳號到剪貼簿
-
-                                clipboardManager.setText(
-                                    AnnotatedString(
-                                        auth.currentUser?.email.toString()
-                                    )
-                                )
-
-                                Toast
-                                    .makeText(
-                                        context,
-                                        context.getString(R.string.copy_success),
-                                        Toast.LENGTH_SHORT
-                                    )
-                                    .show()
-                            }
-                            .size(35.dp)
-                            .padding(bottom = 5.dp),
-                        tint = ItemColor
-                    )
-
-                }
-            }
-
-            Divider(
-                modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-                color = Color.LightGray
-            )
-            //密碼
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Column(modifier = Modifier.weight(1f),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center) {
-                    Text(
-                        text = stringResource(id = R.string.UpdatePassword),
-                        color = ItemColor,
-                        fontSize = 20.sp,
-                        modifier = Modifier.clickable {
-                            val userInputEmail = auth.currentUser?.email.toString()
-                            var userInputError = false
-                            //按下按鈕後的操作
-                            //檢查輸入
-
-                            if (userInputEmail.isEmpty() || userInputEmail.isBlank() || checkEmail(
-                                    userInputEmail
-                                )
+                            //使用者名稱(帳號)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 5.dp, end = 5.dp, top = 50.dp, bottom = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
 
-                                userInputError = true
-                            } else {
-                                //寄送密碼重設郵件
-                                Firebase.auth.sendPasswordResetEmail(userInputEmail)
-                                    .addOnCompleteListener { task ->
-                                        //寄送成功
-                                        if (task.isSuccessful) {
-                                            showDialog = true
-                                        } else {
-                                            Log.d("HIIIIIIII","msg")
-                                            userInputError = true
-                                        }
-                                    }
-                            }
+                                //資訊顯示
+                                Column() {
 
+                                    Text(
+                                        text = stringResource(id = R.string.view_app_username),
+                                        color = Color.Gray,
+                                        fontSize = 15.sp
+                                    )
+
+                                    Text(text = auth.currentUser?.email.toString(), fontSize = 20.sp)
+                                }
+                                //複製按鈕
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f),
+                                    verticalArrangement = Arrangement.Bottom,
+                                    horizontalAlignment = Alignment.End
+                                ) {
+
+                                    //複製按鈕icon
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.copy),
+                                        contentDescription = "Copy Icon",
+                                        modifier = Modifier
+                                            .clickable() {
+                                                //複製帳號到剪貼簿
+
+                                                clipboardManager.setText(
+                                                    AnnotatedString(
+                                                        auth.currentUser?.email.toString()
+                                                    )
+                                                )
+
+                                                Toast
+                                                    .makeText(
+                                                        context,
+                                                        context.getString(R.string.copy_success),
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                    .show()
+                                            }
+                                            .size(30.dp)
+                                            .padding(bottom = 5.dp),
+                                        tint = ItemColor
+                                    )
+
+                                }
+                            }
+                            //重設密碼
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 5.dp, end = 5.dp, top = 50.dp, bottom = 10.dp),
+                                verticalAlignment = Alignment.Bottom
+                            ) {
+
+                                Column(
+                                    modifier = Modifier.weight(1f),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Bottom
+                                ) {
+                                    Text(
+                                        text = stringResource(id = R.string.UpdatePassword),
+                                        color = ItemColor,
+                                        fontSize = 20.sp,
+                                        modifier = Modifier.clickable {
+                                            val userInputEmail = auth.currentUser?.email.toString()
+                                            var userInputError = false
+                                            //按下按鈕後的操作
+                                            //檢查輸入
+
+                                            if (userInputEmail.isEmpty() || userInputEmail.isBlank() || checkEmail(
+                                                    userInputEmail
+                                                )
+                                            ) {
+                                                userInputError = true
+                                            } else {
+                                                //寄送密碼重設郵件
+                                                Firebase.auth.sendPasswordResetEmail(userInputEmail)
+                                                    .addOnCompleteListener { task ->
+                                                        //寄送成功
+                                                        if (task.isSuccessful) {
+                                                            showDialog = true
+                                                        } else {
+                                                            Log.d("HIIIIIIII", "msg")
+                                                            userInputError = true
+                                                        }
+                                                    }
+                                            }
+
+                                        }
+                                    )
+                                }
+                            }
                         }
-                    )
+                    }
                 }
             }
         }
     }
-    resetPassword(
-        showDialog = showDialog,
-        onDismissRequest = { showDialog = false },
-        title_num = R.string.forget_email_success,
-        artical_num = R.string.forget_email_success_artical
-    ){
 
-    }
+        resetPassword(
+            showDialog = showDialog,
+            onDismissRequest = {
+                showDialog = false
+                accc = false
+            },
+            title_num = R.string.forget_email_success,
+            artical_num = R.string.forget_email_success_artical
+        ) {
+
+        }
 }
+
 //檢查電子郵件格式
 private fun checkEmail(email: String = ""): Boolean {
     return !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
@@ -1117,7 +1172,7 @@ fun resetPassword(
                         .pointerInput(Unit) { detectTapGestures { } }
                         .shadow(8.dp, shape = RoundedCornerShape(16.dp))
                         .width(330.dp)
-                        .height(370.dp)
+                        .height(350.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .background(
                             MaterialTheme.colorScheme.surface,
@@ -1177,7 +1232,7 @@ fun resetPassword(
                                         start = 20.dp,
                                         end = 20.dp,
                                         top = 20.dp,
-                                        bottom = 150.dp
+                                        bottom = 100.dp
                                     ),
                                 textAlign = TextAlign.Center
                             )

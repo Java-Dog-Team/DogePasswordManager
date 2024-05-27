@@ -849,7 +849,7 @@ fun CustomDialog(
                                                     title = R.string.forget_email_success
                                                     artical = R.string.forget_email_success_artical
                                                     title_top_padding = 70
-                                                    artical_buttom_padding = 150
+                                                    artical_buttom_padding = 100
                                                     read = true
                                                     aph=0f
                                                 } else {
