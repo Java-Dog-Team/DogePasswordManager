@@ -52,6 +52,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -76,6 +77,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -596,6 +598,9 @@ fun passwordRoom(
 fun settingPage(context: Context) {
     var showDialog by remember { mutableStateOf(false) }
     var acc by remember { mutableStateOf(false) }
+    var delete_account by remember { mutableStateOf(false) }
+    var show_delete_account by remember { mutableStateOf(false) }
+
     val albumlist = ArrayList<Int>()
 
     val language = (R.string.language)
@@ -644,6 +649,8 @@ fun settingPage(context: Context) {
                             showDialog = true
                         else if (item == account)
                             acc = true
+                        else if(item == deleteAccount)
+                            show_delete_account = true
                         chooseItem = item
                         Click(chooseItem, context)
                     }
@@ -730,6 +737,15 @@ fun settingPage(context: Context) {
         context = context){
 
     }
+    deleteAccountCheck(
+        show_delete_account = show_delete_account,
+        delete_account = delete_account,
+        onDismissRequest = {show_delete_account = false},
+        callDeleteAccount = {
+            show_delete_account = false
+            deleteAccount(context)},
+        context = context
+    ){}
 
     if (chooseItem == R.string.teach) {
 
@@ -741,45 +757,46 @@ fun Click(chooseItem: Int, context: Context){
     val activity=context as Activity
     //    點選刪除帳號
     if (chooseItem == R.string.deleteAccount) {
-        //  設定彈跳視窗
-        val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
-        val p: String = context.resources.getString(R.string.deletePositiveButton)
-        val n: String = context.resources.getString(R.string.deleteNeutralButton)
-        alertDialog.setTitle(R.string.deleteTitle)
-        alertDialog.setPositiveButton(
-//          設定字體顏色
-            Html.fromHtml("<font color='#8080802'>" + p + "</font>")
-        ) { dialog, which ->
 
-        };
-        alertDialog.setNeutralButton(
-//          設定字體顏色
-
-            Html.fromHtml("<font color='#FF0000'>" + n + "</font>")
-        ) { dialog, which ->
-
-            //          設定 click 事件
-            deleteAccount(context)
-
-        }
-//      讓使用者可以點視窗以外的灰色部分回到上一頁
-        alertDialog.setCancelable(true)
-//      顯示彈跳視窗
-        alertDialog.show()
-    } else if (chooseItem == R.string.logout) {
-        activity.finish()
-        val intent = Intent()
-        intent.setClass(activity, MainActivity::class.java)
-        //開啟登入頁面
-        activity.startActivity(
-            intent, ActivityOptions.makeCustomAnimation(
-                activity,
-                androidx.appcompat.R.anim.abc_slide_in_bottom,
-                androidx.appcompat.R.anim.abc_popup_exit
-            ).toBundle()
-        )
-        //關閉頁面
-        activity.finish()
+//        //  設定彈跳視窗
+//        val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
+//        val p: String = context.resources.getString(R.string.deletePositiveButton)
+//        val n: String = context.resources.getString(R.string.deleteNeutralButton)
+//        alertDialog.setTitle(R.string.deleteTitle)
+//        alertDialog.setPositiveButton(
+////          設定字體顏色
+//            Html.fromHtml("<font color='#8080802'>" + p + "</font>")
+//        ) { dialog, which ->
+//
+//        };
+//        alertDialog.setNeutralButton(
+////          設定字體顏色
+//
+//            Html.fromHtml("<font color='#FF0000'>" + n + "</font>")
+//        ) { dialog, which ->
+//
+//            //          設定 click 事件
+//            deleteAccount(context)
+//
+//        }
+////      讓使用者可以點視窗以外的灰色部分回到上一頁
+//        alertDialog.setCancelable(true)
+////      顯示彈跳視窗
+//        alertDialog.show()
+//    } else if (chooseItem == R.string.logout) {
+//        activity.finish()
+//        val intent = Intent()
+//        intent.setClass(activity, MainActivity::class.java)
+//        //開啟登入頁面
+//        activity.startActivity(
+//            intent, ActivityOptions.makeCustomAnimation(
+//                activity,
+//                androidx.appcompat.R.anim.abc_slide_in_bottom,
+//                androidx.appcompat.R.anim.abc_popup_exit
+//            ).toBundle()
+//        )
+//        //關閉頁面
+//        activity.finish()
     }
 }
 @OptIn(ExperimentalMaterial3Api::class)
@@ -1217,7 +1234,7 @@ fun resetPassword(
                             // 添加標題
                             Text(
                                 text = stringResource(title_num),
-                                color = Color(237, 197, 49),
+                                color = ItemColor,
                                 fontSize = 30.sp,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.padding(top = 70.dp)
@@ -1247,6 +1264,45 @@ fun resetPassword(
     }
 }
 
+@Composable
+fun deleteAccountCheck(
+    show_delete_account:Boolean,
+    delete_account:Boolean,
+    onDismissRequest: () -> Unit,
+    callDeleteAccount: () -> Unit,
+    context: Context,
+    content: @Composable () -> Unit
+){
+    //點選刪除帳號按鈕
+    if (show_delete_account) {
+        AlertDialog(
+            title = {
+                Text(
+                    text = stringResource(id = R.string.deleteTitle),
+                    fontSize = 25.sp
+                )
+            },
+            onDismissRequest = onDismissRequest,
+            confirmButton = {
+                TextButton(
+                    onClick = callDeleteAccount
+                ) {
+                    Text(stringResource(id = R.string.deleteNeutralButton),
+                        color = BrickRed)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = onDismissRequest
+                ) {
+                    Text(stringResource(id = R.string.deletePositiveButton),
+                        color = Color.Gray)
+                }
+            },
+            containerColor = Color(255, 255, 255)
+        )
+    }
+}
 fun deleteAccount(context: Context) {
     var activity: Activity = context as Activity
     //    取得目前登入的用戶
@@ -1254,6 +1310,7 @@ fun deleteAccount(context: Context) {
 
 //      讀取存放資料的 database
     val db = Firebase.firestore
+
 
 
     //      刪除使用者的所有資料

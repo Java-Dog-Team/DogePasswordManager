@@ -256,11 +256,11 @@ fun loginPage(context: Context) {
                         },
                         colors = OutlinedTextFieldDefaults.colors(
                             unfocusedTextColor = Color(0, 0, 0),
-                            unfocusedBorderColor = ItemColor,
-                            unfocusedLabelColor = ItemColor,
+                            unfocusedBorderColor = Color(235, 195, 18),
+                            unfocusedLabelColor = Color(235, 195, 18),
                             focusedTextColor = Color(0, 0, 0),
-                            focusedBorderColor = ItemColor,
-                            focusedLabelColor = ItemColor
+                            focusedBorderColor = Color(235, 195, 18),
+                            focusedLabelColor = Color(235, 195, 18)
                         ),
                         shape = RoundedCornerShape(20.dp),
                         modifier = Modifier.width(275.dp)
@@ -290,7 +290,7 @@ fun loginPage(context: Context) {
                                             .clickable() {
                                                 passwordVisible.value = !passwordVisible.value
                                             },
-                                        tint=ItemColor
+                                        tint=Color(235, 195, 18)
                                     )
                                 } else {
                                     Icon(
@@ -301,7 +301,7 @@ fun loginPage(context: Context) {
                                             .clickable() {
                                                 passwordVisible.value = !passwordVisible.value
                                             },
-                                        tint=ItemColor
+                                        tint=Color(235, 195, 18)
                                     )
                                 }
                             },
@@ -326,11 +326,11 @@ fun loginPage(context: Context) {
 
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedTextColor = Color(0, 0, 0),
-                                unfocusedBorderColor = ItemColor,
-                                unfocusedLabelColor = ItemColor,
+                                unfocusedBorderColor = Color(235, 195, 18),
+                                unfocusedLabelColor = Color(235, 195, 18),
                                 focusedTextColor = Color(0, 0, 0),
-                                focusedBorderColor = ItemColor,
-                                focusedLabelColor = ItemColor
+                                focusedBorderColor = Color(235, 195, 18),
+                                focusedLabelColor = Color(235, 195, 18)
                             ),
                             shape = RoundedCornerShape(20.dp),
                             modifier = Modifier
@@ -376,7 +376,7 @@ fun loginPage(context: Context) {
                         .width(275.dp)
                         .padding(top = 20.dp),
                         shape = RoundedCornerShape(20.dp),
-                        colors = ButtonDefaults.buttonColors(ItemColor),
+                        colors = ButtonDefaults.buttonColors(Color(235, 195, 18)),
                         onClick = {
                             //按下登入按鈕後的操作
                             //檢查帳密是否有誤 有誤:顯示錯誤文字
@@ -755,7 +755,7 @@ fun CustomDialog(
                                         Icon(
                                             imageVector = Icons.Filled.Close,
                                             contentDescription = "Localized description",
-                                            tint= ItemColor,
+                                            tint= Color(235, 195, 18),
                                             modifier = Modifier
                                                 .width(50.dp)
                                                 .height(50.dp)
@@ -814,11 +814,11 @@ fun CustomDialog(
                                 },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     unfocusedTextColor = Color(0, 0, 0),
-                                    unfocusedBorderColor = ItemColor,
-                                    unfocusedLabelColor = ItemColor,
+                                    unfocusedBorderColor = Color(235, 195, 18),
+                                    unfocusedLabelColor = Color(235, 195, 18),
                                     focusedTextColor = Color(0, 0, 0),
-                                    focusedBorderColor = ItemColor,
-                                    focusedLabelColor = ItemColor
+                                    focusedBorderColor = Color(235, 195, 18),
+                                    focusedLabelColor = Color(235, 195, 18)
                                 ),
                                 shape = RoundedCornerShape(20.dp),
                                 singleLine = true,
@@ -863,7 +863,7 @@ fun CustomDialog(
                                     .padding(top = 15.dp)
                                     .alpha(aph),
                                 shape = RoundedCornerShape(20.dp),
-                                colors = ButtonDefaults.buttonColors(ItemColor),
+                                colors = ButtonDefaults.buttonColors(Color(235, 195, 18)),
                             ) {
                                 Text(text = stringResource(id=R.string.forget_send_reset_password_email_button))
                             }

@@ -74,7 +74,7 @@ fun checkEmailPage(context: Context) {
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = "Localized description",
-                            tint= ItemColor,
+                            tint= Color(235, 195, 18),
                             modifier = Modifier
                                 .width(50.dp)
                                 .height(50.dp)

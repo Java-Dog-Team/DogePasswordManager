@@ -548,7 +548,7 @@ fun AddRecordPage(context: Context) {
                                             color = Color.Gray)
                                     }
                                 },
-                                containerColor = Color(253, 248, 225)
+                                containerColor = Color(255, 255, 255)
                             )
                         }
 
