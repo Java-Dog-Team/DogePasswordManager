@@ -68,6 +68,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
@@ -182,7 +183,8 @@ class MainPage : ComponentActivity() {
                     horizontalArrangement = Arrangement.Center
                 ) {
                     CircularProgressIndicator(
-                        modifier = Modifier.width(64.dp)
+                        modifier = Modifier.width(64.dp),
+                        color = ItemColor
                     )
                 }
 
@@ -607,14 +609,12 @@ fun settingPage(context: Context) {
     val language = (R.string.language)
     val theme = (R.string.theme)
     val account = (R.string.account)
-    val document = (R.string.teach)
     val logout = (R.string.logout)
     val deleteAccount = (R.string.deleteAccount)
     val biometricAuthentication = R.string.biometricAuthentication
     albumlist.add(theme)
     albumlist.add(account)
     albumlist.add(biometricAuthentication)
-    albumlist.add(document)
     albumlist.add(logout)
     albumlist.add(deleteAccount)
 
@@ -686,7 +686,12 @@ fun settingPage(context: Context) {
                                     editor.commit()
                                 },
                                 modifier = Modifier.padding(23.dp),
-                                colors = SwitchDefaults.colors(ItemColor)
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.White,
+                                    checkedTrackColor = ItemColor,
+                                    uncheckedThumbColor = Color.LightGray,
+                                    uncheckedTrackColor = Color.DarkGray,
+                                )
                             )
                         }
                     } else {
@@ -762,10 +767,6 @@ fun settingPage(context: Context) {
         },
         context = context
     ){}
-
-    if (chooseItem == R.string.teach) {
-
-    }
 
 }
 
