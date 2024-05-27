@@ -1010,7 +1010,7 @@ fun accountInformation(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(start = 5.dp, end = 5.dp, top = 50.dp, bottom = 10.dp),
+                                    .padding(start = 20.dp, end = 20.dp, top = 50.dp, bottom = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
 
