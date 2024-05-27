@@ -1253,19 +1253,20 @@ fun logoutAccountCheck(
             },
             onDismissRequest = onDismissRequest,
             confirmButton = {
-                TextButton(
-                    onClick = calllogoutAccount
-                ) {
-                    Text(stringResource(id = R.string.logoutNeutralButton),
-                        color = BrickRed)
-                }
-            },
-            dismissButton = {
+
                 TextButton(
                     onClick = onDismissRequest
                 ) {
                     Text(stringResource(id = R.string.logoutPositiveButton),
                         color = Color.Gray)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = calllogoutAccount
+                ) {
+                    Text(stringResource(id = R.string.logoutNeutralButton),
+                        color = BrickRed)
                 }
             },
             containerColor = Color(255, 255, 255)
@@ -1292,19 +1293,20 @@ fun deleteAccountCheck(
             },
             onDismissRequest = onDismissRequest,
             confirmButton = {
-                TextButton(
-                    onClick = callDeleteAccount
-                ) {
-                    Text(stringResource(id = R.string.deleteNeutralButton),
-                        color = BrickRed)
-                }
-            },
-            dismissButton = {
+
                 TextButton(
                     onClick = onDismissRequest
                 ) {
                     Text(stringResource(id = R.string.deletePositiveButton),
                         color = Color.Gray)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = callDeleteAccount
+                ) {
+                    Text(stringResource(id = R.string.deleteNeutralButton),
+                        color = BrickRed)
                 }
             },
             containerColor = Color(255, 255, 255)
