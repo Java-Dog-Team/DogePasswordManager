@@ -96,6 +96,10 @@
     <string name="deleteTitle">Do you want to delete this account?</string>
     <string name="deletePositiveButton">Cancel</string>
     <string name="deleteNeutralButton">Delete</string>
+    <!--  logoutAlert  -->
+    <string name="logoutTitle">Do you want to logout?</string>
+    <string name="logoutPositiveButton">Cancel</string>
+    <string name="logoutNeutralButton">Logout</string>
     <!--  checkEmailPage  -->
     <string name="checkEmailTitle">Check your email box</string>
     <string name="checkEmailArtical">Cilck the link we just sent to complete your account setup.</string>

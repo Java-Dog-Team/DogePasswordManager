@@ -600,7 +600,7 @@ fun settingPage(context: Context) {
     var acc by remember { mutableStateOf(false) }
     var delete_account by remember { mutableStateOf(false) }
     var show_delete_account by remember { mutableStateOf(false) }
-
+    var show_logout_account by remember { mutableStateOf(false) }
     val albumlist = ArrayList<Int>()
 
     val language = (R.string.language)
@@ -651,8 +651,8 @@ fun settingPage(context: Context) {
                             acc = true
                         else if(item == deleteAccount)
                             show_delete_account = true
-                        chooseItem = item
-                        Click(chooseItem, context)
+                        else if(item == logout)
+                            show_logout_account = true
                     }
                     .padding(vertical = 4.dp, horizontal = 8.dp)
                     .height(85.dp)
@@ -746,6 +746,21 @@ fun settingPage(context: Context) {
             deleteAccount(context)},
         context = context
     ){}
+    logoutAccountCheck(
+        show_logout_account = show_logout_account,
+        onDismissRequest = {show_logout_account = false},
+        calllogoutAccount = {
+            show_logout_account = false
+            val intent = Intent()
+            intent.setClass(
+                context,
+                MainActivity::class.java
+            )
+            context.startActivity(intent)
+            activity.finish()
+        },
+        context = context
+    ){}
 
     if (chooseItem == R.string.teach) {
 
@@ -753,52 +768,6 @@ fun settingPage(context: Context) {
 
 }
 
-fun Click(chooseItem: Int, context: Context){
-    val activity=context as Activity
-    //    點選刪除帳號
-    if (chooseItem == R.string.deleteAccount) {
-
-//        //  設定彈跳視窗
-//        val alertDialog: AlertDialog.Builder = AlertDialog.Builder(context)
-//        val p: String = context.resources.getString(R.string.deletePositiveButton)
-//        val n: String = context.resources.getString(R.string.deleteNeutralButton)
-//        alertDialog.setTitle(R.string.deleteTitle)
-//        alertDialog.setPositiveButton(
-////          設定字體顏色
-//            Html.fromHtml("<font color='#8080802'>" + p + "</font>")
-//        ) { dialog, which ->
-//
-//        };
-//        alertDialog.setNeutralButton(
-////          設定字體顏色
-//
-//            Html.fromHtml("<font color='#FF0000'>" + n + "</font>")
-//        ) { dialog, which ->
-//
-//            //          設定 click 事件
-//            deleteAccount(context)
-//
-//        }
-////      讓使用者可以點視窗以外的灰色部分回到上一頁
-//        alertDialog.setCancelable(true)
-////      顯示彈跳視窗
-//        alertDialog.show()
-//    } else if (chooseItem == R.string.logout) {
-//        activity.finish()
-//        val intent = Intent()
-//        intent.setClass(activity, MainActivity::class.java)
-//        //開啟登入頁面
-//        activity.startActivity(
-//            intent, ActivityOptions.makeCustomAnimation(
-//                activity,
-//                androidx.appcompat.R.anim.abc_slide_in_bottom,
-//                androidx.appcompat.R.anim.abc_popup_exit
-//            ).toBundle()
-//        )
-//        //關閉頁面
-//        activity.finish()
-    }
-}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomDialog(
@@ -1263,7 +1232,44 @@ fun resetPassword(
         }
     }
 }
-
+@Composable
+fun logoutAccountCheck(
+    show_logout_account:Boolean,
+    onDismissRequest: () -> Unit,
+    calllogoutAccount: () -> Unit,
+    context: Context,
+    content: @Composable () -> Unit
+){
+    //點選登出帳號按鈕
+    if (show_logout_account) {
+        AlertDialog(
+            title = {
+                Text(
+                    text = stringResource(id = R.string.logoutTitle),
+                    fontSize = 25.sp
+                )
+            },
+            onDismissRequest = onDismissRequest,
+            confirmButton = {
+                TextButton(
+                    onClick = calllogoutAccount
+                ) {
+                    Text(stringResource(id = R.string.logoutNeutralButton),
+                        color = BrickRed)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = onDismissRequest
+                ) {
+                    Text(stringResource(id = R.string.logoutPositiveButton),
+                        color = Color.Gray)
+                }
+            },
+            containerColor = Color(255, 255, 255)
+        )
+    }
+}
 @Composable
 fun deleteAccountCheck(
     show_delete_account:Boolean,
