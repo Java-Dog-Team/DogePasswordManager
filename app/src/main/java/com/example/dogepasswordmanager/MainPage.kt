@@ -583,7 +583,8 @@ fun passwordRoom(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     CircularProgressIndicator(
-                        modifier = Modifier.width(64.dp)
+                        modifier = Modifier.width(64.dp),
+                        color = ItemColor
                     )
                 }
 
